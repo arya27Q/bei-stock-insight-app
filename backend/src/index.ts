@@ -1,20 +1,31 @@
-import express from "express";
-import cors from "cors";
+import express, { Request, Response } from "express";
 import dotenv from "dotenv";
+import { corsMiddleware } from "./config/cors.js";
+import { apiRouter } from "./routes/index.js";
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = Number(process.env.PORT) || 5000;
 
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.disable("x-powered-by");
+app.use(corsMiddleware);
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.get("/api/health", (_req, res) => {
-  res.json({ status: "success", message: "API Server running smoothly" });
+// Rute API terpusat di bawah prefix /api
+app.use("/api", apiRouter);
+
+// Fallback route 404 untuk API
+app.use((_req: Request, res: Response) => {
+  res.status(404).json({
+    status: "error",
+    message: "Endpoint tidak ditemukan di BEI Stock Insight API.",
+  });
 });
 
 app.listen(PORT, () => {
-  console.log(`?? Backend server ready at: http://localhost:${PORT}`);
+  console.log(`BEI Stock Insight API server running at http://localhost:${PORT}`);
+  console.log(`Health check ready at: http://localhost:${PORT}/api/health`);
+  console.log(`Stocks endpoint ready at: http://localhost:${PORT}/api/stocks`);
 });
-

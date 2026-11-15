@@ -1,69 +1,234 @@
-import Image from "next/image";
+"use client";
+
+import React from "react";
+import { Sidebar } from "../components/layout/Sidebar";
+import { RightAiPanel } from "../components/layout/RightAiPanel";
+import { MarketOverviewRow } from "../components/modules/MarketOverviewRow";
+import { StockMap } from "../components/modules/StockMap";
+import { StockScreener } from "../components/modules/StockScreener";
+import { SectorBenchmark } from "../components/modules/SectorBenchmark";
+import { StockFundamental } from "../types/stock";
+import { useStocks, useStockSearch, useDashboardLayout } from "../hooks";
+import {
+  Search,
+  Menu,
+  MessageSquare,
+  PanelLeftClose,
+  PanelLeftOpen,
+  PanelRightClose,
+  PanelRightOpen,
+} from "lucide-react";
 
 export default function Home() {
+  const { stocks } = useStocks();
+  const {
+    searchQuery,
+    searchResults,
+    isSearching,
+    handleSearchChange,
+    clearSearch,
+  } = useStockSearch(stocks);
+
+  const {
+    activeTab,
+    setActiveTab,
+    selectedStock,
+    selectStock,
+    clearSelectedStock,
+    benchmarkSector,
+    navigateToBenchmark,
+    isSidebarCollapsed,
+    setIsSidebarCollapsed,
+    toggleSidebar,
+    isMobileSidebarOpen,
+    setIsMobileSidebarOpen,
+    isRightAiOpen,
+    setIsRightAiOpen,
+    toggleRightAi,
+    openGeneralAi,
+    getTabTitle,
+  } = useDashboardLayout();
+
+  const handleSelectFromSearch = (stock: StockFundamental) => {
+    selectStock(stock);
+    clearSearch();
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="min-h-screen bg-slate-100 font-sans text-zinc-900 dark:bg-[#16171f] dark:text-zinc-100 flex">
+      {/* 1. Left Sidebar Navigation (Bisa Buka/Tutup + Lekukan S-Curve Cutout) */}
+      <Sidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        isAiPanelOpen={isRightAiOpen}
+        setIsAiPanelOpen={setIsRightAiOpen}
+        isMobileOpen={isMobileSidebarOpen}
+        setIsMobileOpen={setIsMobileSidebarOpen}
+        isCollapsed={isSidebarCollapsed}
+        setIsCollapsed={setIsSidebarCollapsed}
+        onOpenGeneralAi={openGeneralAi}
+      />
+
+      {/* 2. Main Shell Frame */}
+      <div
+        className={`flex-1 min-w-0 flex flex-col justify-between transition-all duration-200 ${
+          isSidebarCollapsed ? "lg:pl-20" : "lg:pl-60"
+        } ${isRightAiOpen ? "lg:pr-[360px] 2xl:pr-[400px]" : ""}`}
+      >
+        {/* Top Header */}
+        <header className="sticky top-0 z-30 flex h-20 items-center justify-between gap-3 bg-white px-4 sm:px-6 dark:bg-[#16171f]">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            {/* Tombol Buka Menu Mobile */}
+            <button
+              onClick={() => setIsMobileSidebarOpen(true)}
+              className="rounded-xl p-2 text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800 lg:hidden shrink-0 cursor-pointer"
+              aria-label="Buka Menu"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              <Menu className="h-5 w-5" aria-hidden="true" />
+            </button>
+
+            {/* Tombol Buka/Tutup Sidebar Desktop */}
+            <button
+              onClick={toggleSidebar}
+              className="hidden lg:flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-[#1e2029] dark:text-zinc-300 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+              title={isSidebarCollapsed ? "Buka Sidebar" : "Tutup Sidebar"}
+              aria-label={isSidebarCollapsed ? "Buka Sidebar" : "Tutup Sidebar"}
             >
-              Learning
-            </a>{" "}
-            center.
+              {isSidebarCollapsed ? (
+                <PanelLeftOpen className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <PanelLeftClose className="h-4 w-4" aria-hidden="true" />
+              )}
+            </button>
+
+            {/* Search Input */}
+            <div className="relative w-full max-w-sm">
+              <label htmlFor="top-search-input" className="sr-only">
+                Cari kode atau nama emiten
+              </label>
+              <input
+                id="top-search-input"
+                type="text"
+                placeholder="Cari emiten (BBCA, BBRI, TLKM)..."
+                value={searchQuery}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="w-full rounded-xl border border-transparent bg-zinc-100/80 pl-4 pr-10 py-2 text-xs sm:text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-700 focus:bg-white focus:outline-none dark:bg-[#1e2029] dark:text-zinc-100 dark:placeholder:text-zinc-400 dark:focus:bg-[#1e2029]"
+              />
+              <Search
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400"
+                aria-hidden="true"
+              />
+
+              {/* Autocomplete Dropdown (Tanpa #) */}
+              {isSearching && (
+                <div className="absolute left-0 right-0 top-11 z-40 max-h-64 overflow-y-auto rounded-2xl border border-zinc-200 bg-white p-1.5 shadow-xl dark:border-zinc-800 dark:bg-[#16171f] text-left">
+                  {searchResults.length === 0 ? (
+                    <div className="p-3 text-center text-xs text-zinc-400">
+                      Emiten tidak ditemukan.
+                    </div>
+                  ) : (
+                    searchResults.map((s) => (
+                      <button
+                        key={s.ticker}
+                        onClick={() => handleSelectFromSearch(s)}
+                        className="w-full flex items-center justify-between rounded-xl p-2.5 hover:bg-zinc-100 dark:hover:bg-zinc-800/70 text-left cursor-pointer"
+                      >
+                        <span className="text-xs font-bold text-zinc-950 dark:text-zinc-100">
+                          {s.ticker}
+                        </span>
+                        <span className="text-xs text-zinc-400 truncate max-w-[140px]">
+                          {s.name}
+                        </span>
+                        <span className="text-[11px] font-semibold text-emerald-500 tabular-nums">
+                          {s.marketCapLabel}
+                        </span>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Kanan: Judul Fitur Aktif & Tombol Buka/Tutup Panel AI */}
+          <div className="flex items-center gap-3 shrink-0">
+            <span className="hidden xl:inline text-xs font-semibold text-zinc-400">
+              {getTabTitle()}
+            </span>
+
+            <button
+              onClick={toggleRightAi}
+              className={`flex h-10 items-center gap-2 rounded-xl px-3.5 text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer ${
+                isRightAiOpen
+                  ? "bg-emerald-600 text-white shadow-xs"
+                  : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-[#1e2029] dark:text-zinc-200 dark:hover:bg-zinc-800"
+              }`}
+              aria-expanded={isRightAiOpen}
+              aria-label="Buka atau tutup panel Penjelasan AI dan Profil Emiten"
+            >
+              <MessageSquare className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              <span className="hidden sm:inline">
+                {isRightAiOpen ? "Tutup Panel AI" : "Buka Panel AI"}
+              </span>
+              {isRightAiOpen ? (
+                <PanelRightClose className="h-3.5 w-3.5 opacity-80 shrink-0" aria-hidden="true" />
+              ) : (
+                <PanelRightOpen className="h-3.5 w-3.5 opacity-80 shrink-0" aria-hidden="true" />
+              )}
+            </button>
+          </div>
+        </header>
+
+        {/* Kanvas Utama Dalam (#0d0e13 dengan Sudut Kiri Atas Melengkung Menyatu dengan Cutout Sidebar) */}
+        <main className="@container flex-1 rounded-tl-[28px] bg-slate-50 dark:bg-[#0d0e13] px-4 py-6 sm:px-6 lg:px-7">
+          <div className="mx-auto max-w-7xl">
+            {/* Ringkasan Pasar 2-Grid Ringkas (Tanpa Animasi 3D) */}
+            <MarketOverviewRow stocks={stocks} />
+
+            {/* 5 Fitur Utama Sesuai Dokumentasi Sistem */}
+            {activeTab === "map" && (
+              <StockMap
+                stocks={stocks}
+                onSelectStock={selectStock}
+              />
+            )}
+
+            {activeTab === "screener" && (
+              <StockScreener
+                stocks={stocks}
+                onSelectStock={selectStock}
+              />
+            )}
+
+            {activeTab === "benchmark" && (
+              <SectorBenchmark
+                stocks={stocks}
+                onSelectStock={selectStock}
+                initialSector={benchmarkSector}
+              />
+            )}
+          </div>
+        </main>
+
+        {/* Footer */}
+        <footer className="bg-slate-50 dark:bg-[#0d0e13] border-t border-zinc-200/70 dark:border-zinc-800/60 py-4 px-4 sm:px-6 lg:px-7 text-xs text-zinc-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <p>© 2026 BEI Stock Insight: Riset Fundamental Saham Bursa Efek Indonesia.</p>
+          <p className="text-zinc-400">
+            Data laporan keuangan publik BEI disajikan untuk analisis edukasi mandiri.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+        </footer>
+      </div>
+
+      {/* 3. Right Panel: 03. Company Fundamental Profile & 05. AI Fundamental Explanation */}
+      <RightAiPanel
+        stock={selectedStock}
+        isOpen={isRightAiOpen}
+        onClose={() => setIsRightAiOpen(false)}
+        onClearStock={clearSelectedStock}
+        onSelectStock={selectStock}
+        onNavigateToBenchmark={navigateToBenchmark}
+        stocks={stocks}
+      />
     </div>
   );
 }
