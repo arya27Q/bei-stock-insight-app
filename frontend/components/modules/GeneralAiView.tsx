@@ -72,24 +72,26 @@ export const GeneralAiView: React.FC<GeneralAiViewProps> = ({
         </div>
       </div>
 
-      {/* Quick Stock Shortcuts */}
+      {/* Quick Stock Shortcuts (Tanpa Truncate) */}
       <div>
-        <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1.5">
+        <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-2">
           Pilih Cepat Emiten Unggulan:
         </span>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2.5">
           {stocks.slice(0, 4).map((s) => (
             <button
               key={s.ticker}
               onClick={() => onSelectStock(s)}
-              className="rounded-lg border border-zinc-200 bg-white p-2 text-left hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+              className="rounded-xl border border-zinc-200 bg-white p-3 text-left hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800 transition-colors cursor-pointer flex flex-col justify-between"
             >
-              <div className="flex items-center gap-1.5">
-                <Avatar ticker={s.ticker} sector={s.sector} size="sm" />
-                <span className="text-xs font-bold text-zinc-950 dark:text-zinc-50">{s.ticker}</span>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <Avatar ticker={s.ticker} sector={s.sector} size="sm" />
+                  <span className="text-xs font-bold text-zinc-950 dark:text-zinc-50">{s.ticker}</span>
+                </div>
+                <div className="text-[11px] text-zinc-500 leading-snug mt-1.5">{s.name}</div>
               </div>
-              <div className="text-[11px] text-zinc-500 truncate mt-1">{s.name}</div>
-              <div className="text-[10px] text-[rgba(52,184,150,0.95)] font-semibold mt-0.5">
+              <div className="text-[10px] text-[rgba(52,184,150,0.95)] font-semibold mt-2">
                 ROE: {s.roe}% • PER: {s.per}x
               </div>
             </button>

@@ -103,7 +103,7 @@ export const DropdownSelect: React.FC<DropdownSelectProps> = ({
           buttonClassName
         )}
       >
-        <span className="flex items-center gap-2 truncate">
+        <span className="flex items-center gap-2">
           {selectedOption?.dotColor && (
             <span
               className={cn(
@@ -113,7 +113,7 @@ export const DropdownSelect: React.FC<DropdownSelectProps> = ({
               aria-hidden="true"
             />
           )}
-          <span className="truncate">{selectedOption?.label}</span>
+          <span>{selectedOption?.label}</span>
         </span>
         <ChevronDown
           className={cn(
@@ -129,7 +129,7 @@ export const DropdownSelect: React.FC<DropdownSelectProps> = ({
           role="listbox"
           aria-label={ariaLabel}
           className={cn(
-            "absolute top-full z-50 mt-1.5 min-w-[220px] w-full overflow-hidden rounded-xl border border-zinc-200 bg-white/95 p-1.5 shadow-2xl backdrop-blur-md dark:border-zinc-700/80 dark:bg-[#161822]/95",
+            "absolute top-full z-50 mt-1.5 min-w-[240px] w-max max-w-[320px] overflow-hidden rounded-xl border border-zinc-200 bg-white/95 p-1.5 shadow-2xl backdrop-blur-md dark:border-zinc-700/80 dark:bg-[#161822]/95",
             align === "right" ? "right-0" : "left-0"
           )}
         >
@@ -147,13 +147,13 @@ export const DropdownSelect: React.FC<DropdownSelectProps> = ({
                     setIsOpen(false);
                   }}
                   className={cn(
-                    "flex w-full items-center justify-between gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs transition-colors cursor-pointer",
+                    "flex w-full items-center justify-between gap-3 rounded-lg px-2.5 py-2 text-left text-xs transition-colors cursor-pointer whitespace-nowrap",
                     isSelected
                       ? "bg-zinc-100 font-semibold text-zinc-950 dark:bg-[#222531] dark:text-white"
                       : "font-medium text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 dark:text-zinc-300 dark:hover:bg-[#1c1e28] dark:hover:text-white"
                   )}
                 >
-                  <span className="flex items-center gap-2 truncate">
+                  <span className="flex items-center gap-2">
                     {opt.dotColor && (
                       <span
                         className={cn(
@@ -163,7 +163,7 @@ export const DropdownSelect: React.FC<DropdownSelectProps> = ({
                         aria-hidden="true"
                       />
                     )}
-                    <span className="truncate">{opt.label}</span>
+                    <span>{opt.label}</span>
                   </span>
                   {isSelected && (
                     <Check

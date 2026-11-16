@@ -509,7 +509,7 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
           <input
             id="stock-chat-input"
             type="text"
-            placeholder={`Tanya analisis ${stock.ticker} di sini...`}
+            placeholder={`Tanya ${stock.ticker} (misal: valuasi murah/mahal?)...`}
             value={stockInput}
             onChange={(e) => setStockInput(e.target.value)}
             disabled={isStockSending}

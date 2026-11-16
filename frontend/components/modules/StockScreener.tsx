@@ -166,21 +166,21 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
 
         {/* Kontrol Kanan: Stepper Sektor + Tombol Filter + Tombol Export */}
         <div className="flex flex-wrap items-center gap-2 shrink-0">
-          {/* Stepper Sektor (< Semua Sektor >) */}
-          <div className="inline-flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-2 py-1.5 text-xs sm:text-sm font-semibold text-zinc-800 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 min-w-[190px]">
+          {/* Stepper Sektor (< Semua Sektor >) Tanpa Truncate */}
+          <div className="inline-flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-2.5 py-1.5 text-xs sm:text-sm font-semibold text-zinc-800 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 min-w-[235px]">
             <button
               onClick={() => cycleSector("prev")}
-              className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 cursor-pointer"
+              className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 cursor-pointer shrink-0"
               aria-label="Sektor sebelumnya"
             >
               <ChevronLeft className="h-4 w-4" aria-hidden="true" />
             </button>
-            <span className="px-2 truncate max-w-[130px] text-center">
+            <span className="px-2.5 whitespace-nowrap text-center">
               {selectedSector === "all" ? "Semua Sektor" : selectedSector}
             </span>
             <button
               onClick={() => cycleSector("next")}
-              className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 cursor-pointer"
+              className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 cursor-pointer shrink-0"
               aria-label="Sektor berikutnya"
             >
               <ChevronRight className="h-4 w-4" aria-hidden="true" />
@@ -339,13 +339,13 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
                       >
                         {/* Kolom 1: Avatar Lingkaran Solid + Nama Perusahaan */}
                         <td className="py-3.5 px-5">
-                          <div className="flex items-center gap-3 min-w-[180px]">
+                          <div className="flex items-center gap-3 min-w-[220px]">
                             <Avatar ticker={stock.ticker} sector={stock.sector} size="md" />
                             <div className="min-w-0">
-                              <span className="font-medium group-hover:font-semibold text-zinc-900 dark:text-zinc-100 truncate block">
+                              <span className="font-medium group-hover:font-semibold text-zinc-900 dark:text-zinc-100 leading-snug block">
                                 {stock.name}
                               </span>
-                              <span className="text-[11px] text-zinc-400 dark:text-zinc-500 block truncate">
+                              <span className="text-[11px] text-zinc-400 dark:text-zinc-500 block leading-snug">
                                 {stock.subSector} • {stock.period}
                               </span>
                             </div>
@@ -464,7 +464,7 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
         </div>
       ) : (
         /* 3B. TAMPILAN KARTU GRID (Saat Pengguna Mengklik Ikon Grid di Sebelah Judul) */
-        <div className="grid grid-cols-1 @sm:grid-cols-2 @3xl:grid-cols-3 gap-3.5">
+        <div className="grid grid-cols-1 @md:grid-cols-2 @4xl:grid-cols-3 gap-4">
           {filteredStocks.map((stock) => {
             const status = getFundamentalStatus(stock);
             const StatusIcon = status.icon;
@@ -474,14 +474,14 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
                 onClick={() => onSelectStock(stock)}
                 className="rounded-xl border border-zinc-200 bg-white p-4 text-left hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700 transition-all cursor-pointer space-y-3"
               >
-                <div className="flex items-center justify-between gap-2">
+                <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2.5 min-w-0">
                     <Avatar ticker={stock.ticker} sector={stock.sector} size="md" />
                     <div className="min-w-0">
                       <span className="font-bold text-sm text-zinc-950 dark:text-zinc-50 block">
                         {stock.ticker}
                       </span>
-                      <span className="text-xs text-zinc-500 truncate block">
+                      <span className="text-xs text-zinc-500 leading-snug block">
                         {stock.name}
                       </span>
                     </div>

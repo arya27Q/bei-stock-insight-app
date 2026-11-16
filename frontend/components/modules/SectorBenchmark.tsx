@@ -209,7 +209,7 @@ export const SectorBenchmark: React.FC<SectorBenchmarkProps> = ({
                             : "< Median Sektor"}
                         </span>
                       </div>
-                      <span className="text-xs sm:text-sm text-zinc-500 font-medium line-clamp-1">
+                      <span className="text-xs sm:text-sm text-zinc-500 font-medium leading-snug block">
                         {stock.name}
                       </span>
                     </div>

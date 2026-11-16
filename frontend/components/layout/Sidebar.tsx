@@ -82,11 +82,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <BarChart3 className="h-5 w-5" aria-hidden="true" />
               </div>
               {!isCollapsed && (
-                <div className="truncate">
-                  <span className="text-sm font-bold tracking-tight text-zinc-950 dark:text-zinc-100 block leading-tight">
+                <div>
+                  <span className="text-sm font-bold tracking-tight text-zinc-950 dark:text-zinc-100 block leading-tight whitespace-nowrap">
                     BEI Stock Insight
                   </span>
-                  <span className="text-[11px] text-zinc-400 font-medium">
+                  <span className="text-[11px] text-zinc-400 font-medium whitespace-nowrap">
                     Analisis Fundamental
                   </span>
                 </div>
@@ -145,7 +145,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   >
                     <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
                   </div>
-                  {!isCollapsed && <span className="truncate">{item.label}</span>}
+                  {!isCollapsed && <span className="whitespace-nowrap">{item.label}</span>}
                 </button>
               );
             })}
@@ -169,7 +169,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               >
                 <div className="flex items-center gap-3 overflow-hidden">
                   <MessageSquare className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  {!isCollapsed && <span className="truncate">Penjelasan AI</span>}
+                  {!isCollapsed && <span className="whitespace-nowrap">Penjelasan AI</span>}
                 </div>
                 {!isCollapsed && (
                   <span
