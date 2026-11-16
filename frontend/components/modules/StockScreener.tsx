@@ -14,10 +14,15 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { StockFundamental } from "../../types/stock";
-import { useStockScreener, ScreenerPreset } from "../../hooks/useStockScreener";
+import {
+  useStockScreener,
+  ScreenerPreset,
+  getSpecificFundamentalStatus,
+} from "../../hooks/useStockScreener";
 import { Avatar } from "../ui/Avatar";
 import { Badge } from "../ui/Badge";
 import { SearchInput } from "../ui/SearchInput";
+import { DropdownSelect } from "../ui/DropdownSelect";
 
 interface StockScreenerProps {
   stocks: StockFundamental[];
@@ -47,29 +52,33 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
     handleExportCsv,
   } = useStockScreener(stocks);
 
-  // Status fundamental bergaya clean badge + dot icon seperti kolom Status di referensi Bilde
+  // Status fundamental spesifik berbasis indikator dan median sektor
   const getFundamentalStatus = (stock: StockFundamental) => {
-    if (stock.revenueGrowth >= 8 && stock.roe >= 15) {
+    const info = getSpecificFundamentalStatus(stock, stocks);
+    if (info.variant === "positive") {
       return {
-        label: "Sangat Sehat",
+        label: info.label,
+        reason: info.reason,
         icon: CheckCircle2,
         iconColor: "text-[rgba(52,184,150,0.95)]",
         textColor: "text-zinc-800 dark:text-zinc-200",
       };
     }
-    if (stock.revenueGrowth >= 0 && stock.roe >= 10) {
+    if (info.variant === "neutral") {
       return {
-        label: "Stabil Wajar",
+        label: info.label,
+        reason: info.reason,
         icon: MinusCircle,
         iconColor: "text-[rgba(224,154,64,0.95)]",
         textColor: "text-zinc-700 dark:text-zinc-300",
       };
     }
     return {
-      label: "Perlu Pantauan",
+      label: info.label,
+      reason: info.reason,
       icon: AlertCircle,
       iconColor: "text-[rgba(220,90,110,0.95)]",
-      textColor: "text-zinc-500 dark:text-zinc-400",
+      textColor: "text-zinc-600 dark:text-zinc-300",
     };
   };
 
@@ -112,17 +121,17 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
             </div>
           </div>
           <p className="mt-1 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
-            Tabel fundamental yang baik merangkum ribuan halaman laporan keuangan emiten.
+            Menyaring perusahaan berdasarkan pertumbuhan pendapatan, laba bersih, dan perbandingan terhadap median sektor (Laporan Q3 2024).
           </p>
         </div>
 
-        {/* Quick Preset Pills di Kanan Atas */}
+        {/* Quick Preset Pills di Kanan Atas (Berbasis Median Sektor & Pertumbuhan) */}
         <div className="flex flex-wrap items-center gap-1.5">
           {[
             { id: "all", label: "Semua Saham" },
-            { id: "stable_growth", label: "Tumbuh > 8%" },
-            { id: "high_roe", label: "ROE > 15%" },
-            { id: "fair_valuation", label: "PER Wajar < 15x" },
+            { id: "stable_growth", label: "Pendapatan & Laba Tumbuh" },
+            { id: "high_roe", label: "ROE ≥ Median Sektor" },
+            { id: "fair_valuation", label: "PER ≤ Median Sektor" },
           ].map((preset) => {
             const active = activePreset === preset.id;
             return (
@@ -207,20 +216,33 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
       {showFilterPanel && (
         <div className="grid grid-cols-1 gap-4 rounded-xl border border-zinc-200 bg-white p-4 shadow-xs @xl:grid-cols-3 dark:border-zinc-800 dark:bg-zinc-900">
           <div>
-            <label htmlFor="screener-sector-select" className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 block mb-1.5">
+            <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 block mb-1.5">
               Pilih Sektor Spesifik
-            </label>
-            <select
-              id="screener-sector-select"
+            </span>
+            <DropdownSelect
+              ariaLabel="Pilih Sektor Spesifik"
+              align="left"
+              className="w-full"
+              buttonClassName="py-2 text-xs sm:text-sm"
               value={selectedSector}
-              onChange={(e) => setSelectedSector(e.target.value)}
-              className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs sm:text-sm font-medium text-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
-            >
-              <option value="all">Semua Sektor</option>
-              {sectors.filter((s) => s !== "all").map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
+              onChange={(val) => setSelectedSector(val)}
+              options={sectors.map((s) => ({
+                value: s,
+                label: s === "all" ? "Semua Sektor" : s,
+                dotColor:
+                  s === "Keuangan"
+                    ? "bg-[rgba(38,166,134,0.95)]"
+                    : s === "Barang Konsumsi Primer"
+                    ? "bg-[rgba(224,154,64,0.95)]"
+                    : s === "Infrastruktur"
+                    ? "bg-[rgba(56,155,210,0.95)]"
+                    : s === "Perindustrian"
+                    ? "bg-[rgba(120,130,220,0.95)]"
+                    : s === "Energi"
+                    ? "bg-[rgba(220,90,110,0.95)]"
+                    : "bg-zinc-400",
+              }))}
+            />
           </div>
 
           <div>
@@ -280,9 +302,9 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
                   <th scope="col" className="py-3.5 px-5 first:rounded-tl-lg">Emiten & Perusahaan</th>
                   <th scope="col" className="py-3.5 px-4">Kode & Sektor</th>
                   <th scope="col" className="py-3.5 px-4">Kapitalisasi</th>
-                  <th scope="col" className="py-3.5 px-4">Pendapatan YoY</th>
-                  <th scope="col" className="py-3.5 px-4">ROE & Valuasi</th>
-                  <th scope="col" className="py-3.5 px-5 last:rounded-tr-lg">Status</th>
+                  <th scope="col" className="py-3.5 px-4">Pendapatan & Laba YoY</th>
+                  <th scope="col" className="py-3.5 px-4">Kemampuan Laba (ROE) & PER</th>
+                  <th scope="col" className="py-3.5 px-5 last:rounded-tr-lg">Status Indikator</th>
                 </tr>
               </thead>
 
@@ -307,6 +329,7 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
                     const status = getFundamentalStatus(stock);
                     const StatusIcon = status.icon;
                     const isRevPos = stock.revenueGrowth >= 0;
+                    const isNetPos = stock.netIncomeGrowth >= 0;
 
                     return (
                       <tr
@@ -323,13 +346,13 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
                                 {stock.name}
                               </span>
                               <span className="text-[11px] text-zinc-400 dark:text-zinc-500 block truncate">
-                                {stock.subSector}
+                                {stock.subSector} • {stock.period}
                               </span>
                             </div>
                           </div>
                         </td>
 
-                        {/* Kolom 2: Kode Emiten & Sektor (Tanpa Tanda #) */}
+                        {/* Kolom 2: Kode Emiten & Sektor */}
                         <td className="py-3.5 px-4 whitespace-nowrap">
                           <span className="font-semibold text-zinc-800 dark:text-zinc-200 tracking-tight">
                             {stock.ticker}
@@ -339,25 +362,39 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
                           </span>
                         </td>
 
-                        {/* Kolom 3: Kapitalisasi Pasar (Seperti Qty. di Bilde) */}
+                        {/* Kolom 3: Kapitalisasi Pasar */}
                         <td className="py-3.5 px-4 whitespace-nowrap font-medium text-zinc-700 dark:text-zinc-300 tabular-nums">
                           {stock.marketCapLabel}
                         </td>
 
-                        {/* Kolom 4: Pertumbuhan Pendapatan dengan Simbol Berwarna + Angka Netral Bersih */}
+                        {/* Kolom 4: Pertumbuhan Pendapatan & Laba Bersih YoY */}
                         <td className="py-3.5 px-4 whitespace-nowrap tabular-nums">
-                          <span
-                            className={`font-bold mr-1 ${
-                              isRevPos
-                                ? "text-emerald-600 dark:text-emerald-400"
-                                : "text-rose-600 dark:text-rose-400"
-                            }`}
-                          >
-                            {isRevPos ? "▲" : "▼"}
-                          </span>
-                          <span className="font-medium group-hover:font-semibold text-zinc-800 dark:text-zinc-200">
-                            {isRevPos ? `+${stock.revenueGrowth}%` : `${stock.revenueGrowth}%`}
-                          </span>
+                          <div>
+                            <span
+                              className={`font-bold mr-1 ${
+                                isRevPos
+                                  ? "text-emerald-600 dark:text-emerald-400"
+                                  : "text-rose-600 dark:text-rose-400"
+                              }`}
+                            >
+                              {isRevPos ? "▲" : "▼"}
+                            </span>
+                            <span className="font-medium text-zinc-800 dark:text-zinc-200">
+                              Pendapatan {isRevPos ? `+${stock.revenueGrowth}%` : `${stock.revenueGrowth}%`}
+                            </span>
+                          </div>
+                          <div className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+                            Laba bersih:{" "}
+                            <span
+                              className={`font-semibold ${
+                                isNetPos
+                                  ? "text-emerald-600 dark:text-emerald-400"
+                                  : "text-rose-600 dark:text-rose-400"
+                              }`}
+                            >
+                              {isNetPos ? `+${stock.netIncomeGrowth}%` : `${stock.netIncomeGrowth}%`}
+                            </span>
+                          </div>
                         </td>
 
                         {/* Kolom 5: ROE & PER */}
@@ -368,18 +405,23 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
                           <span className="font-medium text-zinc-800 dark:text-zinc-200">
                             {stock.roe}%
                           </span>
-                          <span className="text-zinc-400 dark:text-zinc-500 text-[11px] ml-1.5">
-                            ({stock.per}x PER)
+                          <span className="text-zinc-400 dark:text-zinc-500 text-[11px] block mt-0.5">
+                            Valuasi PER: {stock.per}x
                           </span>
                         </td>
 
-                        {/* Kolom 6: Status Fundamental dengan Ikon Bulat */}
+                        {/* Kolom 6: Status Fundamental Spesifik Berbasis Indikator */}
                         <td className="py-3.5 px-5 whitespace-nowrap">
-                          <div className="inline-flex items-center gap-2">
-                            <StatusIcon className={`h-4 w-4 shrink-0 ${status.iconColor}`} aria-hidden="true" />
-                            <span className={`font-medium ${status.textColor}`}>
-                              {status.label}
-                            </span>
+                          <div className="inline-flex items-start gap-2">
+                            <StatusIcon className={`h-4 w-4 shrink-0 mt-0.5 ${status.iconColor}`} aria-hidden="true" />
+                            <div>
+                              <span className={`font-semibold block ${status.textColor}`}>
+                                {status.label}
+                              </span>
+                              <span className="text-[11px] text-zinc-400 dark:text-zinc-500 block">
+                                {status.reason}
+                              </span>
+                            </div>
                           </div>
                         </td>
                       </tr>

@@ -1,11 +1,14 @@
 import { useState, useCallback } from "react";
-import { StockFundamental } from "../types/stock";
+import { StockFundamental, MetricType } from "../types/stock";
+import { INITIAL_STOCKS } from "../services/stock-service";
 
 export type DashboardTab = "map" | "screener" | "benchmark";
 
 export interface UseDashboardLayoutReturn {
   activeTab: DashboardTab;
   setActiveTab: (tab: DashboardTab) => void;
+  selectedMetric: MetricType;
+  setSelectedMetric: (metric: MetricType) => void;
   selectedStock: StockFundamental | null;
   setSelectedStock: (stock: StockFundamental | null) => void;
   selectStock: (stock: StockFundamental) => void;
@@ -27,7 +30,9 @@ export interface UseDashboardLayoutReturn {
 
 export function useDashboardLayout(): UseDashboardLayoutReturn {
   const [activeTab, setActiveTab] = useState<DashboardTab>("map");
-  const [selectedStock, setSelectedStock] = useState<StockFundamental | null>(null);
+  const [selectedMetric, setSelectedMetric] = useState<MetricType>("revenueGrowth");
+  // Prioritaskan mode Penjelasan Emiten (BBCA) saat pertama dibuka sesuai standar MVP
+  const [selectedStock, setSelectedStock] = useState<StockFundamental | null>(INITIAL_STOCKS[0]);
   const [benchmarkSector, setBenchmarkSector] = useState<string>("Keuangan");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
@@ -69,6 +74,8 @@ export function useDashboardLayout(): UseDashboardLayoutReturn {
   return {
     activeTab,
     setActiveTab,
+    selectedMetric,
+    setSelectedMetric,
     selectedStock,
     setSelectedStock,
     selectStock,

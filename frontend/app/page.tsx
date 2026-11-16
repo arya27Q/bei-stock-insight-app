@@ -32,6 +32,8 @@ export default function Home() {
   const {
     activeTab,
     setActiveTab,
+    selectedMetric,
+    setSelectedMetric,
     selectedStock,
     selectStock,
     clearSelectedStock,
@@ -73,7 +75,7 @@ export default function Home() {
       <div
         className={`flex-1 min-w-0 flex flex-col justify-between transition-all duration-200 ${
           isSidebarCollapsed ? "lg:pl-20" : "lg:pl-60"
-        } ${isRightAiOpen ? "lg:pr-[360px] 2xl:pr-[400px]" : ""}`}
+        } ${isRightAiOpen ? "lg:pr-[410px] xl:pr-[440px] 2xl:pr-[470px]" : ""}`}
       >
         {/* Top Header */}
         <header className="sticky top-0 z-30 flex h-20 items-center justify-between gap-3 bg-white px-4 sm:px-6 dark:bg-[#16171f]">
@@ -102,7 +104,7 @@ export default function Home() {
             </button>
 
             {/* Search Input */}
-            <div className="relative w-full max-w-sm">
+            <div className="relative w-full max-w-md">
               <label htmlFor="top-search-input" className="sr-only">
                 Cari kode atau nama emiten
               </label>
@@ -119,9 +121,9 @@ export default function Home() {
                 aria-hidden="true"
               />
 
-              {/* Autocomplete Dropdown (Tanpa #) */}
+              {/* Autocomplete Dropdown (Tanpa # & Tanpa Truncate) */}
               {isSearching && (
-                <div className="absolute left-0 right-0 top-11 z-40 max-h-64 overflow-y-auto rounded-2xl border border-zinc-200 bg-white p-1.5 shadow-xl dark:border-zinc-800 dark:bg-[#16171f] text-left">
+                <div className="absolute left-0 right-0 sm:min-w-[380px] top-11 z-40 max-h-64 overflow-y-auto rounded-2xl border border-zinc-200 bg-white p-1.5 shadow-xl dark:border-zinc-800 dark:bg-[#16171f] text-left">
                   {searchResults.length === 0 ? (
                     <div className="p-3 text-center text-xs text-zinc-400">
                       Emiten tidak ditemukan.
@@ -131,15 +133,15 @@ export default function Home() {
                       <button
                         key={s.ticker}
                         onClick={() => handleSelectFromSearch(s)}
-                        className="w-full flex items-center justify-between rounded-xl p-2.5 hover:bg-zinc-100 dark:hover:bg-zinc-800/70 text-left cursor-pointer"
+                        className="w-full grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-xl p-2.5 hover:bg-zinc-100 dark:hover:bg-zinc-800/70 text-left cursor-pointer"
                       >
                         <span className="text-xs font-bold text-zinc-950 dark:text-zinc-100">
                           {s.ticker}
                         </span>
-                        <span className="text-xs text-zinc-400 truncate max-w-[140px]">
+                        <span className="text-xs text-zinc-400 leading-snug">
                           {s.name}
                         </span>
-                        <span className="text-[11px] font-semibold text-emerald-500 tabular-nums">
+                        <span className="text-[11px] font-semibold text-emerald-500 tabular-nums whitespace-nowrap">
                           {s.marketCapLabel}
                         </span>
                       </button>
@@ -181,14 +183,17 @@ export default function Home() {
 
         {/* Kanvas Utama Dalam (#0d0e13 dengan Sudut Kiri Atas Melengkung Menyatu dengan Cutout Sidebar) */}
         <main className="@container flex-1 rounded-tl-[28px] bg-slate-50 dark:bg-[#0d0e13] px-4 py-6 sm:px-6 lg:px-7">
-          <div className="mx-auto max-w-7xl">
-            {/* Ringkasan Pasar 2-Grid Ringkas (Tanpa Animasi 3D) */}
-            <MarketOverviewRow stocks={stocks} />
+          <div className="mx-auto w-full max-w-[1600px]">
+            {/* Ringkasan Pasar 2-Grid Ringkas (Sinkron Indikator & Metadata Transparansi Data) */}
+            <MarketOverviewRow stocks={stocks} selectedMetric={selectedMetric} />
 
             {/* 5 Fitur Utama Sesuai Dokumentasi Sistem */}
             {activeTab === "map" && (
               <StockMap
                 stocks={stocks}
+                selectedMetric={selectedMetric}
+                onSelectMetric={setSelectedMetric}
+                selectedTicker={selectedStock?.ticker}
                 onSelectStock={selectStock}
               />
             )}
@@ -214,7 +219,7 @@ export default function Home() {
         <footer className="bg-slate-50 dark:bg-[#0d0e13] border-t border-zinc-200/70 dark:border-zinc-800/60 py-4 px-4 sm:px-6 lg:px-7 text-xs text-zinc-500 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p>© 2026 BEI Stock Insight: Riset Fundamental Saham Bursa Efek Indonesia.</p>
           <p className="text-zinc-400">
-            Data laporan keuangan publik BEI disajikan untuk analisis edukasi mandiri.
+            Sumber: BEI / IDX • Periode Laporan: Q3 2024 (Diperbarui 15 Nov 2024 • Status: Terverifikasi). Disajikan untuk analisis edukasi mandiri.
           </p>
         </footer>
       </div>

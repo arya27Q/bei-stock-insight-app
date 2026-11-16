@@ -26,19 +26,19 @@ export const StatTile: React.FC<StatTileProps> = ({
   return (
     <div
       className={cn(
-        "rounded-xl bg-zinc-50 dark:bg-[#0d0e13] p-2.5 border border-zinc-100 dark:border-zinc-800/70 transition-colors",
+        "rounded-xl bg-zinc-50 dark:bg-[#0d0e13] p-3 border border-zinc-100 dark:border-zinc-800/70 transition-colors flex flex-col justify-between",
         className
       )}
       {...props}
     >
-      <span className="text-[11px] text-zinc-400 block truncate">{label}</span>
-      <span className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100 tabular-nums mt-0.5 block truncate">
+      <span className="text-[11px] text-zinc-400 block leading-snug">{label}</span>
+      <span className="text-xs sm:text-sm font-bold text-zinc-900 dark:text-zinc-100 tabular-nums mt-1 block leading-snug">
         {value}
       </span>
       {subValue && (
         <span
           className={cn(
-            "text-[10px] font-semibold tabular-nums block truncate mt-0.5",
+            "text-[10px] font-semibold tabular-nums block leading-snug mt-1",
             subVariantColors[subValueVariant]
           )}
         >

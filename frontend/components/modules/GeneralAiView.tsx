@@ -1,16 +1,16 @@
 "use client";
 
 import React from "react";
-import { Send, User, Bot, RefreshCw } from "lucide-react";
+import { Send, User, Bot, RefreshCw, Sparkles, ArrowRight } from "lucide-react";
 import { StockFundamental } from "../../types/stock";
 import { useGeneralAiChat } from "../../hooks/useGeneralAiChat";
 import { Avatar } from "../ui/Avatar";
 
 const GENERAL_PROMPTS = [
-  "Emiten apa dengan efisiensi laba (ROE) tertinggi?",
-  "Emiten dengan valuasi PER relatif murah saat ini?",
-  "Bagaimana prospek laba sektor perbankan?",
-  "Saham apa saja yang dipantau di platform ini?",
+  "Emiten apa dengan kemampuan menghasilkan laba (ROE) tertinggi?",
+  "Bagaimana perbandingan valuasi PER antar sektor di BEI?",
+  "Bagaimana prospek pertumbuhan laba sektor perbankan?",
+  "Saham apa saja yang dipantau pada dataset Q3 2024 ini?",
 ];
 
 export interface GeneralAiViewProps {
@@ -43,20 +43,30 @@ export const GeneralAiView: React.FC<GeneralAiViewProps> = ({
         </p>
       </div>
 
-      {/* Quick Prompt Chips */}
-      <div>
-        <span className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block mb-1.5">
-          Pertanyaan Populer:
-        </span>
-        <div className="flex flex-col gap-1.5">
+      {/* Quick Prompt Chips (Rapi, Berjarak Proporsional, & Interaktif) */}
+      <div className="space-y-2.5">
+        <div className="flex items-center gap-1.5">
+          <Sparkles className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
+          <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            Pertanyaan Populer Analisis Pasar
+          </span>
+        </div>
+        <div className="flex flex-col gap-2.5">
           {GENERAL_PROMPTS.map((prompt, idx) => (
             <button
               key={idx}
+              type="button"
               onClick={() => handleSendGeneral(prompt)}
               disabled={isGeneralSending}
-              className="rounded-lg border border-zinc-200 bg-white p-2.5 text-left text-xs font-medium text-zinc-700 hover:bg-zinc-50 hover:text-zinc-950 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+              className="group w-full flex items-center justify-between gap-3 rounded-xl border border-zinc-200/90 bg-white p-3 text-left text-xs font-medium leading-relaxed text-zinc-700 hover:border-emerald-500/40 hover:bg-zinc-50 hover:text-zinc-950 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-emerald-500/40 dark:hover:bg-[#1c202d] dark:hover:text-zinc-100 transition-all cursor-pointer shadow-2xs"
             >
-              {prompt}
+              <span className="flex-1">{prompt}</span>
+              <span
+                className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-zinc-100 text-zinc-500 group-hover:bg-emerald-600 group-hover:text-white dark:bg-zinc-800 dark:text-zinc-400 dark:group-hover:bg-emerald-600 dark:group-hover:text-white transition-colors text-[11px]"
+                aria-hidden="true"
+              >
+                <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+              </span>
             </button>
           ))}
         </div>

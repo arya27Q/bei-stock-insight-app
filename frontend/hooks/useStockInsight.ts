@@ -22,7 +22,7 @@ export function useStockInsight(ticker: string, stockName?: string): UseStockIns
     {
       id: `stock-welcome-${ticker}`,
       sender: "assistant",
-      text: `Halo, saya Analis Fundamental untuk ${stockName || ticker} (${ticker}). Silakan tanyakan hal seputar valuasi harga, kapasitas dividen, maupun risiko bisnis perusahaan.`,
+      text: `Halo, saya Analis Fundamental untuk ${stockName || ticker} (${ticker}) berbasis laporan keuangan Q3 2024 (Sumber: BEI / IDX). Setiap jawaban memisahkan antara fakta laporan keuangan dan interpretasi AI edukatif.`,
       time: "Terkini",
     },
   ]);
