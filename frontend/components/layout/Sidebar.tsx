@@ -7,7 +7,6 @@ import {
   Layers,
   SlidersHorizontal,
   TrendingUp,
-  MessageSquare,
   BarChart3,
   Activity,
   X,
@@ -17,10 +16,10 @@ import {
 } from "lucide-react";
 
 interface SidebarProps {
-  activeTab?: "map" | "screener" | "benchmark";
-  setActiveTab?: (tab: "map" | "screener" | "benchmark") => void;
-  isAiPanelOpen: boolean;
-  setIsAiPanelOpen: (open: boolean) => void;
+  activeTab?: "map" | "screener" | "benchmark" | "profile";
+  setActiveTab?: (tab: "map" | "screener" | "benchmark" | "profile") => void;
+  isAiPanelOpen?: boolean;
+  setIsAiPanelOpen?: (open: boolean) => void;
   isMobileOpen: boolean;
   setIsMobileOpen: (open: boolean) => void;
   isCollapsed: boolean;
@@ -31,13 +30,10 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({
   activeTab: propActiveTab,
   setActiveTab,
-  isAiPanelOpen,
-  setIsAiPanelOpen,
   isMobileOpen,
   setIsMobileOpen,
   isCollapsed,
   setIsCollapsed,
-  onOpenGeneralAi,
 }) => {
   const pathname = usePathname();
 
@@ -63,17 +59,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
       icon: TrendingUp,
       href: "/benchmark",
     },
+    {
+      id: "profile" as const,
+      label: "Profil Investor",
+      title: "Profil Investor & Pengaturan",
+      icon: User,
+      href: "/profile",
+    },
   ];
 
-  const isNavActive = (id: "map" | "screener" | "benchmark") => {
+  const isNavActive = (id: "map" | "screener" | "benchmark" | "profile") => {
     if (propActiveTab) return propActiveTab === id;
     if (id === "map") return pathname === "/market-map" || pathname === "/";
     if (id === "screener") return pathname.startsWith("/screener");
     if (id === "benchmark") return pathname.startsWith("/benchmark");
+    if (id === "profile") return pathname.startsWith("/profile");
     return false;
   };
-
-  const isProfileActive = pathname.startsWith("/profile");
 
   return (
     <>
@@ -87,9 +89,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Sidebar Container: Mendukung Buka/Tutup (w-60 <-> w-20) & Lekukan S-Curve Cutout Murni */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex flex-col justify-between bg-white dark:bg-[#16171f] transition-all duration-200 select-none ${
-          isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        } ${isCollapsed ? "w-20" : "w-60"}`}
+        className={`fixed inset-y-0 left-0 z-40 flex flex-col justify-between bg-white dark:bg-[#16171f] transition-all duration-200 select-none ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          } ${isCollapsed ? "w-20" : "w-60"}`}
         aria-label="Navigasi Utama Platform"
       >
         <div>
@@ -135,11 +136,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     setIsMobileOpen(false);
                   }}
                   title={item.title}
-                  className={`group relative w-full flex items-center gap-3.5 rounded-l-full py-3.5 pl-4 pr-3 text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
-                    isActive
+                  className={`group relative w-full flex items-center gap-3.5 rounded-l-full py-3.5 pl-4 pr-3 text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${isActive
                       ? "bg-slate-50 text-emerald-600 dark:bg-[#0d0e13] dark:text-emerald-400"
                       : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-                  }`}
+                    }`}
                 >
                   {/* Lengkungan Cekung Atas & Bawah (S-Curve Cutout Notch) Saat Aktif */}
                   {isActive && (
@@ -156,11 +156,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   )}
 
                   <div
-                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors ${
-                      isActive
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors ${isActive
                         ? "text-emerald-600 dark:text-emerald-400"
                         : "text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-200"
-                    }`}
+                      }`}
                   >
                     <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
                   </div>
@@ -168,61 +167,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </Link>
               );
             })}
-
-            {/* Tombol 05. AI Fundamental Explanation */}
-            <div className="pr-3 pt-3">
-              <button
-                onClick={() => {
-                  setIsAiPanelOpen(!isAiPanelOpen);
-                  if (!isAiPanelOpen && onOpenGeneralAi) onOpenGeneralAi();
-                  setIsMobileOpen(false);
-                }}
-                title="05. AI Fundamental Explanation & Profil Emiten"
-                className={`w-full flex items-center ${
-                  isCollapsed ? "justify-center" : "justify-between"
-                } rounded-2xl p-3 text-xs font-semibold transition-colors cursor-pointer ${
-                  isAiPanelOpen
-                    ? "bg-emerald-600 text-white"
-                    : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-[#1e2029] dark:text-zinc-300 dark:hover:bg-zinc-800"
-                }`}
-              >
-                <div className="flex items-center gap-3 overflow-hidden">
-                  <MessageSquare className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  {!isCollapsed && <span className="whitespace-nowrap">Penjelasan AI</span>}
-                </div>
-                {!isCollapsed && (
-                  <span
-                    className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
-                      isAiPanelOpen
-                        ? "bg-black/25 text-white"
-                        : "bg-emerald-600 text-white"
-                    }`}
-                  >
-                    AI
-                  </span>
-                )}
-              </button>
-            </div>
-            {/* Tombol Profil Pengguna & Pengaturan */}
-            <div className="pr-3 pt-2">
-              <Link
-                href="/profile"
-                onClick={() => setIsMobileOpen(false)}
-                title="Profil Investor & Pengaturan"
-                className={`w-full flex items-center ${
-                  isCollapsed ? "justify-center" : "justify-between"
-                } rounded-2xl p-3 text-xs font-semibold transition-colors ${
-                  isProfileActive
-                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/20"
-                    : "text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-[#1e2029]"
-                }`}
-              >
-                <div className="flex items-center gap-3 overflow-hidden">
-                  <User className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  {!isCollapsed && <span className="whitespace-nowrap">Profil Investor</span>}
-                </div>
-              </Link>
-            </div>
           </nav>
         </div>
 

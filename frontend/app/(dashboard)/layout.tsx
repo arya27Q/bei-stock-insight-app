@@ -164,6 +164,15 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
               <span className="hidden sm:inline">
                 {isRightAiOpen ? "Tutup Panel AI" : "Buka Panel AI"}
               </span>
+              <span
+                className={`flex h-5 items-center justify-center rounded px-1.5 text-[10px] font-bold tracking-wider ${
+                  isRightAiOpen
+                    ? "bg-black/25 text-white"
+                    : "bg-emerald-600 text-white shadow-xs"
+                }`}
+              >
+                AI
+              </span>
               {isRightAiOpen ? (
                 <PanelRightClose className="h-3.5 w-3.5 opacity-80 shrink-0" aria-hidden="true" />
               ) : (

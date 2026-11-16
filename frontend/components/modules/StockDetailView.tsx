@@ -15,6 +15,9 @@ import {
   RefreshCw,
   ArrowRight,
   Sparkles,
+  Building2,
+  PieChart,
+  Coins,
 } from "lucide-react";
 import { StockFundamental } from "../../types/stock";
 import { useStockInsight } from "../../hooks/useStockInsight";
@@ -54,6 +57,8 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
     showTechnicalDetails,
     setShowTechnicalDetails,
   } = useStockInsight(stock.ticker, stock.name);
+
+  const [profileTab, setProfileTab] = React.useState<"business" | "shareholders" | "valuation">("business");
 
   const revTrend = getHistoricalTrend(stock, "revenueGrowth");
   const netTrend = getHistoricalTrend(stock, "netIncomeGrowth");
@@ -531,10 +536,17 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
         <button
           type="button"
           onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
-          className="w-full flex items-center justify-between py-1 text-xs font-bold text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 transition-colors cursor-pointer"
+          className="w-full flex items-center justify-between py-1 text-xs font-bold text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors cursor-pointer"
           aria-expanded={showTechnicalDetails}
         >
-          <span>Rincian Rasio Valuasi & Profil Bisnis</span>
+          <div className="flex items-center gap-2">
+            <span>Rincian Rasio Valuasi & Profil Bisnis</span>
+            {stock.listingBoard && (
+              <span className="rounded bg-zinc-200/70 px-1.5 py-0.5 text-[9px] font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+                {stock.listingBoard}
+              </span>
+            )}
+          </div>
           {showTechnicalDetails ? (
             <ChevronUp className="h-4 w-4 text-zinc-500" aria-hidden="true" />
           ) : (
@@ -543,50 +555,273 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
         </button>
 
         {showTechnicalDetails && (
-          <div className="mt-2 space-y-2 rounded-xl bg-zinc-50 p-3 text-xs dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
-            <div className="grid grid-cols-2 gap-2">
-              <div className="rounded bg-white p-2 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
-                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block">
-                  Valuasi terhadap Laba (PER)
-                </span>
-                <span className="text-xs font-bold text-zinc-950 dark:text-zinc-50 tabular-nums">
-                  {stock.per}x
-                </span>
-              </div>
-              <div className="rounded bg-white p-2 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
-                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block">
-                  Valuasi Nilai Buku (PBV)
-                </span>
-                <span className="text-xs font-bold text-zinc-950 dark:text-zinc-50 tabular-nums">
-                  {stock.pbv || "1.2"}x
-                </span>
-              </div>
-              <div className="rounded bg-white p-2 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
-                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block">
-                  Utang terhadap Ekuitas (DER)
-                </span>
-                <span className="text-xs font-bold text-zinc-950 dark:text-zinc-50 tabular-nums">
-                  {stock.der || "0.8"}x
-                </span>
-              </div>
-              <div className="rounded bg-white p-2 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
-                <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block">
-                  Ketersediaan Data
-                </span>
-                <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
-                  {stock.hasData ? "Lengkap (BEI)" : "Sebagian"}
-                </span>
-              </div>
+          <div className="mt-2.5 space-y-3 rounded-xl bg-zinc-50 p-3 text-xs dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+            {/* Sub-tab Switcher: Bisnis & Moat, Saham & Dividen, Rasio Finansial */}
+            <div className="flex items-center gap-1.5 rounded-lg bg-zinc-200/60 p-1 dark:bg-zinc-800">
+              <button
+                type="button"
+                onClick={() => setProfileTab("business")}
+                className={`flex-1 rounded-md py-1.5 text-[11px] font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                  profileTab === "business"
+                    ? "bg-white text-zinc-950 shadow-2xs dark:bg-zinc-700 dark:text-zinc-50"
+                    : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+                }`}
+              >
+                <Building2 className="h-3 w-3 shrink-0" aria-hidden="true" />
+                <span>Bisnis & Moat</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setProfileTab("shareholders")}
+                className={`flex-1 rounded-md py-1.5 text-[11px] font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                  profileTab === "shareholders"
+                    ? "bg-white text-zinc-950 shadow-2xs dark:bg-zinc-700 dark:text-zinc-50"
+                    : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+                }`}
+              >
+                <PieChart className="h-3 w-3 shrink-0" aria-hidden="true" />
+                <span>Saham & Dividen</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setProfileTab("valuation")}
+                className={`flex-1 rounded-md py-1.5 text-[11px] font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                  profileTab === "valuation"
+                    ? "bg-white text-zinc-950 shadow-2xs dark:bg-zinc-700 dark:text-zinc-50"
+                    : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+                }`}
+              >
+                <Coins className="h-3 w-3 shrink-0" aria-hidden="true" />
+                <span>Rasio Finansial</span>
+              </button>
             </div>
 
-            {stock.description && (
-              <div className="pt-1.5 border-t border-zinc-200 dark:border-zinc-800">
-                <span className="text-[11px] font-bold text-zinc-800 dark:text-zinc-200 block mb-0.5">
-                  Profil Perusahaan:
-                </span>
-                <p className="text-zinc-600 dark:text-zinc-300 text-[11px] leading-relaxed">
-                  {stock.description}
-                </p>
+            {/* TAB 1: BISNIS & MOAT */}
+            {profileTab === "business" && (
+              <div className="space-y-3 pt-1">
+                {stock.description && (
+                  <p className="text-zinc-600 dark:text-zinc-300 text-[11px] leading-relaxed">
+                    {stock.description}
+                  </p>
+                )}
+
+                {/* Segmen Pendapatan Usaha */}
+                {stock.businessSegments && stock.businessSegments.length > 0 && (
+                  <div className="space-y-2 rounded-lg border border-zinc-200/80 bg-white p-2.5 dark:border-zinc-800 dark:bg-zinc-800/60">
+                    <span className="text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider block">
+                      Kontribusi Segmen Usaha:
+                    </span>
+                    <div className="space-y-2 pt-0.5">
+                      {stock.businessSegments.map((seg, idx) => (
+                        <div key={idx} className="space-y-1">
+                          <div className="flex justify-between items-center text-[11px] text-zinc-700 dark:text-zinc-300">
+                            <span className="truncate pr-2 font-medium">{seg.name}</span>
+                            <span className="font-bold text-zinc-950 dark:text-zinc-50 tabular-nums shrink-0">
+                              {seg.percentage}%
+                            </span>
+                          </div>
+                          <div className="h-1.5 w-full rounded-full bg-zinc-100 dark:bg-zinc-700 overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-emerald-600 dark:bg-emerald-500 transition-all duration-300"
+                              style={{ width: `${seg.percentage}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Keunggulan Moat */}
+                {stock.keyMoat && (
+                  <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 p-2.5 text-[11px] text-emerald-950 dark:text-emerald-200 space-y-1">
+                    <span className="flex items-center gap-1.5 font-bold text-emerald-800 dark:text-emerald-400">
+                      <Sparkles className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                      Keunggulan Kompetitif (Moat):
+                    </span>
+                    <p className="leading-relaxed">{stock.keyMoat}</p>
+                  </div>
+                )}
+
+                {/* Risiko Utama */}
+                {stock.keyRisk && (
+                  <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-2.5 text-[11px] text-amber-950 dark:text-amber-200 space-y-1">
+                    <span className="flex items-center gap-1.5 font-bold text-amber-800 dark:text-amber-400">
+                      <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                      Risiko Bisnis Utama:
+                    </span>
+                    <p className="leading-relaxed">{stock.keyRisk}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* TAB 2: SAHAM & DIVIDEN */}
+            {profileTab === "shareholders" && (
+              <div className="space-y-3 pt-1">
+                {/* Struktur Pemegang Saham */}
+                <div className="space-y-2 rounded-lg border border-zinc-200/80 bg-white p-2.5 dark:border-zinc-800 dark:bg-zinc-800/60">
+                  <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                    <span>Komposisi Pemegang Saham</span>
+                    <span>BEI Q3 2024</span>
+                  </div>
+
+                  {/* Stacked Percentage Bar */}
+                  <div className="h-2 w-full rounded-full bg-zinc-200 dark:bg-zinc-700 overflow-hidden flex">
+                    <div
+                      className="bg-emerald-600 transition-all duration-300"
+                      style={{ width: `${stock.controllingPercentage || 50}%` }}
+                      title={`Pengendali: ${stock.controllingPercentage || 50}%`}
+                    />
+                    <div
+                      className="bg-blue-600 transition-all duration-300"
+                      style={{ width: `${stock.publicPercentage || 50}%` }}
+                      title={`Publik: ${stock.publicPercentage || 50}%`}
+                    />
+                  </div>
+
+                  {/* Legend & Details */}
+                  <div className="space-y-1.5 pt-1 text-[11px]">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="h-2 w-2 rounded-full bg-emerald-600 shrink-0" />
+                        <span className="text-zinc-600 dark:text-zinc-300 truncate">
+                          {stock.controllingShareholder || "Pemegang Saham Pengendali"}
+                        </span>
+                      </div>
+                      <span className="font-bold text-zinc-950 dark:text-zinc-50 tabular-nums shrink-0">
+                        {stock.controllingPercentage || 50}%
+                      </span>
+                    </div>
+
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="h-2 w-2 rounded-full bg-blue-600 shrink-0" />
+                        <span className="text-zinc-600 dark:text-zinc-300 truncate">
+                          {stock.publicShareholder || "Masyarakat / Publik"}
+                        </span>
+                      </div>
+                      <span className="font-bold text-zinc-950 dark:text-zinc-50 tabular-nums shrink-0">
+                        {stock.publicPercentage || 50}%
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Listing Board & IPO Info */}
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="rounded-lg bg-white p-2 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/80">
+                    <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block">
+                      Tahun IPO
+                    </span>
+                    <span className="text-xs font-bold text-zinc-950 dark:text-zinc-50">
+                      {stock.ipoYear ? `Tahun ${stock.ipoYear}` : "Tercatat di BEI"}
+                    </span>
+                  </div>
+                  <div className="rounded-lg bg-white p-2 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/80">
+                    <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block">
+                      Papan Pencatatan
+                    </span>
+                    <span className="text-xs font-bold text-zinc-950 dark:text-zinc-50">
+                      {stock.listingBoard || "Papan Utama"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Profil Dividen */}
+                <div className="space-y-2 rounded-lg border border-zinc-200/80 bg-white p-2.5 dark:border-zinc-800 dark:bg-zinc-800/60">
+                  <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                    <span>Kebijakan Dividen</span>
+                    <span className="text-emerald-700 dark:text-emerald-400 font-semibold">Aktif</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 pt-0.5">
+                    <div className="rounded bg-zinc-50 p-2 dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800">
+                      <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block">
+                        Dividend Yield
+                      </span>
+                      <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
+                        {stock.dividendYield ? `${stock.dividendYield}%` : "-"}
+                      </span>
+                    </div>
+                    <div className="rounded bg-zinc-50 p-2 dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800">
+                      <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block">
+                        Payout Ratio (DPR)
+                      </span>
+                      <span className="text-xs font-bold text-zinc-950 dark:text-zinc-50 tabular-nums">
+                        {stock.dividendPayoutRatio ? `${stock.dividendPayoutRatio}%` : "-"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {stock.dividendDateNote && (
+                    <p className="text-[10px] text-zinc-500 dark:text-zinc-400 pt-0.5 leading-relaxed">
+                      Jadwal: {stock.dividendDateNote}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* TAB 3: RASIO FINANSIAL & VALUASI */}
+            {profileTab === "valuation" && (
+              <div className="space-y-2.5 pt-1">
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="rounded bg-white p-2 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
+                    <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block">
+                      Valuasi terhadap Laba (PER)
+                    </span>
+                    <span className="text-xs font-bold text-zinc-950 dark:text-zinc-50 tabular-nums">
+                      {stock.per}x
+                    </span>
+                  </div>
+                  <div className="rounded bg-white p-2 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
+                    <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block">
+                      Valuasi Nilai Buku (PBV)
+                    </span>
+                    <span className="text-xs font-bold text-zinc-950 dark:text-zinc-50 tabular-nums">
+                      {stock.pbv || "1.2"}x
+                    </span>
+                  </div>
+                  <div className="rounded bg-white p-2 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
+                    <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block">
+                      Utang terhadap Ekuitas (DER)
+                    </span>
+                    <span className="text-xs font-bold text-zinc-950 dark:text-zinc-50 tabular-nums">
+                      {stock.der || "0.8"}x
+                    </span>
+                  </div>
+                  <div className="rounded bg-white p-2 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
+                    <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block">
+                      Margin Laba Bersih (NPM)
+                    </span>
+                    <span className="text-xs font-bold text-zinc-950 dark:text-zinc-50 tabular-nums">
+                      {stock.netProfitMargin ? `${stock.netProfitMargin}%` : "-"}
+                    </span>
+                  </div>
+                  {stock.sectorSpecificMetric && (
+                    <div className="rounded bg-white p-2 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
+                      <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block truncate">
+                        {stock.sectorSpecificMetric.label}
+                      </span>
+                      <span className="text-xs font-bold text-zinc-950 dark:text-zinc-50 tabular-nums">
+                        {stock.sectorSpecificMetric.value}
+                      </span>
+                    </div>
+                  )}
+                  <div className="rounded bg-white p-2 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
+                    <span className="text-[10px] text-zinc-500 dark:text-zinc-400 block">
+                      Ketersediaan Data
+                    </span>
+                    <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+                      {stock.hasData ? "Lengkap (BEI)" : "Sebagian"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="rounded-lg bg-zinc-100/80 p-2 text-[10px] text-zinc-500 dark:bg-zinc-800/60 dark:text-zinc-400 leading-relaxed border border-zinc-200/60 dark:border-zinc-700/60">
+                  Data Laporan Keuangan BEI ({stock.period}). Disajikan untuk referensi analisis fundamental mandiri.
+                </div>
               </div>
             )}
           </div>

@@ -1,5 +1,15 @@
 export type MetricType = "revenueGrowth" | "netIncomeGrowth" | "roe" | "per";
 
+export interface BusinessSegment {
+  name: string;
+  percentage: number;
+}
+
+export interface SectorSpecificMetric {
+  label: string;
+  value: string;
+}
+
 export interface StockFundamental {
   ticker: string;
   name: string;
@@ -24,6 +34,22 @@ export interface StockFundamental {
   hasData: boolean; // Integritas data
   description?: string;
   historicalTrends?: Partial<Record<MetricType, number[]>>; // Tren 4 kuartal (Q4 '23, Q1 '24, Q2 '24, Q3 '24)
+
+  // Rincian Profil & Analisis Bisnis Lanjutan
+  ipoYear?: number;
+  listingBoard?: string;
+  controllingShareholder?: string;
+  controllingPercentage?: number;
+  publicShareholder?: string;
+  publicPercentage?: number;
+  businessSegments?: BusinessSegment[];
+  dividendYield?: number;
+  dividendPayoutRatio?: number;
+  dividendDateNote?: string;
+  netProfitMargin?: number;
+  sectorSpecificMetric?: SectorSpecificMetric;
+  keyMoat?: string;
+  keyRisk?: string;
 }
 
 export interface MetricDefinition {

@@ -78,8 +78,8 @@ export default function ProfilePage() {
   const router = useRouter();
   const { user, isLoaded, updateProfile, logout } = useAuth();
 
-  const [name, setName] = useState(user?.name || "Arya Pratama");
-  const [email, setEmail] = useState(user?.email || "arya@beistockinsight.id");
+  const [name, setName] = useState(user?.name || "Andreas Peter Parker");
+  const [email, setEmail] = useState(user?.email || "Parker@beistockinsight.id");
   const [experienceLevel, setExperienceLevel] = useState<"Pemula" | "Menengah" | "Mahir">(
     user?.experienceLevel || "Pemula"
   );

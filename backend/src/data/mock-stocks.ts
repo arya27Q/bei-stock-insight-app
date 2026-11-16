@@ -1,3 +1,13 @@
+export interface BusinessSegment {
+  name: string;
+  percentage: number;
+}
+
+export interface SectorSpecificMetric {
+  label: string;
+  value: string;
+}
+
 export interface StockFundamental {
   ticker: string;
   name: string;
@@ -20,6 +30,21 @@ export interface StockFundamental {
   dataSource?: string;
   dataStatus?: string;
   hasData: boolean; // Flag untuk data integrity
+  description?: string;
+  ipoYear?: number;
+  listingBoard?: string;
+  controllingShareholder?: string;
+  controllingPercentage?: number;
+  publicShareholder?: string;
+  publicPercentage?: number;
+  businessSegments?: BusinessSegment[];
+  dividendYield?: number;
+  dividendPayoutRatio?: number;
+  dividendDateNote?: string;
+  netProfitMargin?: number;
+  sectorSpecificMetric?: SectorSpecificMetric;
+  keyMoat?: string;
+  keyRisk?: string;
 }
 
 export const MOCK_STOCKS: StockFundamental[] = [
@@ -45,6 +70,25 @@ export const MOCK_STOCKS: StockFundamental[] = [
     dataSource: "BEI / IDX",
     dataStatus: "Terverifikasi",
     hasData: true,
+    description:
+      "Bank swasta terbesar di Indonesia dengan keunggulan transaksi digital dan porsi dana murah (CASA) yang dominan.",
+    ipoYear: 2000,
+    listingBoard: "Papan Utama",
+    controllingShareholder: "PT Dwimuria Investama Andalan (Grup Djarum)",
+    controllingPercentage: 54.94,
+    publicShareholder: "Masyarakat / Free Float",
+    publicPercentage: 45.06,
+    businessSegments: [
+      { name: "Pendapatan Bunga Bersih (NII)", percentage: 77 },
+      { name: "Pendapatan Non-Bunga & Transaksi", percentage: 23 },
+    ],
+    dividendYield: 2.8,
+    dividendPayoutRatio: 68.0,
+    dividendDateNote: "Rutin 2x setahun (Interim & Final)",
+    netProfitMargin: 52.4,
+    sectorSpecificMetric: { label: "NIM / NPL Gross", value: "5.8% / 1.8%" },
+    keyMoat: "Rasio CASA mencapai 82% (dana murah melimpah) dengan ekosistem transaksi perbankan digital terdepan di Indonesia.",
+    keyRisk: "Penurunan daya beli kredit konsumer serta potensi persaingan dari neobank dan ekosistem fintech.",
   },
   {
     ticker: "BBRI",
@@ -68,6 +112,26 @@ export const MOCK_STOCKS: StockFundamental[] = [
     dataSource: "BEI / IDX",
     dataStatus: "Terverifikasi",
     hasData: true,
+    description:
+      "Bank fokus pembiayaan segmen UMKM dan mikro terbesar dengan jaringan kantor cabang terluas di seluruh Indonesia.",
+    ipoYear: 2003,
+    listingBoard: "Papan Utama",
+    controllingShareholder: "Negara Republik Indonesia (BUMN)",
+    controllingPercentage: 53.19,
+    publicShareholder: "Masyarakat / Free Float",
+    publicPercentage: 46.81,
+    businessSegments: [
+      { name: "Kredit Mikro & Ultra Mikro (Kupedes/KUR)", percentage: 58 },
+      { name: "Kredit Korporasi & Komersial", percentage: 24 },
+      { name: "Jasa Keuangan & Operasional Lainnya", percentage: 18 },
+    ],
+    dividendYield: 6.8,
+    dividendPayoutRatio: 80.0,
+    dividendDateNote: "Dividen jumbo BUMN, rutin 2x setahun",
+    netProfitMargin: 30.5,
+    sectorSpecificMetric: { label: "NIM / NPL Gross", value: "7.7% / 2.9%" },
+    keyMoat: "Monopoli segmen kredit mikro dan jaringan AgenBRILink di seluruh pelosok pedesaan Indonesia.",
+    keyRisk: "Sensitivitas pemburukan NPL segmen mikro pasca normalisasi restrukturisasi pembiayaan.",
   },
   {
     ticker: "BMRI",
@@ -91,6 +155,26 @@ export const MOCK_STOCKS: StockFundamental[] = [
     dataSource: "BEI / IDX",
     dataStatus: "Terverifikasi",
     hasData: true,
+    description:
+      "Bank korporasi dan komersial terkemuka dengan pertumbuhan ekosistem digital Livin' dan Kopra by Mandiri.",
+    ipoYear: 2003,
+    listingBoard: "Papan Utama",
+    controllingShareholder: "Negara Republik Indonesia (BUMN)",
+    controllingPercentage: 52.0,
+    publicShareholder: "Masyarakat / Free Float",
+    publicPercentage: 48.0,
+    businessSegments: [
+      { name: "Kredit Korporasi & Institusi", percentage: 52 },
+      { name: "Kredit Komersial & Retail", percentage: 31 },
+      { name: "Treasury & Pasar Modal", percentage: 17 },
+    ],
+    dividendYield: 5.2,
+    dividendPayoutRatio: 60.0,
+    dividendDateNote: "Rutin dividen tahunan BUMN",
+    netProfitMargin: 37.3,
+    sectorSpecificMetric: { label: "NIM / NPL Gross", value: "5.2% / 1.0%" },
+    keyMoat: "Penguasa pangsa pasar kredit korporasi nasional dengan adopsi pesat platform digital Livin' dan Kopra.",
+    keyRisk: "Eksposur kredit terhadap volatilitas komoditas dan proyek infrastruktur besar nasional.",
   },
   {
     ticker: "TLKM",
@@ -114,6 +198,26 @@ export const MOCK_STOCKS: StockFundamental[] = [
     dataSource: "BEI / IDX",
     dataStatus: "Terverifikasi",
     hasData: true,
+    description:
+      "Perusahaan telekomunikasi digital terbesar di Indonesia penyedia jaringan fiber optic, seluler (Telkomsel), dan pusat data.",
+    ipoYear: 1995,
+    listingBoard: "Papan Utama",
+    controllingShareholder: "Negara Republik Indonesia (BUMN)",
+    controllingPercentage: 52.09,
+    publicShareholder: "Masyarakat / Free Float",
+    publicPercentage: 47.91,
+    businessSegments: [
+      { name: "Seluler & Broadband (Telkomsel & IndiHome)", percentage: 72 },
+      { name: "Enterprise & Pusat Data (Data Center)", percentage: 18 },
+      { name: "Jaringan Wholesale & Tower", percentage: 10 },
+    ],
+    dividendYield: 5.8,
+    dividendPayoutRatio: 72.0,
+    dividendDateNote: "Dividen konsisten historis tinggi",
+    netProfitMargin: 15.7,
+    sectorSpecificMetric: { label: "ARPU / Pelanggan Seluler", value: "Rp 46.000 / 159 Juta" },
+    keyMoat: "Infrastruktur kabel serat optik dan jaringan BTS terluas di seluruh kepulauan Indonesia.",
+    keyRisk: "Perang tarif paket data seluler serta beban belanja modal (Capex) infrastruktur 5G.",
   },
   {
     ticker: "ASII",
@@ -137,6 +241,27 @@ export const MOCK_STOCKS: StockFundamental[] = [
     dataSource: "BEI / IDX",
     dataStatus: "Terverifikasi",
     hasData: true,
+    description:
+      "Perusahaan multisektor yang mengoperasikan lini bisnis otomotif, jasa keuangan, alat berat, pertambangan, dan agribisnis.",
+    ipoYear: 1990,
+    listingBoard: "Papan Utama",
+    controllingShareholder: "Jardine Cycle & Carriage Ltd",
+    controllingPercentage: 50.11,
+    publicShareholder: "Masyarakat / Free Float",
+    publicPercentage: 49.89,
+    businessSegments: [
+      { name: "Otomotif & Komponen (Toyota, Daihatsu, Honda)", percentage: 42 },
+      { name: "Alat Berat, Tambang & Konstruksi (UNTR)", percentage: 39 },
+      { name: "Jasa Keuangan & Asuransi", percentage: 12 },
+      { name: "Agribisnis & Teknologi", percentage: 7 },
+    ],
+    dividendYield: 7.2,
+    dividendPayoutRatio: 65.0,
+    dividendDateNote: "Rutin dividen interim & final tinggi",
+    netProfitMargin: 10.5,
+    sectorSpecificMetric: { label: "Pangsa Pasar Otomotif 4W", value: "56% Nasional" },
+    keyMoat: "Konglomerasi multi-industri terdiversifikasi dengan dominasi rantai pasok otomotif terbesar di ASEAN.",
+    keyRisk: "Penetrasi kendaraan listrik (EV) merek baru dan penurunan harga komoditas tambang di anak usaha.",
   },
   {
     ticker: "ICBP",
@@ -160,6 +285,26 @@ export const MOCK_STOCKS: StockFundamental[] = [
     dataSource: "BEI / IDX",
     dataStatus: "Terverifikasi",
     hasData: true,
+    description:
+      "Produsen barang konsumsi kebutuhan pokok dengan merek mi instan Indomie, produk susu, dan makanan ringan.",
+    ipoYear: 2010,
+    listingBoard: "Papan Utama",
+    controllingShareholder: "PT Indofood Sukses Makmur Tbk (INDF)",
+    controllingPercentage: 80.53,
+    publicShareholder: "Masyarakat / Free Float",
+    publicPercentage: 19.47,
+    businessSegments: [
+      { name: "Mi Instan (Indomie, Supermi, Sarimi)", percentage: 72 },
+      { name: "Dairy / Produk Susu (Indomilk)", percentage: 14 },
+      { name: "Makanan Ringan & Bumbu Makanan", percentage: 14 },
+    ],
+    dividendYield: 3.5,
+    dividendPayoutRatio: 45.0,
+    dividendDateNote: "Rutin tahunan stabil",
+    netProfitMargin: 14.6,
+    sectorSpecificMetric: { label: "Gross Profit Margin (GPM)", value: "37.2%" },
+    keyMoat: "Kekuatan penetapan harga (pricing power) merek global Indomie dengan penetrasi ekspor di Timur Tengah & Afrika.",
+    keyRisk: "Fluktuasi harga komoditas gandum dan CPO dunia serta beban utang valas (USD) akuisisi Pinehill.",
   },
   {
     ticker: "ADRO",
@@ -183,6 +328,26 @@ export const MOCK_STOCKS: StockFundamental[] = [
     dataSource: "BEI / IDX",
     dataStatus: "Terverifikasi",
     hasData: true,
+    description:
+      "Perusahaan energi terintegrasi dan pertambangan batu bara termal yang mendiversifikasi bisnis ke pengolahan mineral dan energi baru.",
+    ipoYear: 2008,
+    listingBoard: "Papan Utama",
+    controllingShareholder: "Konsorsium Garibaldi Thohir & Keluarga Soeryadjaya",
+    controllingPercentage: 43.91,
+    publicShareholder: "Masyarakat / Free Float",
+    publicPercentage: 56.09,
+    businessSegments: [
+      { name: "Pertambangan & Perdagangan Batu Bara Termal", percentage: 82 },
+      { name: "Batu Bara Metalurgi (Coking Coal)", percentage: 12 },
+      { name: "Logistik, Pelabuhan & Pembangkit Listrik", percentage: 6 },
+    ],
+    dividendYield: 11.5,
+    dividendPayoutRatio: 40.0,
+    dividendDateNote: "Dividen reguler tinggi & dividen spesial spin-off",
+    netProfitMargin: 25.6,
+    sectorSpecificMetric: { label: "Arus Kas Operasi (CFO)", value: "Rp 21,8 T" },
+    keyMoat: "Struktur biaya penambangan terendah di kelasnya (cash cost leader) dengan cadangan Envirocoal bernilai tinggi.",
+    keyRisk: "Normalisasi harga batu bara global pasca siklus komoditas dan kebijakan transisi energi ramah lingkungan.",
   },
   {
     ticker: "BBNI",
@@ -206,6 +371,26 @@ export const MOCK_STOCKS: StockFundamental[] = [
     dataSource: "BEI / IDX",
     dataStatus: "Terverifikasi",
     hasData: true,
+    description:
+      "Bank BUMN yang berfokus pada pembiayaan korporasi, sindikasi, dan layanan perbankan transaksi internasional.",
+    ipoYear: 1996,
+    listingBoard: "Papan Utama",
+    controllingShareholder: "Negara Republik Indonesia (BUMN)",
+    controllingPercentage: 60.0,
+    publicShareholder: "Masyarakat / Free Float",
+    publicPercentage: 40.0,
+    businessSegments: [
+      { name: "Kredit Korporasi & Sindikasi", percentage: 54 },
+      { name: "Kredit Konsumer & Komersial", percentage: 32 },
+      { name: "Transaksi Perbankan Global & Treasury", percentage: 14 },
+    ],
+    dividendYield: 4.8,
+    dividendPayoutRatio: 50.0,
+    dividendDateNote: "Rutin dividen tahunan BUMN",
+    netProfitMargin: 33.5,
+    sectorSpecificMetric: { label: "NIM / NPL Gross", value: "4.4% / 2.0%" },
+    keyMoat: "Spesialisasi perbankan transaksi internasional dengan jaringan kantor cabang luar negeri (London, Tokyo, New York).",
+    keyRisk: "Margin bunga bersih (NIM) yang lebih rendah dibanding bank BUMN pesaing.",
   },
   {
     ticker: "UNVR",
@@ -229,5 +414,24 @@ export const MOCK_STOCKS: StockFundamental[] = [
     dataSource: "BEI / IDX",
     dataStatus: "Terverifikasi",
     hasData: true,
+    description:
+      "Produsen barang kebutuhan harian rumah tangga, perawatan diri, dan produk makanan-minuman konsumen.",
+    ipoYear: 1982,
+    listingBoard: "Papan Utama",
+    controllingShareholder: "Unilever Indonesia Holding B.V.",
+    controllingPercentage: 85.0,
+    publicShareholder: "Masyarakat / Free Float",
+    publicPercentage: 15.0,
+    businessSegments: [
+      { name: "Perawatan Tubuh & Kebersihan (Lifebuoy, Dove)", percentage: 66 },
+      { name: "Makanan & Minuman (Bango, Royco, SariWangi)", percentage: 34 },
+    ],
+    dividendYield: 4.2,
+    dividendPayoutRatio: 99.0,
+    dividendDateNote: "Dividen payout konsisten mendekati 100% laba",
+    netProfitMargin: 10.9,
+    sectorSpecificMetric: { label: "Return on Assets (ROA)", value: "18.2%" },
+    keyMoat: "Kekuatan merek legendaris (household names) dengan penetrasi distribusi di hampir setiap gerai ritel Indonesia.",
+    keyRisk: "Erosi pangsa pasar akibat kompetitor berharga lebih ekonomis dan tantangan daya beli konsumen kelas menengah.",
   },
 ];

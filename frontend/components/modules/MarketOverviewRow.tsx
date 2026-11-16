@@ -189,50 +189,50 @@ export const MarketOverviewRow: React.FC<MarketOverviewRowProps> = ({
           </span>
         </div>
 
-        <div className="flex flex-col @md:flex-row items-center justify-between gap-4">
-          <div className="relative flex h-20 w-20 shrink-0 items-center justify-center">
-            <svg className="h-full w-full -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
-              <circle
-                cx="50"
-                cy="50"
-                r="40"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="8"
-                className="text-zinc-100 dark:text-zinc-800"
-              />
-              <circle
-                cx="50"
-                cy="50"
-                r="40"
-                fill="none"
-                stroke="rgba(38, 166, 134, 0.9)"
-                strokeWidth="8"
-                strokeDasharray="155 251.2"
-                strokeLinecap="round"
-              />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-1">
-              <span className="text-sm font-bold text-zinc-950 dark:text-white tabular-nums leading-none">
-                {summary.circleMain}
-              </span>
-              <span className="text-[9px] text-zinc-400 mt-1 leading-tight">
-                {summary.circleSub}
-              </span>
+        <div className="grid grid-cols-1 @sm:grid-cols-2 @md:grid-cols-4 gap-3 items-stretch">
+          <div className="flex h-full min-h-[92px] items-center justify-center py-1">
+            <div className="relative flex h-[92px] w-[92px] shrink-0 items-center justify-center">
+              <svg className="h-full w-full -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                  className="text-zinc-100 dark:text-zinc-800"
+                />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  fill="none"
+                  stroke="rgba(38, 166, 134, 0.9)"
+                  strokeWidth="8"
+                  strokeDasharray="155 251.2"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-1">
+                <span className="text-base font-bold text-zinc-950 dark:text-white tabular-nums leading-none">
+                  {summary.circleMain}
+                </span>
+                <span className="text-[10px] text-zinc-400 mt-1 leading-tight">
+                  {summary.circleSub}
+                </span>
+              </div>
             </div>
           </div>
 
-          <div className="w-full flex-1 grid grid-cols-1 @sm:grid-cols-3 gap-3 min-w-0">
-            {summary.tiles.map((tile, idx) => (
-              <StatTile
-                key={idx}
-                label={tile.label}
-                value={tile.value}
-                subValue={tile.subValue}
-                subValueVariant={tile.variant}
-              />
-            ))}
-          </div>
+          {summary.tiles.map((tile, idx) => (
+            <StatTile
+              key={idx}
+              label={tile.label}
+              value={tile.value}
+              subValue={tile.subValue}
+              subValueVariant={tile.variant}
+            />
+          ))}
         </div>
       </div>
 
@@ -248,39 +248,37 @@ export const MarketOverviewRow: React.FC<MarketOverviewRowProps> = ({
           </span>
         </div>
 
-        <div className="flex flex-col @md:flex-row items-center gap-4">
-          <div className="flex h-20 w-20 shrink-0 flex-col items-center justify-center rounded-2xl bg-[rgba(20,130,102,0.88)] border border-[rgba(52,184,150,0.3)] p-2.5 text-white text-center">
-            <span className="text-[10px] uppercase tracking-wider text-white/80 font-semibold">
+        <div className="grid grid-cols-1 @sm:grid-cols-2 @md:grid-cols-4 gap-3 items-stretch">
+          <div className="flex h-full min-h-[92px] flex-col items-center justify-center rounded-xl bg-[rgba(20,130,102,0.88)] border border-[rgba(52,184,150,0.3)] p-3 text-white text-center">
+            <span className="text-[11px] uppercase tracking-wider text-white/80 font-semibold block leading-snug">
               Sumber
             </span>
-            <span className="block text-xs font-bold leading-tight mt-0.5">
+            <span className="block text-xs sm:text-sm font-bold leading-snug mt-1">
               {DATA_METADATA.source}
             </span>
-            <span className="block text-[10px] text-white/90 mt-1 tabular-nums">
+            <span className="block text-[10px] font-semibold text-white/90 mt-1 tabular-nums leading-snug">
               Rp 3.567 T
             </span>
           </div>
 
-          <div className="w-full flex-1 grid grid-cols-1 @sm:grid-cols-3 gap-3 min-w-0">
-            <StatTile
-              label="Periode Laporan"
-              value={DATA_METADATA.period}
-              subValue="Kuartal III berjalan"
-              subValueVariant="emerald"
-            />
-            <StatTile
-              label="Diperbarui"
-              value={DATA_METADATA.lastUpdated}
-              subValue="Dataset standar MVP"
-              subValueVariant="zinc"
-            />
-            <StatTile
-              label="Ketersediaan Data"
-              value={`${completedCount}/${stocks.length} Lengkap`}
-              subValue="0 kosong • Terverifikasi"
-              subValueVariant="emerald"
-            />
-          </div>
+          <StatTile
+            label="Periode Laporan"
+            value={DATA_METADATA.period}
+            subValue="Kuartal III berjalan"
+            subValueVariant="emerald"
+          />
+          <StatTile
+            label="Diperbarui"
+            value={DATA_METADATA.lastUpdated}
+            subValue="Dataset standar MVP"
+            subValueVariant="zinc"
+          />
+          <StatTile
+            label="Ketersediaan Data"
+            value={`${completedCount}/${stocks.length} Lengkap`}
+            subValue="0 kosong • Terverifikasi"
+            subValueVariant="emerald"
+          />
         </div>
       </div>
     </div>
