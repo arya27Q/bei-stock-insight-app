@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Layers,
   SlidersHorizontal,
@@ -11,11 +13,12 @@ import {
   X,
   PanelLeftClose,
   PanelLeftOpen,
+  User,
 } from "lucide-react";
 
 interface SidebarProps {
-  activeTab: "map" | "screener" | "benchmark";
-  setActiveTab: (tab: "map" | "screener" | "benchmark") => void;
+  activeTab?: "map" | "screener" | "benchmark";
+  setActiveTab?: (tab: "map" | "screener" | "benchmark") => void;
   isAiPanelOpen: boolean;
   setIsAiPanelOpen: (open: boolean) => void;
   isMobileOpen: boolean;
@@ -26,7 +29,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
-  activeTab,
+  activeTab: propActiveTab,
   setActiveTab,
   isAiPanelOpen,
   setIsAiPanelOpen,
@@ -36,26 +39,41 @@ export const Sidebar: React.FC<SidebarProps> = ({
   setIsCollapsed,
   onOpenGeneralAi,
 }) => {
+  const pathname = usePathname();
+
   const navItems = [
     {
       id: "map" as const,
       label: "Peta Saham",
       title: "01. Fundamental Stock Map (Treemap)",
       icon: Layers,
+      href: "/market-map",
     },
     {
       id: "screener" as const,
       label: "Smart Screener",
       title: "02. Smart Fundamental Screener",
       icon: SlidersHorizontal,
+      href: "/screener",
     },
     {
       id: "benchmark" as const,
       label: "Benchmark Sektor",
       title: "04. Sector Benchmark (Komparasi Sektor)",
       icon: TrendingUp,
+      href: "/benchmark",
     },
   ];
+
+  const isNavActive = (id: "map" | "screener" | "benchmark") => {
+    if (propActiveTab) return propActiveTab === id;
+    if (id === "map") return pathname === "/market-map" || pathname === "/";
+    if (id === "screener") return pathname.startsWith("/screener");
+    if (id === "benchmark") return pathname.startsWith("/benchmark");
+    return false;
+  };
+
+  const isProfileActive = pathname.startsWith("/profile");
 
   return (
     <>
@@ -107,12 +125,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <nav className="mt-4 space-y-3 pl-3" aria-label="Menu Fitur Utama">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = activeTab === item.id;
+              const isActive = isNavActive(item.id);
               return (
-                <button
+                <Link
                   key={item.id}
+                  href={item.href}
                   onClick={() => {
-                    setActiveTab(item.id);
+                    if (setActiveTab) setActiveTab(item.id);
                     setIsMobileOpen(false);
                   }}
                   title={item.title}
@@ -146,7 +165,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
                   </div>
                   {!isCollapsed && <span className="whitespace-nowrap">{item.label}</span>}
-                </button>
+                </Link>
               );
             })}
 
@@ -183,6 +202,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   </span>
                 )}
               </button>
+            </div>
+            {/* Tombol Profil Pengguna & Pengaturan */}
+            <div className="pr-3 pt-2">
+              <Link
+                href="/profile"
+                onClick={() => setIsMobileOpen(false)}
+                title="Profil Investor & Pengaturan"
+                className={`w-full flex items-center ${
+                  isCollapsed ? "justify-center" : "justify-between"
+                } rounded-2xl p-3 text-xs font-semibold transition-colors ${
+                  isProfileActive
+                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-500/20"
+                    : "text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-[#1e2029]"
+                }`}
+              >
+                <div className="flex items-center gap-3 overflow-hidden">
+                  <User className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  {!isCollapsed && <span className="whitespace-nowrap">Profil Investor</span>}
+                </div>
+              </Link>
             </div>
           </nav>
         </div>

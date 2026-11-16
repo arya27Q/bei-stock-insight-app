@@ -17,6 +17,7 @@ export interface DropdownSelectProps {
   ariaLabel?: string;
   className?: string;
   buttonClassName?: string;
+  menuClassName?: string;
   align?: "left" | "right";
 }
 
@@ -27,6 +28,7 @@ export const DropdownSelect: React.FC<DropdownSelectProps> = ({
   ariaLabel = "Pilih opsi",
   className,
   buttonClassName,
+  menuClassName,
   align = "right",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -130,7 +132,8 @@ export const DropdownSelect: React.FC<DropdownSelectProps> = ({
           aria-label={ariaLabel}
           className={cn(
             "absolute top-full z-50 mt-1.5 min-w-[240px] w-max max-w-[320px] overflow-hidden rounded-xl border border-zinc-200 bg-white/95 p-1.5 shadow-2xl backdrop-blur-md dark:border-zinc-700/80 dark:bg-[#161822]/95",
-            align === "right" ? "right-0" : "left-0"
+            align === "right" ? "right-0" : "left-0",
+            menuClassName
           )}
         >
           <div className="space-y-0.5">

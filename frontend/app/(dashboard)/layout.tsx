@@ -1,14 +1,10 @@
 "use client";
 
 import React from "react";
-import { Sidebar } from "../components/layout/Sidebar";
-import { RightAiPanel } from "../components/layout/RightAiPanel";
-import { MarketOverviewRow } from "../components/modules/MarketOverviewRow";
-import { StockMap } from "../components/modules/StockMap";
-import { StockScreener } from "../components/modules/StockScreener";
-import { SectorBenchmark } from "../components/modules/SectorBenchmark";
-import { StockFundamental } from "../types/stock";
-import { useStocks, useStockSearch, useDashboardLayout } from "../hooks";
+import Link from "next/link";
+import { DashboardProvider, useDashboard } from "@/context/DashboardContext";
+import { Sidebar } from "@/components/layout/Sidebar";
+import { RightAiPanel } from "@/components/layout/RightAiPanel";
 import {
   Search,
   Menu,
@@ -17,30 +13,17 @@ import {
   PanelLeftOpen,
   PanelRightClose,
   PanelRightOpen,
+  User,
 } from "lucide-react";
 
-export default function Home() {
-  const { stocks } = useStocks();
+function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
   const {
-    searchQuery,
-    searchResults,
-    isSearching,
-    handleSearchChange,
-    clearSearch,
-  } = useStockSearch(stocks);
-
-  const {
-    activeTab,
-    setActiveTab,
-    selectedMetric,
-    setSelectedMetric,
+    stocks,
     selectedStock,
     selectStock,
     clearSelectedStock,
-    benchmarkSector,
     navigateToBenchmark,
     isSidebarCollapsed,
-    setIsSidebarCollapsed,
     toggleSidebar,
     isMobileSidebarOpen,
     setIsMobileSidebarOpen,
@@ -48,26 +31,24 @@ export default function Home() {
     setIsRightAiOpen,
     toggleRightAi,
     openGeneralAi,
-    getTabTitle,
-  } = useDashboardLayout();
-
-  const handleSelectFromSearch = (stock: StockFundamental) => {
-    selectStock(stock);
-    clearSearch();
-  };
+    searchQuery,
+    searchResults,
+    isSearching,
+    handleSearchChange,
+    handleSelectFromSearch,
+    pageTitle,
+  } = useDashboard();
 
   return (
     <div className="min-h-screen bg-slate-100 font-sans text-zinc-900 dark:bg-[#16171f] dark:text-zinc-100 flex">
-      {/* 1. Left Sidebar Navigation (Bisa Buka/Tutup + Lekukan S-Curve Cutout) */}
+      {/* 1. Left Sidebar Navigation */}
       <Sidebar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
         isAiPanelOpen={isRightAiOpen}
         setIsAiPanelOpen={setIsRightAiOpen}
         isMobileOpen={isMobileSidebarOpen}
         setIsMobileOpen={setIsMobileSidebarOpen}
         isCollapsed={isSidebarCollapsed}
-        setIsCollapsed={setIsSidebarCollapsed}
+        setIsCollapsed={() => toggleSidebar()}
         onOpenGeneralAi={openGeneralAi}
       />
 
@@ -121,7 +102,7 @@ export default function Home() {
                 aria-hidden="true"
               />
 
-              {/* Autocomplete Dropdown (Tanpa # & Tanpa Truncate) */}
+              {/* Autocomplete Dropdown */}
               {isSearching && (
                 <div className="absolute left-0 right-0 sm:min-w-[380px] top-11 z-40 max-h-64 overflow-y-auto rounded-2xl border border-zinc-200 bg-white p-1.5 shadow-xl dark:border-zinc-800 dark:bg-[#16171f] text-left">
                   {searchResults.length === 0 ? (
@@ -155,8 +136,19 @@ export default function Home() {
           {/* Kanan: Judul Fitur Aktif & Tombol Buka/Tutup Panel AI */}
           <div className="flex items-center gap-3 shrink-0">
             <span className="hidden xl:inline text-xs font-semibold text-zinc-400">
-              {getTabTitle()}
+              {pageTitle}
             </span>
+
+            <Link
+              href="/profile"
+              title="Profil Investor & Pengaturan"
+              className="flex h-10 items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-[#1e2029] dark:text-zinc-200 dark:hover:bg-zinc-800 transition-colors shrink-0 cursor-pointer"
+            >
+              <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold text-[10px]">
+                <User className="h-3.5 w-3.5" aria-hidden="true" />
+              </div>
+              <span className="hidden md:inline">Profil</span>
+            </Link>
 
             <button
               onClick={toggleRightAi}
@@ -181,37 +173,10 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Kanvas Utama Dalam (#0d0e13 dengan Sudut Kiri Atas Melengkung Menyatu dengan Cutout Sidebar) */}
+        {/* Kanvas Utama Dalam */}
         <main className="@container flex-1 rounded-tl-[28px] bg-slate-50 dark:bg-[#0d0e13] px-4 py-6 sm:px-6 lg:px-7">
           <div className="mx-auto w-full max-w-[1600px]">
-            {/* Ringkasan Pasar 2-Grid Ringkas (Sinkron Indikator & Metadata Transparansi Data) */}
-            <MarketOverviewRow stocks={stocks} selectedMetric={selectedMetric} />
-
-            {/* 5 Fitur Utama Sesuai Dokumentasi Sistem */}
-            {activeTab === "map" && (
-              <StockMap
-                stocks={stocks}
-                selectedMetric={selectedMetric}
-                onSelectMetric={setSelectedMetric}
-                selectedTicker={selectedStock?.ticker}
-                onSelectStock={selectStock}
-              />
-            )}
-
-            {activeTab === "screener" && (
-              <StockScreener
-                stocks={stocks}
-                onSelectStock={selectStock}
-              />
-            )}
-
-            {activeTab === "benchmark" && (
-              <SectorBenchmark
-                stocks={stocks}
-                onSelectStock={selectStock}
-                initialSector={benchmarkSector}
-              />
-            )}
+            {children}
           </div>
         </main>
 
@@ -235,5 +200,13 @@ export default function Home() {
         stocks={stocks}
       />
     </div>
+  );
+}
+
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <DashboardProvider>
+      <DashboardLayoutContent>{children}</DashboardLayoutContent>
+    </DashboardProvider>
   );
 }

@@ -20,6 +20,25 @@ Pengguna mengakses platform ini **sebelum mengeksekusi transaksi** di sekuritas 
 4. **Validasi & Konsultasi Berbantuan AI**: Mengetahui kekuatan dan risiko terbesar bisnis perusahaan secara instan melalui analisis otomatis dan chatbot interaktif.
 5. **Perbandingan Antar-Emiten (*Benchmarking*)**: Memastikan emiten yang dipilih memiliki daya saing lebih unggul dibanding kompetitor di sektor yang sama sebelum modal diinvestasikan.
 
+### Masalah Nyata yang Dihadapi Pengguna (User Pain Points)
+Sistem ini dirancang dengan memetakan secara mendalam permasalahan nyata yang dihadapi masyarakat awam dan investor ritel pemula di Indonesia:
+
+1. **Kendala Latar Belakang Finansial (Bukan Orang Keuangan)**:
+   * Laporan keuangan resmi BEI (*financial statements*) rata-rata setebal 80 hingga 150 halaman berformat PDF dengan ribuan baris angka padat.
+   * Istilah teknis seperti *Return on Equity (ROE)*, *Price to Earnings Ratio (PER)*, *Price to Book Value (PBV)*, dan *Debt to Equity Ratio (DER)* terasa asing dan mengintimidasi bagi pengguna tanpa latar belakang akuntansi atau manajemen keuangan.
+
+2. **Kendala Satuan Transaksi Lot (1 Lot = 100 Lembar) & Alokasi Modal Terbatas**:
+   * Saham di BEI wajib dibeli minimal 1 lot (100 lembar saham).
+   * Mayoritas investor ritel pemula memulai dengan modal awal terbatas (misal Rp 100.000 hingga Rp 2.000.000). Mereka sering kesulitan dan bingung menghitung secara manual berapa lot yang sanggup dibeli dengan modal yang mereka miliki saat ini.
+   * Kebingungan ini sering meninggalkan sisa saldo mengendap (*idle cash*) di Rekening Dana Nasabah (RDN) karena pemula tidak tahu saham sehat apa lagi yang terjangkau dengan sisa dana tersebut.
+
+3. **Jebakan Bias "Harga Nominal Murah" vs "Valuasi Fundamental Murah" (*The Nominal Price Illusion*)**:
+   * Pemula sering terjebak membeli saham berharga nominal rendah (misal Rp 50 atau Rp 100 per lembar, setara Rp 5.000 s/d Rp 10.000 per lot) dengan asumsi keliru bahwa saham tersebut pasti "murah" dan mudah naik, padahal perusahaan tersebut merugi, bermasalah, dan valuasinya tergolong sangat mahal.
+   * Sebaliknya, pemula merasa takut membeli saham berfundamental prima (seperti BBCA atau BMRI di kisaran Rp 10.000/lembar = Rp 1.000.000 per lot) karena merasa "terlalu mahal", padahal secara valuasi laba dan dividen posisinya sangat wajar dan menguntungkan dalam jangka panjang.
+
+4. **Ketergantungan pada Rumor Media Sosial (*FOMO*) Tanpa Alat Riset Mandiri**:
+   * Karena tidak memiliki alat analisis yang mudah dipahami, pemula cenderung bergantung pada rekomendasi *influencer*, grup obrolan instan, atau rumor pasar, yang sering berujung pada kerugian modal besar.
+
 ### Posisi dalam Alur Keputusan Investor (Investor Journey)
 ```
 [Tahap 1: Riset & Analisis di BEI Stock Insight]
@@ -87,6 +106,16 @@ Halaman khusus saat pengguna memilih salah satu emiten (misal: **BBCA**):
 | **Financial History** | Grafik interaktif perkembangan kinerja keuangan tahunan & kuartalan |
 
 > **Peran Fitur:** Halaman detail ini menjadi penghubung sentral antara peta saham (*Stock Map*), hasil saringan (*Screener*), perbandingan (*Sector Benchmark*), dan penjelasan AI (*AI Explanation*).
+
+### 06: Modul Autentikasi & Profil Investor (User Account & Lot Simulator)
+Menyediakan pengelolaan identitas pengguna, preferensi riset, serta simulator keterjangkauan modal beli lot saham:
+
+| Halaman | Rute (*Route*) | Fungsi Utama |
+|---|---|---|
+| **Halaman Masuk** | `/login` | Otentikasi pengguna terdaftar dengan fitur *remember me*, info akun demo praktis, dan proteksi kredensial. |
+| **Halaman Pendaftaran** | `/register` | Registrasi investor baru dengan pemilihan tingkat pengalaman (Pemula, Menengah, Mahir) dan penetapan tier modal awal RDN. |
+| **Pemulihan Sandi** | `/forgot-password` | Pengiriman instruksi dan tautan atur ulang kata sandi melalui email terdaftar dengan konfirmasi visual. |
+| **Profil & Pengaturan** | `/profile` | Pengelolaan data investor, bio strategi investasi, daftar pantauan (*watchlist*), serta **Simulator Keterjangkauan Lot Saham (1 Lot = 100 Lembar)** untuk menghitung sisa dana mengendap secara transparan. |
 
 ---
 
@@ -159,8 +188,10 @@ Kelima fitur tidak berdiri sendiri, melainkan terintegrasi secara utuh dalam sat
 
 ## 9. Target Pengguna & Kesimpulan
 
-* **Target Pengguna:** Investor ritel pemula hingga menengah yang ingin riset saham berbasis kinerja bisnis tanpa harus menghitung rasio atau membaca tabel laporan keuangan mentah secara manual.
-* **Fokus Pembeda:** Visualisasi kondisi fundamental saham dalam satu peta interaktif dan penjelasan AI naratif berbasis data keuangan faktual.
+* **Target Pengguna Utama:**
+  1. **Investor Ritel Pemula & Awam:** Masyarakat yang baru mulai berinvestasi di pasar modal Indonesia, tidak memiliki latar belakang akuntansi/keuangan, dan ingin berinvestasi secara mandiri tanpa terjebak rumor atau *FOMO*.
+  2. **Investor dengan Modal Awal Terbatas:** Pengguna yang membutuhkan kejelasan keterjangkauan modal beli minimum per lot (1 lot = 100 lembar) untuk mengalokasikan saldo Rekening Dana Nasabah (RDN) secara efisien ke saham-saham yang sehat secara fundamental.
+* **Fokus Pembeda:** Visualisasi kondisi fundamental saham dalam satu peta interaktif, pemecah kebingungan lot/keterjangkauan modal, dan penjelasan AI naratif berbasis data keuangan faktual.
 * **Strategi Pengembangan MVP:** Membatasi emiten awal pada saham-saham berkapitalisasi besar (9 emiten unggulan LQ45 dari sektor utama) untuk validasi struktur data dan formula rasio sebelum memperluas cakupan ke seluruh emiten BEI.
 
 ---
@@ -199,3 +230,50 @@ Validasi pemahaman pengguna dilakukan kepada 5 s/d 8 calon investor pemula melal
 1. **Tugas 1 (Eksplorasi Visual)**: Mencari saham yang memiliki pertumbuhan pendapatan positif melalui Peta Saham.
 2. **Tugas 2 (Pemahaman Indikator)**: Menjelaskan kembali dengan bahasa sendiri arti *Kemampuan Menghasilkan Laba (ROE)* pada salah satu emiten menggunakan bantuan penjelasan sistem.
 3. **Tugas 3 (Komparasi Sektoral)**: Membandingkan dua perusahaan dari sektor yang sama pada fitur *Sector Benchmark* dan menjelaskan perbedaan posisinya terhadap median sektor.
+
+---
+
+## 11. Modul Autentikasi Pengguna & Standardisasi UI Dropdown
+
+Untuk memfasilitasi personalisasi riset tanpa membebani pengguna dengan input modal yang kaku, sistem mengadopsi struktur berikut:
+
+1. **Halaman Autentikasi Mandiri (`/login`, `/register`, `/forgot-password`, `/profile`)**:
+   * Memudahkan investor menyimpan daftar saham pantauan (*watchlist*), tingkat pengalaman pasar, dan preferensi sektor industri pilihan.
+   * Input modal investasi RDN dihilangkan dari form registrasi dan profil agar pengguna dapat mengeksplorasi platform secara bebas tanpa hambatan memasukkan saldo pribadi.
+
+2. **Standardisasi Komponen `DropdownSelect`**:
+   * Mengganti elemen native browser `<select>` di seluruh sistem dengan komponen `DropdownSelect` berbasis custom menu yang responsif, mendukung tema gelap/terang, dilengkapi indikator warna (*dot indicator*), serta navigasi keyboard lengkap (Arrow, Enter, Escape).
+   * Menghasilkan konsistensi visual identik antara menu rasio di Peta Pasar (Treemap), penyaring Smart Screener, dan form preferensi Profil Investor.
+
+3. **Panduan Satuan Lot Saham BEI (1 Lot = 100 Lembar)**:
+   * Menjelaskan ketentuan perdagangan saham di Bursa Efek Indonesia dalam satuan 1 lot (100 lembar) secara edukatif pada panel profil.
+   * Menampilkan harga per lembar vs biaya minimum 1 lot untuk emiten pilihan (misal: BBCA Rp 1.000.000/lot, BBRI Rp 465.000/lot, ICBP Rp 1.180.000/lot, TLKM Rp 285.000/lot), membantu investor pemula memahami kebutuhan modal riil tanpa perlu kalkulator modal yang rumit.
+
+---
+
+## 12. Arsitektur Next.js App Router (Route Groups & Shared Layout)
+
+Struktur rute frontend ditata menggunakan pola standar industri Next.js App Router:
+
+```text
+frontend/app/
+│
+├── (auth)/                        # Grup Autentikasi (Standalone card layout tanpa sidebar)
+│   ├── login/page.tsx             # URL: /login
+│   ├── register/page.tsx          # URL: /register
+│   └── forgot-password/page.tsx   # URL: /forgot-password
+│
+└── (dashboard)/                   # Grup Dashboard Kerja (Persistent Shared Layout)
+    ├── layout.tsx                 # Menyediakan Sidebar, Header, Right AI Panel, & DashboardProvider
+    ├── page.tsx                   # URL: / (Redirect ke /market-map)
+    ├── market-map/page.tsx        # URL: /market-map (Peta Saham Treemap)
+    ├── screener/page.tsx          # URL: /screener (Smart Fundamental Screener)
+    ├── benchmark/page.tsx         # URL: /benchmark (Sector Benchmark)
+    ├── ai-insight/page.tsx        # URL: /ai-insight (Pusat Riset AI)
+    └── profile/page.tsx           # URL: /profile (Profil Investor)
+```
+
+* **Keuntungan Teknis:**
+  1. **Zero Re-mount Shell:** Sidebar dan Right AI Panel berada di `(dashboard)/layout.tsx` sehingga tidak pernah dimuat ulang saat berpindah antar-halaman.
+  2. **Preservasi State & Chat:** Konteks saham aktif (misal BBCA) dan percakapan AI tetap tersimpan di `DashboardContext` saat pengguna membuka Screener atau Benchmark.
+  3. **Direct Linking & Deep Navigation:** Setiap fitur memiliki URL unik yang dapat di-*share* atau di-*bookmark*, serta tombol *Back/Forward* browser bekerja secara normal.
