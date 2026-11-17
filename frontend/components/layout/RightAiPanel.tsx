@@ -47,7 +47,7 @@ export const RightAiPanel: React.FC<RightAiPanelProps> = ({
       />
 
       <aside
-        className="fixed inset-y-0 right-0 z-40 flex w-full sm:w-[410px] xl:w-[440px] 2xl:w-[470px] flex-col justify-between border-l border-zinc-200 bg-white p-4 sm:p-5 shadow-xl dark:border-zinc-800/80 dark:bg-[#16171f] overflow-y-auto"
+        className="fixed inset-y-0 right-0 z-40 flex w-full sm:w-[480px] lg:w-[490px] xl:w-[540px] 2xl:w-[580px] flex-col justify-between border-l border-zinc-200 bg-white p-4 sm:p-5 shadow-xl dark:border-zinc-800/80 dark:bg-[#16171f] overflow-y-auto"
         aria-label="Panel Analis AI dan Detail Emiten"
       >
         <div>

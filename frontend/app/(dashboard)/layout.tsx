@@ -5,6 +5,7 @@ import Link from "next/link";
 import { DashboardProvider, useDashboard } from "@/context/DashboardContext";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { RightAiPanel } from "@/components/layout/RightAiPanel";
+import { CommandPaletteModal } from "@/components/modules/CommandPaletteModal";
 import {
   Search,
   Menu,
@@ -31,16 +32,15 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     setIsRightAiOpen,
     toggleRightAi,
     openGeneralAi,
-    searchQuery,
-    searchResults,
-    isSearching,
-    handleSearchChange,
-    handleSelectFromSearch,
     pageTitle,
+    watchlist,
+    isCommandPaletteOpen,
+    openCommandPalette,
+    closeCommandPalette,
   } = useDashboard();
 
   return (
-    <div className="min-h-screen bg-slate-100 font-sans text-zinc-900 dark:bg-[#16171f] dark:text-zinc-100 flex">
+    <div className="fixed inset-0 overflow-hidden bg-slate-100 font-sans text-zinc-900 dark:bg-[#16171f] dark:text-zinc-100 flex">
       {/* 1. Left Sidebar Navigation */}
       <Sidebar
         isAiPanelOpen={isRightAiOpen}
@@ -54,12 +54,12 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
       {/* 2. Main Shell Frame */}
       <div
-        className={`flex-1 min-w-0 flex flex-col justify-between transition-all duration-200 ${
+        className={`flex-1 min-w-0 h-full flex flex-col justify-between overflow-hidden transition-all duration-200 ${
           isSidebarCollapsed ? "lg:pl-20" : "lg:pl-60"
-        } ${isRightAiOpen ? "lg:pr-[410px] xl:pr-[440px] 2xl:pr-[470px]" : ""}`}
+        } ${isRightAiOpen ? "lg:pr-[490px] xl:pr-[540px] 2xl:pr-[580px]" : ""}`}
       >
         {/* Top Header */}
-        <header className="sticky top-0 z-30 flex h-20 items-center justify-between gap-3 bg-white px-4 sm:px-6 dark:bg-[#16171f]">
+        <header className="shrink-0 z-30 flex h-20 items-center justify-between gap-3 bg-white px-4 sm:px-6 dark:bg-[#16171f] border-b border-zinc-200/80 dark:border-zinc-800/80">
           <div className="flex items-center gap-3 min-w-0 flex-1">
             {/* Tombol Buka Menu Mobile */}
             <button
@@ -84,53 +84,23 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
               )}
             </button>
 
-            {/* Search Input */}
-            <div className="relative w-full max-w-md">
-              <label htmlFor="top-search-input" className="sr-only">
-                Cari kode atau nama emiten
-              </label>
-              <input
-                id="top-search-input"
-                type="text"
-                placeholder="Cari emiten (BBCA, BBRI, TLKM)..."
-                value={searchQuery}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                className="w-full rounded-xl border border-transparent bg-zinc-100/80 pl-4 pr-10 py-2 text-xs sm:text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-700 focus:bg-white focus:outline-none dark:bg-[#1e2029] dark:text-zinc-100 dark:placeholder:text-zinc-400 dark:focus:bg-[#1e2029]"
-              />
-              <Search
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400"
-                aria-hidden="true"
-              />
-
-              {/* Autocomplete Dropdown */}
-              {isSearching && (
-                <div className="absolute left-0 right-0 sm:min-w-[380px] top-11 z-40 max-h-64 overflow-y-auto rounded-2xl border border-zinc-200 bg-white p-1.5 shadow-xl dark:border-zinc-800 dark:bg-[#16171f] text-left">
-                  {searchResults.length === 0 ? (
-                    <div className="p-3 text-center text-xs text-zinc-400">
-                      Emiten tidak ditemukan.
-                    </div>
-                  ) : (
-                    searchResults.map((s) => (
-                      <button
-                        key={s.ticker}
-                        onClick={() => handleSelectFromSearch(s)}
-                        className="w-full grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-xl p-2.5 hover:bg-zinc-100 dark:hover:bg-zinc-800/70 text-left cursor-pointer"
-                      >
-                        <span className="text-xs font-bold text-zinc-950 dark:text-zinc-100">
-                          {s.ticker}
-                        </span>
-                        <span className="text-xs text-zinc-400 leading-snug">
-                          {s.name}
-                        </span>
-                        <span className="text-[11px] font-semibold text-emerald-500 tabular-nums whitespace-nowrap">
-                          {s.marketCapLabel}
-                        </span>
-                      </button>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
+            {/* Quick Search & Command Palette Trigger (Ctrl + K) */}
+            <button
+              type="button"
+              onClick={openCommandPalette}
+              className="relative w-full max-w-md flex items-center justify-between rounded-xl border border-transparent bg-zinc-100/90 pl-3.5 pr-2.5 py-2 text-xs sm:text-sm text-zinc-500 hover:text-zinc-800 hover:bg-zinc-200/70 dark:bg-[#1e2029] dark:text-zinc-400 dark:hover:text-zinc-200 dark:hover:bg-zinc-800 transition-all text-left cursor-pointer group"
+              aria-label="Buka Pencarian Cepat Saham (Shortcut Ctrl + K)"
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <Search className="h-4 w-4 text-zinc-400 group-hover:text-emerald-500 transition-colors shrink-0" aria-hidden="true" />
+                <span className="truncate">Cari emiten (BBCA, BBRI, TLKM)...</span>
+              </div>
+              <div className="flex items-center gap-1 shrink-0">
+                <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded-lg border border-zinc-200 bg-white px-1.5 py-0.5 font-mono text-[10px] font-semibold text-zinc-500 shadow-2xs dark:border-zinc-700/80 dark:bg-zinc-800 dark:text-zinc-400">
+                  <span className="text-[11px]">⌘</span>K
+                </kbd>
+              </div>
+            </button>
           </div>
 
           {/* Kanan: Judul Fitur Aktif & Tombol Buka/Tutup Panel AI */}
@@ -182,15 +152,15 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        {/* Kanvas Utama Dalam */}
-        <main className="@container flex-1 rounded-tl-[28px] bg-slate-50 dark:bg-[#0d0e13] px-4 py-6 sm:px-6 lg:px-7">
+        {/* Kanvas Utama Dalam (Hanya area ini yang dapat discroll) */}
+        <main className="@container flex-1 min-h-0 overflow-y-auto overscroll-contain rounded-tl-[28px] bg-slate-50 dark:bg-[#0d0e13] px-4 py-6 sm:px-6 lg:px-7">
           <div className="mx-auto w-full max-w-[1600px]">
             {children}
           </div>
         </main>
 
-        {/* Footer */}
-        <footer className="bg-slate-50 dark:bg-[#0d0e13] border-t border-zinc-200/70 dark:border-zinc-800/60 py-4 px-4 sm:px-6 lg:px-7 text-xs text-zinc-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+        {/* Footer (Fixed di bawah / tidak bergerak saat scroll) */}
+        <footer className="shrink-0 z-20 bg-slate-50 dark:bg-[#0d0e13] border-t border-zinc-200/70 dark:border-zinc-800/60 py-3 px-4 sm:px-6 lg:px-7 text-xs text-zinc-500 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p>© 2026 BEI Stock Insight: Riset Fundamental Saham Bursa Efek Indonesia.</p>
           <p className="text-zinc-400">
             Sumber: BEI / IDX • Periode Laporan: Q3 2024 (Diperbarui 15 Nov 2024 • Status: Terverifikasi). Disajikan untuk analisis edukasi mandiri.
@@ -207,6 +177,18 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         onSelectStock={selectStock}
         onNavigateToBenchmark={navigateToBenchmark}
         stocks={stocks}
+      />
+
+      {/* 4. Command Palette Modal (Ctrl + K) */}
+      <CommandPaletteModal
+        isOpen={isCommandPaletteOpen}
+        onClose={closeCommandPalette}
+        stocks={stocks}
+        onSelectStock={(stock) => {
+          selectStock(stock);
+          setIsRightAiOpen(true);
+        }}
+        watchlist={watchlist}
       />
     </div>
   );

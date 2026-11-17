@@ -12,6 +12,7 @@ import {
   MinusCircle,
   AlertCircle,
   RotateCcw,
+  Bookmark,
 } from "lucide-react";
 import { StockFundamental } from "../../types/stock";
 import {
@@ -23,6 +24,7 @@ import { Avatar } from "../ui/Avatar";
 import { Badge } from "../ui/Badge";
 import { SearchInput } from "../ui/SearchInput";
 import { DropdownSelect } from "../ui/DropdownSelect";
+import { useDashboard } from "@/context/DashboardContext";
 
 interface StockScreenerProps {
   stocks: StockFundamental[];
@@ -30,6 +32,7 @@ interface StockScreenerProps {
 }
 
 export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectStock }) => {
+  const { isWatchlisted, toggleWatchlist } = useDashboard();
   const {
     viewMode,
     setViewMode,
@@ -354,12 +357,29 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
 
                         {/* Kolom 2: Kode Emiten & Sektor */}
                         <td className="py-3.5 px-4 whitespace-nowrap">
-                          <span className="font-semibold text-zinc-800 dark:text-zinc-200 tracking-tight">
-                            {stock.ticker}
-                          </span>
-                          <span className="ml-2 rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
-                            {stock.sector === "Barang Konsumsi Primer" ? "Konsumsi" : stock.sector}
-                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleWatchlist(stock.ticker);
+                              }}
+                              title={isWatchlisted(stock.ticker) ? "Hapus dari Watchlist" : "Simpan ke Watchlist"}
+                              className={`p-1 rounded-md transition-all cursor-pointer ${
+                                isWatchlisted(stock.ticker)
+                                  ? "text-amber-500 hover:text-amber-600 dark:text-amber-400"
+                                  : "text-zinc-300 hover:text-zinc-600 dark:text-zinc-600 dark:hover:text-zinc-300"
+                              }`}
+                            >
+                              <Bookmark className={`h-3.5 w-3.5 ${isWatchlisted(stock.ticker) ? "fill-current" : ""}`} />
+                            </button>
+                            <span className="font-semibold text-zinc-800 dark:text-zinc-200 tracking-tight">
+                              {stock.ticker}
+                            </span>
+                            <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+                              {stock.sector === "Barang Konsumsi Primer" ? "Konsumsi" : stock.sector}
+                            </span>
+                          </div>
                         </td>
 
                         {/* Kolom 3: Kapitalisasi Pasar */}
@@ -486,9 +506,33 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
                       </span>
                     </div>
                   </div>
-                  <Badge variant="zinc">
-                    {stock.sector === "Barang Konsumsi Primer" ? "Konsumsi" : stock.sector}
-                  </Badge>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleWatchlist(stock.ticker);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.stopPropagation();
+                          toggleWatchlist(stock.ticker);
+                        }
+                      }}
+                      title={isWatchlisted(stock.ticker) ? "Hapus dari Watchlist" : "Simpan ke Watchlist"}
+                      className={`p-1 rounded-md transition-all cursor-pointer ${
+                        isWatchlisted(stock.ticker)
+                          ? "text-amber-500 hover:text-amber-600 bg-amber-500/10"
+                          : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                      }`}
+                    >
+                      <Bookmark className={`h-3.5 w-3.5 ${isWatchlisted(stock.ticker) ? "fill-current" : ""}`} />
+                    </span>
+                    <Badge variant="zinc">
+                      {stock.sector === "Barang Konsumsi Primer" ? "Konsumsi" : stock.sector}
+                    </Badge>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-1.5 py-2 border-y border-zinc-100 dark:border-zinc-800 text-center">

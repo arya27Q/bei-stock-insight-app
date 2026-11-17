@@ -100,11 +100,11 @@ export const GeneralAiView: React.FC<GeneralAiViewProps> = ({
       </div>
 
       {/* General Chat Messages Thread */}
-      <div className="space-y-3 max-h-56 overflow-y-auto pr-1 pt-2">
+      <div className="space-y-3.5 max-h-80 overflow-y-auto pr-1 pt-2">
         {generalMessages.map((m) => (
           <div
             key={m.id}
-            className={`flex items-start gap-2 ${
+            className={`flex items-start gap-2.5 ${
               m.sender === "user" ? "flex-row-reverse" : "flex-row"
             }`}
           >
@@ -122,14 +122,14 @@ export const GeneralAiView: React.FC<GeneralAiViewProps> = ({
               )}
             </div>
             <div
-              className={`max-w-[85%] rounded-xl px-3 py-2 text-xs leading-relaxed ${
+              className={`max-w-[92%] rounded-2xl px-4 py-3 text-xs leading-relaxed ${
                 m.sender === "user"
                   ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 font-medium"
                   : "bg-zinc-100 text-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 border border-zinc-200/70 dark:border-zinc-800"
               }`}
             >
-              <p>{m.text}</p>
-              <span className="block text-[9px] mt-0.5 opacity-60 text-right">{m.time}</span>
+              <p className="whitespace-pre-line leading-relaxed">{m.text}</p>
+              <span className="block text-[9px] mt-1.5 opacity-60 text-right">{m.time}</span>
             </div>
           </div>
         ))}

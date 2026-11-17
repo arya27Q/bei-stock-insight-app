@@ -1,0 +1,138 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+// 1. Tabel Master Emiten & Fundamental BEI
+model Stock {
+  ticker                 String          @id @db.VarChar(10)
+  name                   String          @db.VarChar(255)
+  sector                 String          @db.VarChar(100)
+  subSector              String          @db.VarChar(100)
+  pricePerShare          Float           @default(1000)
+  pricePerLot            Float           @default(100000)
+  marketCap              Float
+  marketCapLabel         String          @db.VarChar(50)
+  revenueGrowth          Float
+  netIncomeGrowth        Float
+  roe                    Float
+  per                    Float
+  pbv                    Float?
+  der                    Float?
+  revenueLabel           String?         @db.VarChar(50)
+  netIncomeLabel         String?         @db.VarChar(50)
+  totalAssetsLabel       String?         @db.VarChar(50)
+  totalEquityLabel       String?         @db.VarChar(50)
+  period                 String          @default("Q3 2024") @db.VarChar(20)
+  lastUpdated            String?         @db.VarChar(50)
+  dataSource             String?         @default("BEI / IDX") @db.VarChar(50)
+  dataStatus             String?         @default("Terverifikasi") @db.VarChar(50)
+  hasData                Boolean         @default(true)
+  description            String?         @db.Text
+
+  // Rincian Profil & Analisis Bisnis Lanjutan
+  ipoYear                Int?
+  listingBoard           String?         @db.VarChar(50)
+  controllingShareholder String?         @db.VarChar(255)
+  controllingPercentage  Float?
+  publicShareholder      String?         @db.VarChar(255)
+  publicPercentage       Float?
+  businessSegments       Json?
+  dividendYield          Float?
+  dividendPayoutRatio    Float?
+  dividendDateNote       String?         @db.VarChar(255)
+  netProfitMargin        Float?
+  sectorSpecificMetric   Json?
+  keyMoat                String?         @db.Text
+  keyRisk                String?         @db.Text
+
+  // Relasi Internal Modul Saham & AI
+  aiInsights             AiInsight[]
+  aiChatLogs             AiChatLog[]
+  lotSimulations         LotSimulation[]
+  watchlists             Watchlist[]
+
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
+
+  @@map("stocks")
+}
+
+// 2. Tabel Cache Rangkuman Analisis Fundamental AI
+model AiInsight {
+  id                    String   @id @default(uuid()) @db.VarChar(36)
+  stockTicker           String   @db.VarChar(10)
+  period                String   @default("Q3 2024") @db.VarChar(20)
+  summary               String   @db.Text
+  strengths             Json
+  considerations        Json
+  factPoints            Json?
+  interpretationPoints  Json?
+  disclaimer            String?  @db.Text
+  lastUpdated           String?  @db.VarChar(50)
+
+  stock                 Stock    @relation(fields: [stockTicker], references: [ticker], onDelete: Cascade)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([stockTicker])
+  @@map("ai_insights")
+}
+
+// 3. Tabel Riwayat Chat Analisis AI per Emiten
+model AiChatLog {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  stockTicker String   @db.VarChar(10)
+  sender      String   @default("user") @db.VarChar(20)
+  message     String   @db.Text
+  period      String?  @default("Q3 2024") @db.VarChar(20)
+
+  stock       Stock    @relation(fields: [stockTicker], references: [ticker], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@index([stockTicker])
+  @@map("ai_chat_logs")
+}
+
+// 4. Tabel Hasil Simulasi & Rencana Alokasi Lot Modal Saham
+model LotSimulation {
+  id                String   @id @default(uuid()) @db.VarChar(36)
+  stockTicker       String   @db.VarChar(10)
+  pricePerShare     Float
+  pricePerLot       Float
+  targetBudget      Float
+  brokerFeePercent  Float    @default(0.15)
+  calculatedLots    Int
+  totalStockCost    Float
+  brokerFeeAmount   Float
+  totalSpent        Float
+  remainingCash     Float
+  aiCommentary      String?  @db.Text
+
+  stock             Stock    @relation(fields: [stockTicker], references: [ticker], onDelete: Cascade)
+  createdAt         DateTime @default(now())
+
+  @@index([stockTicker])
+  @@map("lot_simulations")
+}
+
+// 5. Tabel Daftar Pantauan (Watchlist) Saham Pengguna
+model Watchlist {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  userEmail   String   @default("investor@beistockinsight.id") @db.VarChar(255)
+  stockTicker String   @db.VarChar(10)
+  notes       String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  stock       Stock    @relation(fields: [stockTicker], references: [ticker], onDelete: Cascade)
+
+  @@unique([userEmail, stockTicker])
+  @@index([userEmail])
+  @@index([stockTicker])
+  @@map("watchlists")
+}

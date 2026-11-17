@@ -9,11 +9,13 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
+  Bookmark,
 } from "lucide-react";
 import { StockFundamental, MetricType } from "../../types/stock";
 import { METRIC_DEFINITIONS, getHistoricalTrend } from "../../services/stock-service";
 import { Sparkline } from "../ui/Sparkline";
 import { DropdownSelect } from "../ui/DropdownSelect";
+import { useDashboard } from "@/context/DashboardContext";
 
 interface StockMapProps {
   stocks: StockFundamental[];
@@ -39,7 +41,9 @@ export const StockMap: React.FC<StockMapProps> = ({
     if (onSelectMetric) onSelectMetric(metric);
   };
 
+  const { watchlist, isWatchlisted, toggleWatchlist } = useDashboard();
   const [selectedSector, setSelectedSector] = useState<string>("all");
+  const [onlyWatchlist, setOnlyWatchlist] = useState<boolean>(false);
   const [layoutMode, setLayoutMode] = useState<ViewLayoutMode>("sectors");
   const [showTooltip, setShowTooltip] = useState(false);
 
@@ -47,9 +51,11 @@ export const StockMap: React.FC<StockMapProps> = ({
 
   const sectors = ["all", ...Array.from(new Set(stocks.map((s) => s.sector)))];
 
-  const filteredStocks = selectedSector === "all"
-    ? stocks
-    : stocks.filter((s) => s.sector === selectedSector);
+  const filteredStocks = stocks.filter((s) => {
+    const matchesSector = selectedSector === "all" || s.sector === selectedSector;
+    const matchesWatchlist = !onlyWatchlist || watchlist.includes(s.ticker);
+    return matchesSector && matchesWatchlist;
+  });
 
   // Warna RGBA harmonis yang menyatu dengan palet dark #16171f namun tetap tajam (WCAG AA >= 5.2:1 terhadap teks putih)
   const getSolidTileStyle = (val: number) => {
@@ -188,7 +194,38 @@ export const StockMap: React.FC<StockMapProps> = ({
   const getShortSectorBadge = (sector: string) => {
     if (sector === "Barang Konsumsi Primer") return "Konsumsi";
     if (sector === "Perindustrian") return "Industri";
+    if (sector === "Infrastruktur") return "Infra";
+    if (sector === "Bahan Baku") return "Bahan Baku";
+    if (sector === "Teknologi") return "Tekno";
+    if (sector === "Kesehatan") return "Kesehatan";
+    if (sector === "Utilitas") return "Utilitas";
     return sector;
+  };
+
+  // Warna indikator titik dot untuk setiap sektor
+  const getSectorColorDot = (sector: string) => {
+    switch (sector) {
+      case "Keuangan":
+        return "bg-emerald-500";
+      case "Barang Konsumsi Primer":
+        return "bg-amber-500";
+      case "Bahan Baku":
+        return "bg-purple-500";
+      case "Infrastruktur":
+        return "bg-sky-500";
+      case "Perindustrian":
+        return "bg-indigo-500";
+      case "Energi":
+        return "bg-rose-500";
+      case "Teknologi":
+        return "bg-cyan-500";
+      case "Kesehatan":
+        return "bg-pink-500";
+      case "Utilitas":
+        return "bg-teal-500";
+      default:
+        return "bg-zinc-400";
+    }
   };
 
   const formatShortCap = (marketCap: number) => {
@@ -196,13 +233,51 @@ export const StockMap: React.FC<StockMapProps> = ({
     return `Rp ${inTrillion.toLocaleString("id-ID", { maximumFractionDigits: 0 })} T`;
   };
 
-  // Kelompokkan emiten per sektor
-  const keuanganStocks = filteredStocks.filter((s) => s.sector === "Keuangan");
-  const konsumsiStocks = filteredStocks.filter((s) => s.sector === "Barang Konsumsi Primer");
-  const infraIndustriStocks = filteredStocks.filter(
-    (s) => s.sector === "Infrastruktur" || s.sector === "Perindustrian"
-  );
-  const energiStocks = filteredStocks.filter((s) => s.sector === "Energi");
+  // Kelompokkan emiten per sektor secara dinamis agar seluruh 9 sektor & 16 emiten tampil
+  const sectorGroups = React.useMemo(() => {
+    const map = new Map<string, StockFundamental[]>();
+    for (const stock of filteredStocks) {
+      if (!map.has(stock.sector)) {
+        map.set(stock.sector, []);
+      }
+      map.get(stock.sector)!.push(stock);
+    }
+
+    const sectorPriority = [
+      "Keuangan",
+      "Bahan Baku",
+      "Barang Konsumsi Primer",
+      "Infrastruktur",
+      "Perindustrian",
+      "Energi",
+      "Teknologi",
+      "Kesehatan",
+      "Utilitas",
+    ];
+
+    const result: { sector: string; stocks: StockFundamental[]; totalCap: number }[] = [];
+    for (const sec of sectorPriority) {
+      if (map.has(sec)) {
+        const list = map.get(sec)!;
+        result.push({
+          sector: sec,
+          stocks: list,
+          totalCap: list.reduce((a, b) => a + b.marketCap, 0),
+        });
+        map.delete(sec);
+      }
+    }
+
+    for (const [sec, list] of map.entries()) {
+      result.push({
+        sector: sec,
+        stocks: list,
+        totalCap: list.reduce((a, b) => a + b.marketCap, 0),
+      });
+    }
+
+    return result;
+  }, [filteredStocks]);
 
   // Komponen Kartu Saham Responsif (Zero Overflow, Container-Aware Typography)
   const renderStockTile = (
@@ -224,7 +299,7 @@ export const StockMap: React.FC<StockMapProps> = ({
           isSelected
             ? "ring-2 ring-white/95 ring-offset-2 ring-offset-[#0d0e13] shadow-lg"
             : ""
-        } text-white flex flex-col justify-between min-h-[114px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white`}
+        } text-white flex flex-col justify-between h-[116px] min-h-[116px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white`}
       >
         {/* Baris Atas: Kode Saham & Kapitalisasi Pasar */}
         <div className="min-w-0">
@@ -239,9 +314,35 @@ export const StockMap: React.FC<StockMapProps> = ({
                 </span>
               )}
             </div>
-            <span className="text-[11px] font-semibold text-white/95 px-2 py-0.5 rounded-md bg-black/20 border border-white/10 tabular-nums whitespace-nowrap shrink-0">
-              {stock.marketCapLabel}
-            </span>
+
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span
+                role="button"
+                tabIndex={0}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleWatchlist(stock.ticker);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.stopPropagation();
+                    toggleWatchlist(stock.ticker);
+                  }
+                }}
+                title={isWatchlisted(stock.ticker) ? `Hapus ${stock.ticker} dari watchlist` : `Simpan ${stock.ticker} ke watchlist`}
+                className={`p-1 rounded-md transition-all cursor-pointer ${
+                  isWatchlisted(stock.ticker)
+                    ? "text-amber-300 hover:text-amber-200 bg-black/30"
+                    : "text-white/60 hover:text-white hover:bg-black/20"
+                }`}
+              >
+                <Bookmark className={`h-3.5 w-3.5 ${isWatchlisted(stock.ticker) ? "fill-amber-300" : ""}`} />
+              </span>
+
+              <span className="text-[11px] font-semibold text-white/95 px-2 py-0.5 rounded-md bg-black/20 border border-white/10 tabular-nums whitespace-nowrap shrink-0">
+                {stock.marketCapLabel}
+              </span>
+            </div>
           </div>
 
           {/* Baris Tengah: Badge Sektor Ringkas & Nama Perusahaan Lengkap Tanpa Truncate */}
@@ -251,7 +352,7 @@ export const StockMap: React.FC<StockMapProps> = ({
                 {getShortSectorBadge(stock.sector)}
               </span>
             )}
-            <span className="text-xs font-normal text-white/90 leading-snug min-w-0 block">
+            <span className="text-xs font-normal text-white/90 leading-snug min-w-0 block truncate">
               {stock.name}
             </span>
           </div>
@@ -266,7 +367,7 @@ export const StockMap: React.FC<StockMapProps> = ({
           <div className="flex items-center gap-2 shrink-0">
             {/* Sparkline SVG Super Mini - Visual Tren Historis Kuartalan */}
             <div
-              title="Tren historis 4 kuartal terakhir"
+              title={`Tren 4 Kuartal (${activeDef.label}): [${trendData.map((v) => `${v}${activeDef.unit}`).join(" → ")}]`}
               className="flex items-center rounded bg-black/15 px-1 py-0.5"
             >
               <Sparkline
@@ -337,21 +438,24 @@ export const StockMap: React.FC<StockMapProps> = ({
               onChange={(val) => setSelectedSector(val)}
               options={sectors.map((s) => ({
                 value: s,
-                label: s === "all" ? "Semua Sektor" : s,
-                dotColor:
-                  s === "Keuangan"
-                    ? "bg-[rgba(38,166,134,0.95)]"
-                    : s === "Barang Konsumsi Primer"
-                    ? "bg-[rgba(224,154,64,0.95)]"
-                    : s === "Infrastruktur"
-                    ? "bg-[rgba(56,155,210,0.95)]"
-                    : s === "Perindustrian"
-                    ? "bg-[rgba(120,130,220,0.95)]"
-                    : s === "Energi"
-                    ? "bg-[rgba(220,90,110,0.95)]"
-                    : "bg-zinc-400",
+                label: s === "all" ? `Semua Sektor (${stocks.length} Emiten)` : s,
+                dotColor: s === "all" ? "bg-emerald-400" : getSectorColorDot(s),
               }))}
             />
+
+            <button
+              type="button"
+              onClick={() => setOnlyWatchlist((prev) => !prev)}
+              className={`flex items-center gap-1.5 rounded-xl border px-2.5 py-1.5 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                onlyWatchlist
+                  ? "border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300 shadow-xs"
+                  : "border-zinc-200 bg-zinc-50 text-zinc-600 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-[#0d0e13] dark:text-zinc-400 dark:hover:bg-zinc-800"
+              }`}
+              title={onlyWatchlist ? "Tampilkan semua emiten" : "Filter hanya emiten di watchlist"}
+            >
+              <Bookmark className={`h-3.5 w-3.5 ${onlyWatchlist ? "fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" : ""}`} />
+              <span suppressHydrationWarning>Watchlist ({watchlist.length})</span>
+            </button>
 
             <div className="relative">
               <button
@@ -454,103 +558,35 @@ export const StockMap: React.FC<StockMapProps> = ({
               </div>
             </div>
           ) : (
-            <>
-              {/* Baris 1: Kluster Sektor Keuangan (4 Bank Utama: 2x2 lega saat panel AI buka, 4 kolom saat layar penuh) */}
-              {keuanganStocks.length > 0 && (
-                <div className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5 dark:border-zinc-800/80 dark:bg-[#16171f] shadow-2xs">
+            <div className="space-y-4">
+              {sectorGroups.map((group) => (
+                <div
+                  key={group.sector}
+                  className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5 dark:border-zinc-800/80 dark:bg-[#16171f] shadow-2xs"
+                >
                   <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-zinc-100 dark:border-zinc-800 mb-3.5">
                     <div className="flex items-center gap-2 min-w-0">
+                      <span
+                        className={`h-2.5 w-2.5 rounded-full ${getSectorColorDot(group.sector)} shrink-0`}
+                      />
                       <h2 className="text-sm sm:text-base font-bold text-zinc-950 dark:text-zinc-50">
-                        Sektor Keuangan (Perbankan Utama)
+                        Sektor {group.sector}
                       </h2>
                       <span className="rounded-md bg-zinc-100 px-2 py-0.5 text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 shrink-0">
-                        {keuanganStocks.length} Emiten
+                        {group.stocks.length} Emiten
                       </span>
                     </div>
                     <span className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold tabular-nums shrink-0">
-                      Total: {formatShortCap(keuanganStocks.reduce((a, b) => a + b.marketCap, 0))}
+                      Total: {formatShortCap(group.totalCap)}
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-1 @md:grid-cols-2 @5xl:grid-cols-4 gap-3.5">
-                    {keuanganStocks.map((stock) => renderStockTile(stock))}
-                  </div>
-                </div>
-              )}
-
-              {/* Baris 2: Kluster Barang Konsumsi & Infrastruktur/Industri */}
-              <div className="grid grid-cols-1 @5xl:grid-cols-2 gap-4">
-                {/* 1. Barang Konsumsi Primer (2 Emiten: ICBP, UNVR) */}
-                {konsumsiStocks.length > 0 && (
-                  <div className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5 dark:border-zinc-800/80 dark:bg-[#16171f] shadow-2xs flex flex-col justify-between">
-                    <div>
-                      <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-zinc-100 dark:border-zinc-800 mb-3.5">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <h2 className="text-sm sm:text-base font-bold text-zinc-950 dark:text-zinc-50">
-                            Sektor Barang Konsumsi Primer
-                          </h2>
-                          <span className="rounded-md bg-zinc-100 px-2 py-0.5 text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 shrink-0">
-                            {konsumsiStocks.length} Emiten
-                          </span>
-                        </div>
-                        <span className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold tabular-nums shrink-0">
-                          Total: {formatShortCap(konsumsiStocks.reduce((a, b) => a + b.marketCap, 0))}
-                        </span>
-                      </div>
-                      <div className={`grid gap-3.5 ${konsumsiStocks.length === 1 ? "grid-cols-1" : "grid-cols-1 @md:grid-cols-2"}`}>
-                        {konsumsiStocks.map((stock) => renderStockTile(stock))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* 2. Infrastruktur & Perindustrian (2 Emiten: TLKM, ASII) */}
-                {infraIndustriStocks.length > 0 && (
-                  <div className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5 dark:border-zinc-800/80 dark:bg-[#16171f] shadow-2xs flex flex-col justify-between">
-                    <div>
-                      <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-zinc-100 dark:border-zinc-800 mb-3.5">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <h2 className="text-sm sm:text-base font-bold text-zinc-950 dark:text-zinc-50">
-                            Sektor Infrastruktur & Industri
-                          </h2>
-                          <span className="rounded-md bg-zinc-100 px-2 py-0.5 text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 shrink-0">
-                            {infraIndustriStocks.length} Emiten
-                          </span>
-                        </div>
-                        <span className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold tabular-nums shrink-0">
-                          Total: {formatShortCap(infraIndustriStocks.reduce((a, b) => a + b.marketCap, 0))}
-                        </span>
-                      </div>
-                      <div className={`grid gap-3.5 ${infraIndustriStocks.length === 1 ? "grid-cols-1" : "grid-cols-1 @md:grid-cols-2"}`}>
-                        {infraIndustriStocks.map((stock) => renderStockTile(stock, { showSectorTag: true }))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Baris 3: Kluster Sektor Energi (ADRO) */}
-              {energiStocks.length > 0 && (
-                <div className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5 dark:border-zinc-800/80 dark:bg-[#16171f] shadow-2xs">
-                  <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-zinc-100 dark:border-zinc-800 mb-3.5">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <h2 className="text-sm sm:text-base font-bold text-zinc-950 dark:text-zinc-50">
-                        Sektor Energi & Sumber Daya Alam
-                      </h2>
-                      <span className="rounded-md bg-zinc-100 px-2 py-0.5 text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 shrink-0">
-                        {energiStocks.length} Emiten
-                      </span>
-                    </div>
-                    <span className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold tabular-nums shrink-0">
-                      Total: {formatShortCap(energiStocks.reduce((a, b) => a + b.marketCap, 0))}
-                    </span>
-                  </div>
                   <div className="grid grid-cols-1 @md:grid-cols-2 @4xl:grid-cols-3 gap-3.5">
-                    {energiStocks.map((stock) => renderStockTile(stock))}
+                    {group.stocks.map((stock) => renderStockTile(stock))}
                   </div>
                 </div>
-              )}
-            </>
+              ))}
+            </div>
           )}
         </div>
       )}

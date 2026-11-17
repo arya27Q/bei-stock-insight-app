@@ -18,9 +18,12 @@ import {
   Building2,
   PieChart,
   Coins,
+  Bookmark,
+  Printer,
 } from "lucide-react";
-import { StockFundamental } from "../../types/stock";
+import { StockFundamental, AIInsightPoint } from "../../types/stock";
 import { useStockInsight } from "../../hooks/useStockInsight";
+import { useDashboard } from "@/context/DashboardContext";
 import {
   getHistoricalTrend,
   QUARTER_LABELS,
@@ -29,6 +32,8 @@ import {
 import { Avatar } from "../ui/Avatar";
 import { Badge } from "../ui/Badge";
 import { Sparkline } from "../ui/Sparkline";
+import { LotCalculator } from "./LotCalculator";
+import { ResearchReportModal } from "./ResearchReportModal";
 
 const STOCK_PROMPTS = [
   "Apakah valuasi harga saham ini tergolong murah atau mahal?",
@@ -58,6 +63,10 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
     setShowTechnicalDetails,
   } = useStockInsight(stock.ticker, stock.name);
 
+  const { isWatchlisted, toggleWatchlist } = useDashboard();
+  const watchlisted = isWatchlisted(stock.ticker);
+
+  const [isReportModalOpen, setIsReportModalOpen] = React.useState(false);
   const [profileTab, setProfileTab] = React.useState<"business" | "shareholders" | "valuation">("business");
 
   const revTrend = getHistoricalTrend(stock, "revenueGrowth");
@@ -82,6 +91,30 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
               <Badge variant="neutral" size="xs">
                 {stock.period}
               </Badge>
+
+              <button
+                type="button"
+                onClick={() => toggleWatchlist(stock.ticker)}
+                className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-semibold transition-all cursor-pointer ${
+                  watchlisted
+                    ? "bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30"
+                    : "bg-zinc-200/60 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
+                }`}
+                title={watchlisted ? "Hapus dari Watchlist" : "Simpan ke Watchlist"}
+              >
+                <Bookmark className={`h-3 w-3 ${watchlisted ? "fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" : ""}`} />
+                <span>{watchlisted ? "Di Watchlist" : "Pantau"}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsReportModalOpen(true)}
+                className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-semibold bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/20 dark:bg-emerald-500/15 dark:text-emerald-300 dark:hover:bg-emerald-500/25 border border-emerald-500/25 transition-all cursor-pointer"
+                title="Cetak Ringkasan Riset / Unduh PDF"
+              >
+                <Printer className="h-3 w-3" />
+                <span>Cetak PDF</span>
+              </button>
             </div>
             <p className="mt-1 text-xs font-semibold text-zinc-700 dark:text-zinc-200 leading-snug">
               {stock.name}
@@ -104,6 +137,25 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
             </span>
             <span className="font-semibold text-zinc-900 dark:text-zinc-100 tabular-nums block mt-0.5">
               {stock.marketCapLabel}
+            </span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 pt-2 border-t border-zinc-200/60 dark:border-zinc-800/60 text-xs">
+          <div>
+            <span className="text-[10px] uppercase tracking-wider text-zinc-400 block">
+              Harga per Lembar
+            </span>
+            <span className="font-bold text-zinc-900 dark:text-zinc-100 tabular-nums block mt-0.5">
+              Rp {(stock.pricePerShare || 1000).toLocaleString("id-ID")}
+            </span>
+          </div>
+          <div>
+            <span className="text-[10px] uppercase tracking-wider text-zinc-400 block">
+              Harga 1 Lot (100 lbr)
+            </span>
+            <span className="font-bold text-emerald-600 dark:text-emerald-400 tabular-nums block mt-0.5">
+              Rp {(stock.pricePerLot || (stock.pricePerShare || 1000) * 100).toLocaleString("id-ID")}
             </span>
           </div>
         </div>
@@ -345,22 +397,33 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
                 <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
                 Aspek Positif & Realisasi Kinerja (Fakta Data):
               </span>
-              {insight.factPoints ? (
+              {insight.factPoints && insight.factPoints.length > 0 ? (
                 <div className="space-y-2">
-                  {insight.factPoints.map((fp, idx) => (
-                    <div
-                      key={idx}
-                      className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-2.5 space-y-1"
-                    >
-                      <span className="font-bold text-zinc-900 dark:text-zinc-100 block text-[11px]">
-                        {fp.category}
-                      </span>
-                      <p className="text-zinc-700 dark:text-zinc-300 text-xs">{fp.text}</p>
-                      <span className="block text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 pt-0.5">
-                        {fp.basisLabel}
-                      </span>
-                    </div>
-                  ))}
+                  {insight.factPoints.map((fp: AIInsightPoint | string, idx) => {
+                    const isObj = typeof fp === "object" && fp !== null;
+                    const cat = isObj ? fp.category : `Fakta Kinerja #${idx + 1}`;
+                    const text = isObj ? fp.text : fp;
+                    const basis = isObj ? fp.basisLabel : `Sumber: ${insight.source || "BEI / IDX"}`;
+
+                    return (
+                      <div
+                        key={idx}
+                        className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-2.5 space-y-1"
+                      >
+                        {cat && (
+                          <span className="font-bold text-zinc-900 dark:text-zinc-100 block text-[11px]">
+                            {cat}
+                          </span>
+                        )}
+                        <p className="text-zinc-700 dark:text-zinc-300 text-xs">{text}</p>
+                        {basis && (
+                          <span className="block text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 pt-0.5">
+                            {basis}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <ul className="pl-4 list-disc space-y-1">
@@ -377,22 +440,33 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
                 <AlertCircle className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
                 Perlu Diperhatikan (Interpretasi AI):
               </span>
-              {insight.interpretationPoints ? (
+              {insight.interpretationPoints && insight.interpretationPoints.length > 0 ? (
                 <div className="space-y-2">
-                  {insight.interpretationPoints.map((ip, idx) => (
-                    <div
-                      key={idx}
-                      className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-2.5 space-y-1"
-                    >
-                      <span className="font-bold text-zinc-900 dark:text-zinc-100 block text-[11px]">
-                        {ip.category}
-                      </span>
-                      <p className="text-zinc-700 dark:text-zinc-300 text-xs">{ip.text}</p>
-                      <span className="block text-[10px] font-semibold text-amber-700 dark:text-amber-400 pt-0.5">
-                        {ip.basisLabel}
-                      </span>
-                    </div>
-                  ))}
+                  {insight.interpretationPoints.map((ip: AIInsightPoint | string, idx) => {
+                    const isObj = typeof ip === "object" && ip !== null;
+                    const cat = isObj ? ip.category : `Analisis Rasio #${idx + 1}`;
+                    const text = isObj ? ip.text : ip;
+                    const basis = isObj ? ip.basisLabel : "Interpretasi AI • Edukasi Mandiri";
+
+                    return (
+                      <div
+                        key={idx}
+                        className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-2.5 space-y-1"
+                      >
+                        {cat && (
+                          <span className="font-bold text-zinc-900 dark:text-zinc-100 block text-[11px]">
+                            {cat}
+                          </span>
+                        )}
+                        <p className="text-zinc-700 dark:text-zinc-300 text-xs">{text}</p>
+                        {basis && (
+                          <span className="block text-[10px] font-semibold text-amber-700 dark:text-amber-400 pt-0.5">
+                            {basis}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <ul className="pl-4 list-disc space-y-1">
@@ -450,7 +524,7 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
         </div>
 
         {/* Stock Chat Thread */}
-        <div className="mt-5 pt-3.5 border-t border-zinc-100 dark:border-zinc-800/80 space-y-3.5 max-h-56 overflow-y-auto pr-1">
+        <div className="mt-5 pt-3.5 border-t border-zinc-100 dark:border-zinc-800/80 space-y-3.5 max-h-80 overflow-y-auto pr-1">
           {stockMessages.map((m) => (
             <div
               key={m.id}
@@ -472,14 +546,14 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
                 )}
               </div>
               <div
-                className={`max-w-[85%] rounded-xl px-3.5 py-2.5 text-xs leading-relaxed ${
+                className={`max-w-[92%] rounded-2xl px-4 py-3 text-xs leading-relaxed ${
                   m.sender === "user"
                     ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 font-medium"
                     : "bg-zinc-100 text-zinc-800 dark:bg-[#16171f] dark:text-zinc-200 border border-zinc-200/70 dark:border-zinc-800"
                 }`}
               >
-                <p>{m.text}</p>
-                <span className="block text-[9px] mt-1 opacity-60 text-right">
+                <p className="whitespace-pre-line leading-relaxed">{m.text}</p>
+                <span className="block text-[9px] mt-1.5 opacity-60 text-right">
                   {m.time} • {stock.period}
                 </span>
               </div>
@@ -531,31 +605,51 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
         </form>
       </div>
 
-      {/* 6. Rincian Rasio Valuasi & Profil Bisnis Lanjutan */}
-      <div className="border-t border-zinc-100 pt-3 dark:border-zinc-800">
+      {/* 5. Profil Bisnis & Rasio Valuasi Perusahaan (Bisa Buka / Tutup) */}
+      <div className="rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900 overflow-hidden shadow-2xs">
         <button
           type="button"
           onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
-          className="w-full flex items-center justify-between py-1 text-xs font-bold text-zinc-800 dark:text-zinc-200 hover:text-zinc-950 dark:hover:text-zinc-50 transition-colors cursor-pointer"
+          className="w-full flex items-center justify-between p-3.5 text-left hover:bg-zinc-50/80 dark:hover:bg-zinc-800/50 transition-colors cursor-pointer"
           aria-expanded={showTechnicalDetails}
         >
-          <div className="flex items-center gap-2">
-            <span>Rincian Rasio Valuasi & Profil Bisnis</span>
-            {stock.listingBoard && (
-              <span className="rounded bg-zinc-200/70 px-1.5 py-0.5 text-[9px] font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
-                {stock.listingBoard}
-              </span>
-            )}
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400">
+              <Building2 className="h-4 w-4" aria-hidden="true" />
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-bold text-zinc-950 dark:text-zinc-50">
+                  Profil Bisnis & Rasio Valuasi
+                </span>
+                {stock.listingBoard && (
+                  <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[9px] font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+                    {stock.listingBoard}
+                  </span>
+                )}
+              </div>
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 truncate">
+                Segmen pendapatan, kepemilikan saham, dividen, dan valuasi
+              </p>
+            </div>
           </div>
-          {showTechnicalDetails ? (
-            <ChevronUp className="h-4 w-4 text-zinc-500" aria-hidden="true" />
-          ) : (
-            <ChevronDown className="h-4 w-4 text-zinc-500" aria-hidden="true" />
-          )}
+
+          <div className="flex items-center gap-2 shrink-0 ml-2">
+            <span className="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 hidden sm:inline-block">
+              {showTechnicalDetails ? "Tutup" : "Buka Profil"}
+            </span>
+            <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+              {showTechnicalDetails ? (
+                <ChevronUp className="h-3.5 w-3.5" aria-hidden="true" />
+              ) : (
+                <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
+              )}
+            </div>
+          </div>
         </button>
 
         {showTechnicalDetails && (
-          <div className="mt-2.5 space-y-3 rounded-xl bg-zinc-50 p-3 text-xs dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+          <div className="p-3.5 pt-0 space-y-3 text-xs border-t border-zinc-100 dark:border-zinc-800/80">
             {/* Sub-tab Switcher: Bisnis & Moat, Saham & Dividen, Rasio Finansial */}
             <div className="flex items-center gap-1.5 rounded-lg bg-zinc-200/60 p-1 dark:bg-zinc-800">
               <button
@@ -827,6 +921,17 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
           </div>
         )}
       </div>
+
+      {/* 6. Kalkulator Simulasi Pembelian Lot Saham (Bisa Buka / Tutup) */}
+      <LotCalculator stock={stock} defaultOpen={false} />
+
+      {/* 7. Modal Dokumen Riset Fundamental Saham (Siap Cetak PDF) */}
+      <ResearchReportModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        stock={stock}
+        insight={insight}
+      />
     </div>
   );
 };

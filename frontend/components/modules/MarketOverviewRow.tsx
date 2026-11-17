@@ -52,13 +52,14 @@ export const MarketOverviewRow: React.FC<MarketOverviewRowProps> = ({
   const medianPer = getMedianValue(stocks.map((s) => s.per));
   const bankMedianPer = getSectorMedian(stocks, "Keuangan", "per");
   const konsumsiMedianPer = getSectorMedian(stocks, "Barang Konsumsi Primer", "per");
-  const riilStocks = stocks.filter(
-    (s) =>
-      s.sector === "Infrastruktur" ||
-      s.sector === "Perindustrian" ||
-      s.sector === "Energi"
-  );
-  const riilMedianPer = getMedianValue(riilStocks.map((s) => s.per));
+  const bahanBakuMedianPer = getSectorMedian(stocks, "Bahan Baku", "per");
+
+  // Total Market Cap riil seluruh emiten yang aktif
+  const totalMarketCap = stocks.reduce((acc, s) => acc + s.marketCap, 0);
+  const totalMarketCapLabel =
+    totalMarketCap > 0
+      ? `Rp ${(totalMarketCap / 1e12).toLocaleString("id-ID", { maximumFractionDigits: 0 })} T`
+      : "Rp 4.000 T";
 
   const renderMetricOverview = () => {
     if (selectedMetric === "revenueGrowth") {
@@ -154,19 +155,19 @@ export const MarketOverviewRow: React.FC<MarketOverviewRowProps> = ({
         {
           label: "Median Sektor Keuangan",
           value: `${bankMedianPer}x PER`,
-          subValue: "Rentang 9.3x s/d 23.5x",
+          subValue: "Acuan Perbankan BEI",
           variant: "emerald" as const,
         },
         {
           label: "Median Sektor Konsumsi",
           value: `${konsumsiMedianPer}x PER`,
-          subValue: "Rentang 15.1x s/d 18.7x",
+          subValue: "Kebutuhan Pokok",
           variant: "amber" as const,
         },
         {
-          label: "Median Sektor Riil",
-          value: `${riilMedianPer}x PER`,
-          subValue: "Infra, Industri & Energi",
+          label: "Median Sektor Bahan Baku",
+          value: `${bahanBakuMedianPer}x PER`,
+          subValue: "Tambang & Komoditas",
           variant: "zinc" as const,
         },
       ],
@@ -257,7 +258,7 @@ export const MarketOverviewRow: React.FC<MarketOverviewRowProps> = ({
               {DATA_METADATA.source}
             </span>
             <span className="block text-[10px] font-semibold text-white/90 mt-1 tabular-nums leading-snug">
-              Rp 3.567 T
+              {totalMarketCapLabel}
             </span>
           </div>
 

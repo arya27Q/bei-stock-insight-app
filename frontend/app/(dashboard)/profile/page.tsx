@@ -16,9 +16,13 @@ import {
   Bookmark,
   Bell,
   Sliders,
+  Trash2,
+  Plus,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useDashboard } from "@/context/DashboardContext";
 import { DropdownSelect } from "@/components/ui/DropdownSelect";
+import { Avatar } from "@/components/ui/Avatar";
 
 const EXPERIENCE_OPTIONS = [
   { value: "Pemula", label: "Pemula (Baru memulai riset)", dotColor: "bg-emerald-500" },
@@ -35,48 +39,10 @@ const SECTOR_OPTIONS = [
   { value: "Kesehatan", label: "Kesehatan & Farmasi", dotColor: "bg-rose-500" },
 ];
 
-const SAMPLE_WATCHLIST = [
-  {
-    ticker: "BBCA",
-    name: "Bank Central Asia Tbk",
-    pricePerShare: 10000,
-    pricePerLot: 1000000,
-    roe: 22.1,
-    per: 23.5,
-    sector: "Keuangan",
-  },
-  {
-    ticker: "BBRI",
-    name: "Bank Rakyat Indonesia Tbk",
-    pricePerShare: 4650,
-    pricePerLot: 465000,
-    roe: 19.4,
-    per: 12.8,
-    sector: "Keuangan",
-  },
-  {
-    ticker: "ICBP",
-    name: "Indofood CBP Sukses Makmur Tbk",
-    pricePerShare: 11800,
-    pricePerLot: 1180000,
-    roe: 18.2,
-    per: 15.1,
-    sector: "Barang Konsumsi Primer",
-  },
-  {
-    ticker: "TLKM",
-    name: "Telkom Indonesia Tbk",
-    pricePerShare: 2850,
-    pricePerLot: 285000,
-    roe: 16.8,
-    per: 13.9,
-    sector: "Infrastruktur",
-  },
-];
-
 export default function ProfilePage() {
   const router = useRouter();
   const { user, isLoaded, updateProfile, logout } = useAuth();
+  const { watchlistStocks, toggleWatchlist, selectStock } = useDashboard();
 
   const [name, setName] = useState(user?.name || "Andreas Peter Parker");
   const [email, setEmail] = useState(user?.email || "Parker@beistockinsight.id");
@@ -352,52 +318,101 @@ export default function ProfilePage() {
             </form>
           </div>
 
-          {/* Watchlist Saham Pilihan */}
+          {/* Watchlist Saham Pilihan Dinamis */}
           <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-xs dark:border-zinc-800/80 dark:bg-[#16171f]">
             <div className="flex items-center justify-between pb-3.5 border-b border-zinc-100 dark:border-zinc-800 mb-4">
               <div className="flex items-center gap-2">
-                <Bookmark className="h-4 w-4 text-emerald-500" aria-hidden="true" />
+                <Bookmark className="h-4 w-4 text-emerald-500 fill-emerald-500" aria-hidden="true" />
                 <h2 className="text-sm font-bold text-zinc-950 dark:text-zinc-50">
                   Daftar Saham Pantauan (*Watchlist*)
                 </h2>
+                <span suppressHydrationWarning className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                  {watchlistStocks.length} Saham
+                </span>
               </div>
               <Link
                 href="/market-map"
-                className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
+                className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
               >
-                Buka Peta Pasar →
+                <span>Buka Peta Pasar</span>
+                <span>→</span>
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {SAMPLE_WATCHLIST.map((stock) => (
+            {watchlistStocks.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800 p-8 text-center space-y-3">
+                <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500">
+                  <Bookmark className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="text-xs font-bold text-zinc-800 dark:text-zinc-200">
+                    Belum Ada Saham di Watchlist
+                  </h3>
+                  <p className="text-[11px] text-zinc-400 max-w-sm mx-auto mt-1 leading-relaxed">
+                    Tandai saham favoritmu dengan mengeklik ikon bintang/bookmark di Peta Saham atau Smart Screener untuk memantau valuasi dan pergerakannya.
+                  </p>
+                </div>
                 <Link
-                  key={stock.ticker}
                   href="/market-map"
-                  className="group rounded-2xl border border-zinc-200 bg-zinc-50/70 p-3.5 hover:border-zinc-400 dark:border-zinc-800 dark:bg-[#0d0e13] dark:hover:border-zinc-700 transition-all block"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-emerald-500 transition-colors cursor-pointer"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm text-zinc-950 dark:text-zinc-50">
-                      {stock.ticker}
-                    </span>
-                    <span className="text-[10px] font-semibold text-zinc-500 bg-zinc-200/60 dark:bg-zinc-800 px-2 py-0.5 rounded">
-                      {stock.sector}
-                    </span>
-                  </div>
-                  <span className="text-xs text-zinc-500 dark:text-zinc-400 block mt-1">
-                    {stock.name}
-                  </span>
-                  <div className="mt-2.5 pt-2 border-t border-zinc-200/60 dark:border-zinc-800/60 flex items-center justify-between text-xs">
-                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold tabular-nums">
-                      ROE {stock.roe}% • PER {stock.per}x
-                    </span>
-                    <span className="text-zinc-400 text-[11px] font-mono tabular-nums">
-                      Rp {stock.pricePerLot.toLocaleString("id-ID")}/lot
-                    </span>
-                  </div>
+                  <Plus className="h-3.5 w-3.5" />
+                  <span>Jelajahi Saham BEI</span>
                 </Link>
-              ))}
-            </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {watchlistStocks.map((stock) => (
+                  <div
+                    key={stock.ticker}
+                    onClick={() => {
+                      selectStock(stock);
+                      router.push("/market-map");
+                    }}
+                    className="group relative rounded-2xl border border-zinc-200 bg-zinc-50/70 p-3.5 hover:border-emerald-500/50 hover:bg-white dark:border-zinc-800 dark:bg-[#0d0e13] dark:hover:border-emerald-500/40 dark:hover:bg-zinc-900 transition-all cursor-pointer block shadow-2xs"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <Avatar ticker={stock.ticker} sector={stock.sector} size="sm" />
+                        <div className="min-w-0">
+                          <span className="font-bold text-sm text-zinc-950 dark:text-zinc-50 block leading-tight">
+                            {stock.ticker}
+                          </span>
+                          <span className="text-[10px] font-semibold text-zinc-500 block truncate mt-0.5">
+                            {stock.sector}
+                          </span>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleWatchlist(stock.ticker);
+                        }}
+                        title={`Hapus ${stock.ticker} dari watchlist`}
+                        className="p-1 rounded-lg text-zinc-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+
+                    <span className="text-xs text-zinc-600 dark:text-zinc-300 block mt-2 line-clamp-1 font-medium">
+                      {stock.name}
+                    </span>
+
+                    <div className="mt-2.5 pt-2 border-t border-zinc-200/60 dark:border-zinc-800/60 flex items-center justify-between text-xs">
+                      <span className="text-emerald-600 dark:text-emerald-400 font-semibold tabular-nums">
+                        ROE {stock.roe}% • PER {stock.per}x
+                      </span>
+                      <span className="text-zinc-500 dark:text-zinc-400 text-[11px] font-mono tabular-nums">
+                        Rp {(stock.pricePerLot || (stock.pricePerShare || 1000) * 100).toLocaleString("id-ID")}/lot
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -412,29 +427,38 @@ export default function ProfilePage() {
             </div>
 
             <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">
-              Di Bursa Efek Indonesia, perdagangan saham resmi dilakukan dalam kelipatan <strong>1 lot (100 lembar)</strong>. Berikut perbandingan nilai investasi minimum per 1 lot saham pilihan:
+              Di Bursa Efek Indonesia, perdagangan saham resmi dilakukan dalam kelipatan <strong>1 lot (100 lembar)</strong>. Berikut rincian nilai modal minimum 1 lot untuk saham pantauan kamu:
             </p>
 
             <div className="space-y-3">
-              {SAMPLE_WATCHLIST.map((stock) => (
+              {(watchlistStocks.length > 0 ? watchlistStocks : []).map((stock) => (
                 <div
                   key={stock.ticker}
-                  className="rounded-2xl border border-zinc-200 bg-white p-3.5 dark:border-zinc-800 dark:bg-[#0d0e13] space-y-1.5"
+                  className="rounded-2xl border border-zinc-200 bg-white p-3.5 dark:border-zinc-800 dark:bg-[#0d0e13] space-y-1.5 shadow-2xs"
                 >
                   <div className="flex items-center justify-between text-xs font-bold">
-                    <span className="text-zinc-950 dark:text-zinc-100">{stock.ticker}</span>
+                    <div className="flex items-center gap-2">
+                      <Avatar ticker={stock.ticker} sector={stock.sector} size="sm" />
+                      <span className="text-zinc-950 dark:text-zinc-100">{stock.ticker}</span>
+                    </div>
                     <span className="text-zinc-500 dark:text-zinc-400 font-normal">
-                      Rp {stock.pricePerShare.toLocaleString("id-ID")}/lembar
+                      Rp {(stock.pricePerShare || 1000).toLocaleString("id-ID")}/lbr
                     </span>
                   </div>
-                  <div className="flex items-center justify-between text-xs font-semibold text-emerald-600 dark:text-emerald-400 pt-1 border-t border-zinc-100 dark:border-zinc-800/80">
-                    <span>Nilai 1 Lot (100 lembar):</span>
+                  <div className="flex items-center justify-between text-xs font-semibold text-emerald-600 dark:text-emerald-400 pt-1.5 border-t border-zinc-100 dark:border-zinc-800/80">
+                    <span>Modal 1 Lot (100 lbr):</span>
                     <span className="font-mono tabular-nums">
-                      Rp {stock.pricePerLot.toLocaleString("id-ID")}
+                      Rp {(stock.pricePerLot || (stock.pricePerShare || 1000) * 100).toLocaleString("id-ID")}
                     </span>
                   </div>
                 </div>
               ))}
+
+              {watchlistStocks.length === 0 && (
+                <div className="p-4 text-center text-xs text-zinc-400">
+                  Tambahkan saham ke watchlist untuk melihat hitungan modal per lot.
+                </div>
+              )}
             </div>
 
             <div className="rounded-xl bg-zinc-50 dark:bg-zinc-900/80 p-3 text-[11px] text-zinc-500 space-y-1">
