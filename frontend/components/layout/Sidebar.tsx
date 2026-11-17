@@ -54,8 +54,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     {
       id: "benchmark" as const,
-      label: "Benchmark Sektor",
-      title: "04. Sector Benchmark (Komparasi Sektor)",
+      label: "Komparasi Saham",
+      title: "Komparasi 1 vs 1 & Benchmark Sektor",
       icon: TrendingUp,
       href: "/benchmark",
     },

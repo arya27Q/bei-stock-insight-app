@@ -19,7 +19,11 @@
   }
 }
 
+html,
 body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
@@ -51,3 +55,50 @@ button:disabled, select:disabled, input:disabled {
   outline: 2px solid currentColor;
   outline-offset: 2px;
 }
+
+/* Print Stylesheet for Equity Research Report */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm 15mm 15mm 15mm;
+  }
+
+  body {
+    overflow: visible !important;
+    height: auto !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Sembunyikan elemen dashboard saat cetak dokumen */
+  aside,
+  header,
+  footer,
+  .no-print,
+  button:not(.print-keep),
+  [role="dialog"] > div:first-child {
+    display: none !important;
+  }
+
+  /* Tampilkan area riset cetak secara penuh */
+  .printable-report-area {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #ffffff !important;
+  }
+
+  /* Cegah halaman terpotong di tengah kartu */
+  .print-avoid-break {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+}
+

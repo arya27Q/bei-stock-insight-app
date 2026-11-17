@@ -10,11 +10,21 @@ export interface SectorSpecificMetric {
   value: string;
 }
 
+export interface SectorInfo {
+  name: string;
+  slug: string;
+  description: string;
+  totalMarketCapLabel: string;
+  tickers: string[];
+}
+
 export interface StockFundamental {
   ticker: string;
   name: string;
   sector: string;
   subSector: string;
+  pricePerShare?: number;
+  pricePerLot?: number;
   marketCap: number; // Angka riil dalam Rupiah
   marketCapLabel: string; // Misal: "Rp 1.250 T"
   revenueGrowth: number; // Persentase YoY
@@ -87,4 +97,19 @@ export interface ChatMessage {
   text: string;
   time: string;
   metaBasis?: string;
+}
+
+export interface LotSimulationResult {
+  id?: string;
+  stockTicker: string;
+  pricePerShare: number;
+  pricePerLot: number;
+  targetBudget: number;
+  brokerFeePercent: number;
+  calculatedLots: number;
+  totalStockCost: number;
+  brokerFeeAmount: number;
+  totalSpent: number;
+  remainingCash: number;
+  aiCommentary: string;
 }
