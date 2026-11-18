@@ -15,7 +15,7 @@ export default function MarketMapPage() {
   } = useDashboard();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 sm:space-y-6">
       <MarketOverviewRow stocks={stocks} selectedMetric={selectedMetric} />
       <StockMap
         stocks={stocks}

@@ -178,11 +178,11 @@ export const MarketOverviewRow: React.FC<MarketOverviewRowProps> = ({
   const completedCount = stocks.filter((s) => s.hasData).length;
 
   return (
-    <div className="grid grid-cols-1 @5xl:grid-cols-2 gap-4 mb-5">
+    <div className="grid grid-cols-1 @5xl:grid-cols-2 gap-2.5 sm:gap-4 mb-3 sm:mb-5">
       {/* Grid 1: Ringkasan Dinamis Sesuai Indikator Aktif (Tidak Mencampur Indikator) */}
-      <div className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5 dark:border-zinc-800/80 dark:bg-[#16171f] flex flex-col justify-between gap-3.5">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-100 dark:border-zinc-800/80 pb-2.5">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+      <div className="rounded-xl sm:rounded-2xl border border-zinc-200 bg-white p-3 sm:p-5 dark:border-zinc-800/80 dark:bg-[#16171f] flex flex-col justify-between gap-2.5 sm:gap-3.5">
+        <div className="flex flex-wrap items-center justify-between gap-1.5 sm:gap-2 border-b border-zinc-100 dark:border-zinc-800/80 pb-2 sm:pb-2.5">
+          <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
             Ringkasan Indikator Aktif: <strong className="text-zinc-900 dark:text-zinc-100">{activeDef.label}</strong>
           </span>
           <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
@@ -190,9 +190,9 @@ export const MarketOverviewRow: React.FC<MarketOverviewRowProps> = ({
           </span>
         </div>
 
-        <div className="grid grid-cols-1 @sm:grid-cols-2 @md:grid-cols-4 gap-3 items-stretch">
-          <div className="flex h-full min-h-[92px] items-center justify-center py-1">
-            <div className="relative flex h-[92px] w-[92px] shrink-0 items-center justify-center">
+        <div className="grid grid-cols-2 @md:grid-cols-4 gap-2 sm:gap-3 items-stretch">
+          <div className="flex h-full min-h-[74px] sm:min-h-[92px] items-center justify-center py-0.5 sm:py-1">
+            <div className="relative flex h-[74px] w-[74px] sm:h-[92px] sm:w-[92px] shrink-0 items-center justify-center">
               <svg className="h-full w-full -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
                 <circle
                   cx="50"
@@ -215,10 +215,10 @@ export const MarketOverviewRow: React.FC<MarketOverviewRowProps> = ({
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-1">
-                <span className="text-base font-bold text-zinc-950 dark:text-white tabular-nums leading-none">
+                <span className="text-sm sm:text-base font-bold text-zinc-950 dark:text-white tabular-nums leading-none">
                   {summary.circleMain}
                 </span>
-                <span className="text-[10px] text-zinc-400 mt-1 leading-tight">
+                <span className="text-[9px] sm:text-[10px] text-zinc-400 mt-0.5 sm:mt-1 leading-tight">
                   {summary.circleSub}
                 </span>
               </div>
@@ -238,9 +238,9 @@ export const MarketOverviewRow: React.FC<MarketOverviewRowProps> = ({
       </div>
 
       {/* Grid 2: Metadata Sumber, Periode, & Ketersediaan Data (Standar Transparansi) */}
-      <div className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5 dark:border-zinc-800/80 dark:bg-[#16171f] flex flex-col justify-between gap-3.5">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-100 dark:border-zinc-800/80 pb-2.5">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+      <div className="rounded-xl sm:rounded-2xl border border-zinc-200 bg-white p-3 sm:p-5 dark:border-zinc-800/80 dark:bg-[#16171f] flex flex-col justify-between gap-2.5 sm:gap-3.5">
+        <div className="flex flex-wrap items-center justify-between gap-1.5 sm:gap-2 border-b border-zinc-100 dark:border-zinc-800/80 pb-2 sm:pb-2.5">
+          <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
             Informasi Data & Ketersediaan Laporan
           </span>
           <span className="inline-flex items-center gap-1 rounded bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
@@ -249,15 +249,15 @@ export const MarketOverviewRow: React.FC<MarketOverviewRowProps> = ({
           </span>
         </div>
 
-        <div className="grid grid-cols-1 @sm:grid-cols-2 @md:grid-cols-4 gap-3 items-stretch">
-          <div className="flex h-full min-h-[92px] flex-col items-center justify-center rounded-xl bg-[rgba(20,130,102,0.88)] border border-[rgba(52,184,150,0.3)] p-3 text-white text-center">
-            <span className="text-[11px] uppercase tracking-wider text-white/80 font-semibold block leading-snug">
+        <div className="grid grid-cols-2 @md:grid-cols-4 gap-2 sm:gap-3 items-stretch">
+          <div className="flex h-full min-h-[74px] sm:min-h-[92px] flex-col items-center justify-center rounded-xl bg-[rgba(20,130,102,0.88)] border border-[rgba(52,184,150,0.3)] p-2 sm:p-3 text-white text-center">
+            <span className="text-[10px] sm:text-[11px] uppercase tracking-wider text-white/80 font-semibold block leading-snug">
               Sumber
             </span>
-            <span className="block text-xs sm:text-sm font-bold leading-snug mt-1">
+            <span className="block text-xs sm:text-sm font-bold leading-snug mt-0.5 sm:mt-1">
               {DATA_METADATA.source}
             </span>
-            <span className="block text-[10px] font-semibold text-white/90 mt-1 tabular-nums leading-snug">
+            <span className="block text-[9.5px] sm:text-[10px] font-semibold text-white/90 mt-0.5 sm:mt-1 tabular-nums leading-snug">
               {totalMarketCapLabel}
             </span>
           </div>

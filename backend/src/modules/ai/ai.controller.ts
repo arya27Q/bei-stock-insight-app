@@ -106,7 +106,7 @@ export const aiController = {
   async getHistory(req: Request, res: Response) {
     try {
       const ticker = (req.query.ticker as string) || "MARKET";
-      const limit = Number(req.query.limit) || 20;
+      const limit = Number(req.query.limit) || 30;
 
       const history = await aiRepository.getChatHistory(ticker, limit);
 
@@ -119,6 +119,45 @@ export const aiController = {
       res.status(500).json({
         status: "error",
         message: "Gagal mengambil riwayat chat AI.",
+      });
+    }
+  },
+
+  // GET /api/ai/sessions - Mengambil daftar seluruh sesi riwayat chat per emiten dari database MySQL
+  async getSessions(_req: Request, res: Response) {
+    try {
+      const sessions = await aiRepository.getChatSessions();
+
+      res.json({
+        status: "success",
+        data: sessions,
+      });
+    } catch (error: any) {
+      console.error("[aiController.getSessions] Error fetching sessions:", error);
+      res.status(500).json({
+        status: "error",
+        message: "Gagal mengambil daftar riwayat sesi chat AI.",
+      });
+    }
+  },
+
+  // DELETE /api/ai/history - Menghapus riwayat dialog chat emiten dari database MySQL
+  async clearHistory(req: Request, res: Response) {
+    try {
+      const ticker = (req.query.ticker as string) || (req.body?.ticker as string) || "MARKET";
+
+      const result = await aiRepository.clearChatHistory(ticker);
+
+      res.json({
+        status: "success",
+        message: `Riwayat chat untuk ${ticker.toUpperCase()} berhasil dibersihkan.`,
+        deletedCount: result.count,
+      });
+    } catch (error: any) {
+      console.error("[aiController.clearHistory] Error clearing history:", error);
+      res.status(500).json({
+        status: "error",
+        message: "Gagal menghapus riwayat chat AI.",
       });
     }
   },

@@ -1,6 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { ChatMessage } from "../types/stock";
-import { askAiStockChat } from "../services/stock-service";
+import {
+  askAiStockChat,
+  getStoredChatHistory,
+  saveStoredChatHistory,
+  clearAiChatHistory,
+} from "../services/stock-service";
 
 export interface UseGeneralAiChatReturn {
   generalMessages: ChatMessage[];
@@ -9,20 +14,33 @@ export interface UseGeneralAiChatReturn {
   isGeneralSending: boolean;
   generalMessagesEndRef: React.RefObject<HTMLDivElement | null>;
   handleSendGeneral: (promptText?: string) => Promise<void>;
+  handleClearHistory: () => Promise<void>;
 }
+
+const GENERAL_WELCOME_MESSAGE: ChatMessage = {
+  id: "gen-welcome",
+  sender: "assistant",
+  text: "Halo, saya Asisten Analis AI BEI. Anda dapat mengklik emiten mana saja di peta saham untuk melihat bedah laporan keuangan lengkap, atau tanyakan perbandingan fundamental langsung di sini.",
+  time: "Terkini",
+};
 
 export function useGeneralAiChat(): UseGeneralAiChatReturn {
   const [generalMessages, setGeneralMessages] = useState<ChatMessage[]>([
-    {
-      id: "gen-welcome",
-      sender: "assistant",
-      text: "Halo, saya Asisten Analis AI BEI. Anda dapat mengklik emiten mana saja di peta saham untuk melihat bedah laporan keuangan lengkap, atau tanyakan perbandingan fundamental langsung di sini.",
-      time: "Terkini",
-    },
+    GENERAL_WELCOME_MESSAGE,
   ]);
   const [generalInput, setGeneralInput] = useState("");
   const [isGeneralSending, setIsGeneralSending] = useState(false);
   const generalMessagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Muat riwayat chat pasar umum dari localStorage pada client mount (aman SSR/hydration)
+  useEffect(() => {
+    const saved = getStoredChatHistory("MARKET");
+    if (saved.length > 0) {
+      queueMicrotask(() => {
+        setGeneralMessages([GENERAL_WELCOME_MESSAGE, ...saved]);
+      });
+    }
+  }, []);
 
   useEffect(() => {
     generalMessagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -33,29 +51,45 @@ export function useGeneralAiChat(): UseGeneralAiChatReturn {
       const text = (promptText || generalInput).trim();
       if (!text || isGeneralSending) return;
 
+      const nowTime = new Date().toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
       const userMsg: ChatMessage = {
-        id: `gen-user-${generalMessages.length + 1}`,
+        id: `gen-user-${Date.now()}`,
         sender: "user",
         text,
-        time: "Baru saja",
+        time: nowTime,
       };
 
-      setGeneralMessages((prev) => [...prev, userMsg]);
+      setGeneralMessages((prev) => {
+        const next = [...prev, userMsg];
+        saveStoredChatHistory("MARKET", next);
+        return next;
+      });
       setGeneralInput("");
       setIsGeneralSending(true);
 
       try {
         const answer = await askAiStockChat("MARKET", text);
         const assistantMsg: ChatMessage = {
-          id: `gen-asst-${generalMessages.length + 2}`,
+          id: `gen-asst-${Date.now()}`,
           sender: "assistant",
           text: answer,
-          time: "Baru saja",
+          time: new Date().toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
         };
-        setGeneralMessages((prev) => [...prev, assistantMsg]);
+        setGeneralMessages((prev) => {
+          const next = [...prev, assistantMsg];
+          saveStoredChatHistory("MARKET", next);
+          return next;
+        });
       } catch {
         const errMsg: ChatMessage = {
-          id: `gen-err-${generalMessages.length + 2}`,
+          id: `gen-err-${Date.now()}`,
           sender: "assistant",
           text: "Terjadi kendala saat menganalisis pasar. Silakan coba kembali sesaat lagi.",
           time: "Baru saja",
@@ -65,8 +99,13 @@ export function useGeneralAiChat(): UseGeneralAiChatReturn {
         setIsGeneralSending(false);
       }
     },
-    [generalInput, isGeneralSending, generalMessages.length]
+    [generalInput, isGeneralSending]
   );
+
+  const handleClearHistory = useCallback(async () => {
+    await clearAiChatHistory("MARKET");
+    setGeneralMessages([GENERAL_WELCOME_MESSAGE]);
+  }, []);
 
   return {
     generalMessages,
@@ -75,5 +114,6 @@ export function useGeneralAiChat(): UseGeneralAiChatReturn {
     isGeneralSending,
     generalMessagesEndRef,
     handleSendGeneral,
+    handleClearHistory,
   };
 }

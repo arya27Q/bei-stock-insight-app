@@ -86,12 +86,12 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
   };
 
   return (
-    <div className="space-y-5 font-sans">
+    <div className="space-y-3.5 sm:space-y-5 font-sans">
       {/* 1. Header Halaman (Model Referensi Bilde: Judul + View Switcher di Kiri, Aksi Utama di Kanan) */}
-      <div className="flex flex-col gap-3 @xl:flex-row @xl:items-center @xl:justify-between">
+      <div className="flex flex-col gap-2.5 sm:gap-3 @xl:flex-row @xl:items-center @xl:justify-between">
         <div>
-          <div className="flex items-center gap-3">
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <h2 className="text-lg sm:text-2xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">
               Smart Screener
             </h2>
 
@@ -141,7 +141,7 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
               <button
                 key={preset.id}
                 onClick={() => applyPreset(preset.id as ScreenerPreset)}
-                className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+                className={`rounded-lg px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold transition-all cursor-pointer ${
                   active
                     ? "bg-zinc-900 text-white shadow-xs dark:bg-zinc-100 dark:text-zinc-950"
                     : "bg-white text-zinc-700 border border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800"
@@ -155,7 +155,7 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
       </div>
 
       {/* 2. Toolbar Pencarian & Kontrol Sejajar (Persis Referensi Bilde: Search + Stepper < Sektor > + Filter + Export) */}
-      <div className="flex flex-col gap-2.5 @2xl:flex-row @2xl:items-center">
+      <div className="flex flex-col gap-2 sm:gap-2.5 @2xl:flex-row @2xl:items-center">
         {/* Search Input Lebar */}
         <div className="flex-1">
           <SearchInput
@@ -168,9 +168,9 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
         </div>
 
         {/* Kontrol Kanan: Stepper Sektor + Tombol Filter + Tombol Export */}
-        <div className="flex flex-wrap items-center gap-2 shrink-0">
-          {/* Stepper Sektor (< Semua Sektor >) Tanpa Truncate */}
-          <div className="inline-flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-2.5 py-1.5 text-xs sm:text-sm font-semibold text-zinc-800 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 min-w-[235px]">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full sm:w-auto min-w-0 max-w-full">
+          {/* Stepper Sektor (< Semua Sektor >) */}
+          <div className="inline-flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-2 sm:px-2.5 py-1 sm:py-1.5 text-[11px] sm:text-sm font-semibold text-zinc-800 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 min-w-0 flex-1 sm:flex-none sm:min-w-[235px]">
             <button
               onClick={() => cycleSector("prev")}
               className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 cursor-pointer shrink-0"
@@ -178,7 +178,7 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
             >
               <ChevronLeft className="h-4 w-4" aria-hidden="true" />
             </button>
-            <span className="px-2.5 whitespace-nowrap text-center">
+            <span className="px-1.5 sm:px-2.5 truncate sm:whitespace-nowrap text-center">
               {selectedSector === "all" ? "Semua Sektor" : selectedSector}
             </span>
             <button
@@ -193,23 +193,23 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
           {/* Tombol Filter */}
           <button
             onClick={() => setShowFilterPanel((prev) => !prev)}
-            className={`inline-flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 sm:gap-2 rounded-xl border px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-[11px] sm:text-sm font-semibold transition-colors cursor-pointer ${
               showFilterPanel
                 ? "border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-950"
                 : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
             }`}
             aria-expanded={showFilterPanel}
           >
-            <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
+            <SlidersHorizontal className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true" />
             <span>Filter</span>
           </button>
 
           {/* Tombol Export CSV */}
           <button
             onClick={handleExportCsv}
-            className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3.5 py-2 text-xs sm:text-sm font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 sm:gap-2 rounded-xl border border-zinc-200 bg-white px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-[11px] sm:text-sm font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
           >
-            <Download className="h-4 w-4" aria-hidden="true" />
+            <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true" />
             <span>Export</span>
           </button>
         </div>
@@ -301,13 +301,13 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
             <table className="w-full text-left border-collapse" aria-label="Tabel Smart Screener Emiten BEI">
               {/* Header Bar Solid Hitam/Charcoal dengan Huruf Title Case Bersih */}
               <thead>
-                <tr className="bg-zinc-900 text-white dark:bg-zinc-800/95 dark:text-zinc-100 text-xs sm:text-[13px] font-semibold border-b border-zinc-800">
-                  <th scope="col" className="py-3.5 px-5 first:rounded-tl-lg">Emiten & Perusahaan</th>
-                  <th scope="col" className="py-3.5 px-4">Kode & Sektor</th>
-                  <th scope="col" className="py-3.5 px-4">Kapitalisasi</th>
-                  <th scope="col" className="py-3.5 px-4">Pendapatan & Laba YoY</th>
-                  <th scope="col" className="py-3.5 px-4">Kemampuan Laba (ROE) & PER</th>
-                  <th scope="col" className="py-3.5 px-5 last:rounded-tr-lg">Status Indikator</th>
+                <tr className="bg-zinc-900 text-white dark:bg-zinc-800/95 dark:text-zinc-100 text-[11px] sm:text-[13px] font-semibold border-b border-zinc-800">
+                  <th scope="col" className="py-2.5 sm:py-3.5 px-3 sm:px-5 first:rounded-tl-lg">Emiten & Perusahaan</th>
+                  <th scope="col" className="py-2.5 sm:py-3.5 px-2.5 sm:px-4">Kode & Sektor</th>
+                  <th scope="col" className="py-2.5 sm:py-3.5 px-2.5 sm:px-4">Kapitalisasi</th>
+                  <th scope="col" className="py-2.5 sm:py-3.5 px-2.5 sm:px-4">Pendapatan & Laba YoY</th>
+                  <th scope="col" className="py-2.5 sm:py-3.5 px-2.5 sm:px-4">Kemampuan Laba (ROE) & PER</th>
+                  <th scope="col" className="py-2.5 sm:py-3.5 px-3 sm:px-5 last:rounded-tr-lg">Status Indikator</th>
                 </tr>
               </thead>
 

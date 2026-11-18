@@ -1,10 +1,11 @@
 "use client";
 
 import React from "react";
-import { Send, User, Bot, RefreshCw, Sparkles, ArrowRight } from "lucide-react";
+import { Send, User, Bot, RefreshCw, Sparkles, ArrowRight, Trash2, History } from "lucide-react";
 import { StockFundamental } from "../../types/stock";
 import { useGeneralAiChat } from "../../hooks/useGeneralAiChat";
 import { Avatar } from "../ui/Avatar";
+import { FormattedChatText } from "../ui/FormattedChatText";
 
 const GENERAL_PROMPTS = [
   "Emiten apa dengan kemampuan menghasilkan laba (ROE) tertinggi?",
@@ -16,11 +17,13 @@ const GENERAL_PROMPTS = [
 export interface GeneralAiViewProps {
   stocks: StockFundamental[];
   onSelectStock: (stock: StockFundamental) => void;
+  onOpenHistory?: () => void;
 }
 
 export const GeneralAiView: React.FC<GeneralAiViewProps> = ({
   stocks,
   onSelectStock,
+  onOpenHistory,
 }) => {
   const {
     generalMessages,
@@ -29,6 +32,7 @@ export const GeneralAiView: React.FC<GeneralAiViewProps> = ({
     isGeneralSending,
     generalMessagesEndRef,
     handleSendGeneral,
+    handleClearHistory,
   } = useGeneralAiChat();
 
   return (
@@ -99,8 +103,45 @@ export const GeneralAiView: React.FC<GeneralAiViewProps> = ({
         </div>
       </div>
 
-      {/* General Chat Messages Thread */}
-      <div className="space-y-3.5 max-h-80 overflow-y-auto pr-1 pt-2">
+      {/* Header Riwayat Chat Umum */}
+      {(generalMessages.length > 1 || onOpenHistory) && (
+        <div className="flex items-center justify-between pt-2 border-t border-zinc-200/70 dark:border-zinc-800/70">
+          {onOpenHistory ? (
+            <button
+              type="button"
+              onClick={onOpenHistory}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 px-2.5 py-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-300 transition-colors cursor-pointer"
+            >
+              <History className="h-3.5 w-3.5" aria-hidden="true" />
+              <span>
+                {generalMessages.length > 1
+                  ? `Sidebar Riwayat (${generalMessages.length - 1} pesan)`
+                  : "Buka Sidebar Riwayat"}
+              </span>
+            </button>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
+              <History className="h-3.5 w-3.5" aria-hidden="true" />
+              <span>Riwayat Percakapan ({generalMessages.length - 1} pesan tersimpan)</span>
+            </span>
+          )}
+          {generalMessages.length > 1 && (
+            <button
+              type="button"
+              onClick={handleClearHistory}
+              disabled={isGeneralSending}
+              title="Hapus riwayat percakapan umum"
+              className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-semibold text-zinc-500 hover:bg-rose-50 hover:text-rose-600 dark:text-zinc-400 dark:hover:bg-rose-950/40 dark:hover:text-rose-400 transition-colors cursor-pointer"
+            >
+              <Trash2 className="h-3 w-3" aria-hidden="true" />
+              <span>Hapus Riwayat</span>
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* General Chat Messages Thread (Area Baca Lega & Panjang) */}
+      <div className="space-y-4 min-h-[420px] max-h-[600px] overflow-y-auto pr-1.5 pt-2">
         {generalMessages.map((m) => (
           <div
             key={m.id}
@@ -109,27 +150,31 @@ export const GeneralAiView: React.FC<GeneralAiViewProps> = ({
             }`}
           >
             <div
-              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-xs ${
+              className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs ${
                 m.sender === "user"
                   ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950"
                   : "bg-zinc-200 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200"
               }`}
             >
               {m.sender === "user" ? (
-                <User className="h-3 w-3" aria-hidden="true" />
+                <User className="h-3.5 w-3.5" aria-hidden="true" />
               ) : (
-                <Bot className="h-3 w-3" aria-hidden="true" />
+                <Bot className="h-3.5 w-3.5" aria-hidden="true" />
               )}
             </div>
             <div
-              className={`max-w-[92%] rounded-2xl px-4 py-3 text-xs leading-relaxed ${
+              className={`max-w-[94%] rounded-2xl px-4 py-3.5 text-[13px] leading-relaxed ${
                 m.sender === "user"
                   ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 font-medium"
                   : "bg-zinc-100 text-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 border border-zinc-200/70 dark:border-zinc-800"
               }`}
             >
-              <p className="whitespace-pre-line leading-relaxed">{m.text}</p>
-              <span className="block text-[9px] mt-1.5 opacity-60 text-right">{m.time}</span>
+              {m.sender === "assistant" ? (
+                <FormattedChatText text={m.text} />
+              ) : (
+                <p className="whitespace-pre-line leading-relaxed">{m.text}</p>
+              )}
+              <span className="block text-[10px] mt-2 opacity-60 text-right">{m.time}</span>
             </div>
           </div>
         ))}

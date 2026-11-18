@@ -20,6 +20,8 @@ import {
   Coins,
   Bookmark,
   Printer,
+  Trash2,
+  History,
 } from "lucide-react";
 import { StockFundamental, AIInsightPoint } from "../../types/stock";
 import { useStockInsight } from "../../hooks/useStockInsight";
@@ -32,6 +34,7 @@ import {
 import { Avatar } from "../ui/Avatar";
 import { Badge } from "../ui/Badge";
 import { Sparkline } from "../ui/Sparkline";
+import { FormattedChatText } from "../ui/FormattedChatText";
 import { LotCalculator } from "./LotCalculator";
 import { ResearchReportModal } from "./ResearchReportModal";
 
@@ -44,21 +47,25 @@ const STOCK_PROMPTS = [
 export interface StockDetailViewProps {
   stock: StockFundamental;
   onNavigateToBenchmark?: (sector: string) => void;
+  onOpenHistory?: () => void;
 }
 
 export const StockDetailView: React.FC<StockDetailViewProps> = ({
   stock,
   onNavigateToBenchmark,
+  onOpenHistory,
 }) => {
   const {
     insight,
     loadingAi,
+    isLoadingHistory,
     stockMessages,
     stockInput,
     setStockInput,
     isStockSending,
     messagesEndRef,
     handleSendStock,
+    handleClearHistory,
     showTechnicalDetails,
     setShowTechnicalDetails,
   } = useStockInsight(stock.ticker, stock.name);
@@ -484,14 +491,52 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
 
       {/* 5. Specific Stock Mini-Chat */}
       <div className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800">
-          <div className="flex items-center gap-2">
-            <MessageSquare className="h-4 w-4 text-zinc-700 dark:text-zinc-300" aria-hidden="true" />
-            <h3 className="text-xs font-bold text-zinc-950 dark:text-zinc-100">
+        <div className="flex items-center justify-between gap-2 pb-3 border-b border-zinc-100 dark:border-zinc-800">
+          <div className="flex items-center gap-2 min-w-0">
+            <MessageSquare className="h-4 w-4 text-zinc-700 dark:text-zinc-300 shrink-0" aria-hidden="true" />
+            <h3 className="text-xs font-bold text-zinc-950 dark:text-zinc-100 truncate">
               Tanya Analis ({stock.ticker})
             </h3>
+            {isLoadingHistory ? (
+              <span className="inline-flex items-center gap-1 rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+                <RefreshCw className="h-2.5 w-2.5 animate-spin" aria-hidden="true" />
+                Memuat...
+              </span>
+            ) : onOpenHistory ? (
+              <button
+                type="button"
+                onClick={onOpenHistory}
+                title="Buka Sidebar Riwayat Semua Chat AI"
+                className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300 transition-colors cursor-pointer"
+              >
+                <History className="h-2.5 w-2.5" aria-hidden="true" />
+                <span>{stockMessages.length > 1 ? `Riwayat (${stockMessages.length - 1})` : "Riwayat"}</span>
+              </button>
+            ) : stockMessages.length > 1 ? (
+              <span className="inline-flex items-center gap-1 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-400">
+                <History className="h-2.5 w-2.5" aria-hidden="true" />
+                {stockMessages.length - 1} pesan
+              </span>
+            ) : null}
           </div>
-          <span className="text-[10px] text-zinc-400 font-medium">Basis Data {stock.period}</span>
+
+          <div className="flex items-center gap-2 shrink-0">
+            {stockMessages.length > 1 && (
+              <button
+                type="button"
+                onClick={handleClearHistory}
+                disabled={isStockSending}
+                title={`Bersihkan riwayat chat ${stock.ticker}`}
+                className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-semibold text-zinc-500 hover:bg-rose-50 hover:text-rose-600 dark:text-zinc-400 dark:hover:bg-rose-950/40 dark:hover:text-rose-400 transition-colors cursor-pointer"
+              >
+                <Trash2 className="h-3 w-3" aria-hidden="true" />
+                <span>Hapus</span>
+              </button>
+            )}
+            <span className="text-[10px] text-zinc-400 font-medium hidden sm:inline">
+              Basis Data {stock.period}
+            </span>
+          </div>
         </div>
 
         {/* Stock Quick Prompts (Rapi, Berjarak Proporsional, & Interaktif) */}
@@ -523,8 +568,8 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
           </div>
         </div>
 
-        {/* Stock Chat Thread */}
-        <div className="mt-5 pt-3.5 border-t border-zinc-100 dark:border-zinc-800/80 space-y-3.5 max-h-80 overflow-y-auto pr-1">
+        {/* Stock Chat Thread (Area Baca Lega & Panjang) */}
+        <div className="mt-5 pt-4 border-t border-zinc-100 dark:border-zinc-800/80 space-y-4 min-h-[380px] max-h-[560px] overflow-y-auto pr-1.5">
           {stockMessages.map((m) => (
             <div
               key={m.id}
@@ -533,7 +578,7 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
               }`}
             >
               <div
-                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-xs ${
+                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs ${
                   m.sender === "user"
                     ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950"
                     : "bg-zinc-200 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200"
@@ -546,14 +591,18 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
                 )}
               </div>
               <div
-                className={`max-w-[92%] rounded-2xl px-4 py-3 text-xs leading-relaxed ${
+                className={`max-w-[94%] rounded-2xl px-4 py-3.5 text-[13px] leading-relaxed ${
                   m.sender === "user"
                     ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 font-medium"
                     : "bg-zinc-100 text-zinc-800 dark:bg-[#16171f] dark:text-zinc-200 border border-zinc-200/70 dark:border-zinc-800"
                 }`}
               >
-                <p className="whitespace-pre-line leading-relaxed">{m.text}</p>
-                <span className="block text-[9px] mt-1.5 opacity-60 text-right">
+                {m.sender === "assistant" ? (
+                  <FormattedChatText text={m.text} />
+                ) : (
+                  <p className="whitespace-pre-line leading-relaxed">{m.text}</p>
+                )}
+                <span className="block text-[10px] mt-2 opacity-60 text-right">
                   {m.time} • {stock.period}
                 </span>
               </div>
