@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import {
   ArrowLeftRight,
+  ArrowUpDown,
   CheckCircle2,
   Award,
   Sparkles,
@@ -104,14 +105,14 @@ const StockSelectorCard: React.FC<StockSelectorCardProps> = ({
   return (
     <div
       ref={dropdownRef}
-      className={`relative rounded-2xl border ${borderColor} bg-white p-3.5 sm:p-4 shadow-2xs dark:bg-zinc-900 transition-all`}
+      className={`relative rounded-xl sm:rounded-2xl border ${borderColor} bg-white p-3 sm:p-4 shadow-2xs dark:bg-zinc-900 transition-all`}
     >
       {/* Top Header Card */}
-      <div className="flex items-center justify-between mb-2">
-        <span className={`text-[10px] font-bold uppercase tracking-wider ${labelColor}`}>
+      <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+        <span className={`text-[9.5px] sm:text-[10px] font-bold uppercase tracking-wider ${labelColor}`}>
           {label}
         </span>
-        <span className="text-[10px] text-zinc-400 font-mono">
+        <span className="text-[9.5px] sm:text-[10px] text-zinc-400 font-mono">
           {period} • {dataSource}
         </span>
       </div>
@@ -120,7 +121,7 @@ const StockSelectorCard: React.FC<StockSelectorCardProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="w-full text-left group flex items-start gap-2.5 rounded-xl p-2 -m-2 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-colors cursor-pointer"
+        className="w-full text-left group flex items-center sm:items-start gap-2.5 rounded-xl p-1.5 -m-1.5 sm:p-2 sm:-m-2 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-colors cursor-pointer"
       >
         <Avatar ticker={selectedStock.ticker} sector={selectedStock.sector} size="md" />
         <div className="flex-1 min-w-0">
@@ -128,21 +129,22 @@ const StockSelectorCard: React.FC<StockSelectorCardProps> = ({
             <span className="text-sm font-bold font-sans text-zinc-950 dark:text-zinc-50 tracking-tight">
               {selectedStock.ticker}
             </span>
-            <span className="flex items-center gap-1 text-[11px] font-semibold text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-200 transition-colors">
-              <span>Ganti Saham</span>
+            <span className="inline-flex items-center gap-1 rounded-md bg-zinc-100 dark:bg-zinc-800/80 px-2 py-0.5 sm:bg-transparent sm:dark:bg-transparent sm:p-0 text-[10px] sm:text-[11px] font-semibold text-zinc-500 dark:text-zinc-300 sm:text-zinc-400 group-hover:text-zinc-700 dark:group-hover:text-zinc-200 transition-colors shrink-0">
+              <span>Ganti</span>
+              <span className="hidden sm:inline">Saham</span>
               <ChevronDown
-                className={`h-3.5 w-3.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+                className={`h-3 w-3 sm:h-3.5 sm:w-3.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
                 aria-hidden="true"
               />
             </span>
           </div>
 
-          {/* Nama Lengkap Emiten Tanpa Truncate / Tanpa Titik-titik (...) */}
-          <div className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 leading-snug mt-0.5 break-words">
+          {/* Nama Lengkap Emiten */}
+          <div className="text-[11.5px] sm:text-xs font-semibold text-zinc-800 dark:text-zinc-200 leading-snug mt-0.5 break-words">
             {selectedStock.name}
           </div>
 
-          <div className="mt-1 flex items-center gap-2 text-[11px] text-zinc-500 flex-wrap">
+          <div className="mt-1 flex items-center gap-1.5 sm:gap-2 text-[10.5px] sm:text-[11px] text-zinc-500 flex-wrap">
             <span className="font-semibold text-zinc-700 dark:text-zinc-300">
               {selectedStock.sector}
             </span>
@@ -429,9 +431,9 @@ export const StockComparisonView: React.FC<StockComparisonViewProps> = ({
   }
 
   return (
-    <div className="@container space-y-4">
+    <div className="@container space-y-3 sm:space-y-4">
       {/* 1. Header Pemilihan Preset Populer (Kompak & Bersih) */}
-      <div className="rounded-2xl border border-zinc-200 bg-white p-3.5 sm:p-4 shadow-2xs dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="rounded-xl sm:rounded-2xl border border-zinc-200 bg-white p-3 sm:p-4 shadow-2xs dark:border-zinc-800 dark:bg-zinc-900">
         <div className="flex items-center gap-1.5 mb-2.5">
           <Sparkles className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
           <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
@@ -486,16 +488,22 @@ export const StockComparisonView: React.FC<StockComparisonViewProps> = ({
           />
         </div>
 
-        {/* Tombol Swap di Tengah */}
-        <div className="@xl:col-span-1 flex justify-center py-0.5">
+        {/* Tombol Swap di Tengah: Panah Atas-Bawah di Mobile, Panah Kanan-Kiri di Desktop */}
+        <div className="@xl:col-span-1 flex items-center justify-center gap-2.5 @xl:gap-0 py-0 @xl:py-0.5">
+          <div className="h-px flex-1 bg-zinc-200/80 dark:bg-zinc-800/80 @xl:hidden" aria-hidden="true" />
           <button
             type="button"
             onClick={handleSwap}
             title="Tukar posisi saham A dan B"
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 bg-white shadow-2xs hover:bg-zinc-100 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800 transition-all cursor-pointer group"
+            className="flex items-center justify-center gap-1.5 h-8 px-3 @xl:h-9 @xl:w-9 @xl:px-0 rounded-full @xl:rounded-xl border border-zinc-200 bg-white shadow-2xs hover:bg-zinc-100 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800 transition-all cursor-pointer group shrink-0"
           >
-            <ArrowLeftRight className="h-4 w-4 text-zinc-600 dark:text-zinc-400 group-hover:scale-110 transition-transform" />
+            <ArrowUpDown className="h-3.5 w-3.5 text-zinc-600 dark:text-zinc-300 group-hover:scale-110 transition-transform @xl:hidden" aria-hidden="true" />
+            <span className="text-[10.5px] font-semibold text-zinc-600 dark:text-zinc-300 @xl:hidden">
+              Tukar Posisi
+            </span>
+            <ArrowLeftRight className="hidden @xl:block h-4 w-4 text-zinc-600 dark:text-zinc-400 group-hover:scale-110 transition-transform" aria-hidden="true" />
           </button>
+          <div className="h-px flex-1 bg-zinc-200/80 dark:bg-zinc-800/80 @xl:hidden" aria-hidden="true" />
         </div>
 
         {/* Kartu Pemilih Saham B */}

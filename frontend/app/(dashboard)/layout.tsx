@@ -59,12 +59,12 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         } ${isRightAiOpen ? "lg:pr-[490px] xl:pr-[540px] 2xl:pr-[580px]" : ""}`}
       >
         {/* Top Header */}
-        <header className="shrink-0 z-30 flex h-20 items-center justify-between gap-3 bg-white px-4 sm:px-6 dark:bg-[#16171f] border-b border-zinc-200/80 dark:border-zinc-800/80">
-          <div className="flex items-center gap-3 min-w-0 flex-1">
+        <header className="shrink-0 z-30 flex h-14 sm:h-20 items-center justify-between gap-2 sm:gap-3 bg-white px-2.5 sm:px-6 dark:bg-[#16171f] border-b border-zinc-200/80 dark:border-zinc-800/80">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
             {/* Tombol Buka Menu Mobile */}
             <button
               onClick={() => setIsMobileSidebarOpen(true)}
-              className="rounded-xl p-2 text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800 lg:hidden shrink-0 cursor-pointer"
+              className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800 lg:hidden shrink-0 cursor-pointer"
               aria-label="Buka Menu"
             >
               <Menu className="h-5 w-5" aria-hidden="true" />
@@ -88,12 +88,13 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
             <button
               type="button"
               onClick={openCommandPalette}
-              className="relative w-full max-w-md flex items-center justify-between rounded-xl border border-transparent bg-zinc-100/90 pl-3.5 pr-2.5 py-2 text-xs sm:text-sm text-zinc-500 hover:text-zinc-800 hover:bg-zinc-200/70 dark:bg-[#1e2029] dark:text-zinc-400 dark:hover:text-zinc-200 dark:hover:bg-zinc-800 transition-all text-left cursor-pointer group"
+              className="relative w-full max-w-md flex items-center justify-between rounded-xl border border-transparent bg-zinc-100/90 pl-2.5 pr-2 py-1.5 sm:pl-3.5 sm:pr-2.5 sm:py-2 text-[11px] sm:text-sm text-zinc-500 hover:text-zinc-800 hover:bg-zinc-200/70 dark:bg-[#1e2029] dark:text-zinc-400 dark:hover:text-zinc-200 dark:hover:bg-zinc-800 transition-all text-left cursor-pointer group"
               aria-label="Buka Pencarian Cepat Saham (Shortcut Ctrl + K)"
             >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <Search className="h-4 w-4 text-zinc-400 group-hover:text-emerald-500 transition-colors shrink-0" aria-hidden="true" />
-                <span className="truncate">Cari emiten (BBCA, BBRI, TLKM)...</span>
+              <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+                <Search className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-zinc-400 group-hover:text-emerald-500 transition-colors shrink-0" aria-hidden="true" />
+                <span className="truncate sm:hidden">Cari saham...</span>
+                <span className="truncate hidden sm:inline">Cari emiten (BBCA, BBRI, TLKM)...</span>
               </div>
               <div className="flex items-center gap-1 shrink-0">
                 <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded-lg border border-zinc-200 bg-white px-1.5 py-0.5 font-mono text-[10px] font-semibold text-zinc-500 shadow-2xs dark:border-zinc-700/80 dark:bg-zinc-800 dark:text-zinc-400">
@@ -104,7 +105,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
           </div>
 
           {/* Kanan: Judul Fitur Aktif & Tombol Buka/Tutup Panel AI */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <span className="hidden xl:inline text-xs font-semibold text-zinc-400">
               {pageTitle}
             </span>
@@ -112,7 +113,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
             <Link
               href="/profile"
               title="Profil Investor & Pengaturan"
-              className="flex h-10 items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-[#1e2029] dark:text-zinc-200 dark:hover:bg-zinc-800 transition-colors shrink-0 cursor-pointer"
+              className="flex h-9 sm:h-10 items-center gap-2 rounded-xl border border-zinc-200 bg-white px-2 sm:px-3 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-[#1e2029] dark:text-zinc-200 dark:hover:bg-zinc-800 transition-colors shrink-0 cursor-pointer"
             >
               <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold text-[10px]">
                 <User className="h-3.5 w-3.5" aria-hidden="true" />
@@ -122,7 +123,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
             <button
               onClick={toggleRightAi}
-              className={`flex h-10 items-center gap-2 rounded-xl px-3.5 text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer ${
+              className={`flex h-9 sm:h-10 items-center gap-1.5 sm:gap-2 rounded-xl px-2.5 sm:px-3.5 text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer ${
                 isRightAiOpen
                   ? "bg-emerald-600 text-white shadow-xs"
                   : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-[#1e2029] dark:text-zinc-200 dark:hover:bg-zinc-800"
@@ -144,25 +145,25 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                 AI
               </span>
               {isRightAiOpen ? (
-                <PanelRightClose className="h-3.5 w-3.5 opacity-80 shrink-0" aria-hidden="true" />
+                <PanelRightClose className="h-3.5 w-3.5 opacity-80 shrink-0 hidden sm:block" aria-hidden="true" />
               ) : (
-                <PanelRightOpen className="h-3.5 w-3.5 opacity-80 shrink-0" aria-hidden="true" />
+                <PanelRightOpen className="h-3.5 w-3.5 opacity-80 shrink-0 hidden sm:block" aria-hidden="true" />
               )}
             </button>
           </div>
         </header>
 
-        {/* Kanvas Utama Dalam (Hanya area ini yang dapat discroll) */}
-        <main className="@container flex-1 min-h-0 overflow-y-auto overscroll-contain rounded-tl-[28px] bg-slate-50 dark:bg-[#0d0e13] px-4 py-6 sm:px-6 lg:px-7">
+        {/* Kanvas Utama Dalam (Hanya area ini yang dapat discroll vertikal, bebas geser samping) */}
+        <main className="@container flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain rounded-none sm:rounded-tl-[28px] bg-slate-50 dark:bg-[#0d0e13] px-2.5 py-3 sm:px-6 sm:py-6 lg:px-7">
           <div className="mx-auto w-full max-w-[1600px]">
             {children}
           </div>
         </main>
 
         {/* Footer (Fixed di bawah / tidak bergerak saat scroll) */}
-        <footer className="shrink-0 z-20 bg-slate-50 dark:bg-[#0d0e13] border-t border-zinc-200/70 dark:border-zinc-800/60 py-3 px-4 sm:px-6 lg:px-7 text-xs text-zinc-500 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p>© 2026 BEI Stock Insight: Riset Fundamental Saham Bursa Efek Indonesia.</p>
-          <p className="text-zinc-400">
+        <footer className="shrink-0 z-20 bg-slate-50 dark:bg-[#0d0e13] border-t border-zinc-200/70 dark:border-zinc-800/60 py-1.5 px-3 sm:py-3 sm:px-6 lg:px-7 text-[10px] sm:text-xs text-zinc-500 flex flex-col sm:flex-row items-center justify-between gap-1 sm:gap-2">
+          <p className="truncate max-w-full">© 2026 BEI Stock Insight • Sumber: BEI / IDX (Q3 2024).</p>
+          <p className="text-zinc-400 hidden sm:block">
             Sumber: BEI / IDX • Periode Laporan: Q3 2024 (Diperbarui 15 Nov 2024 • Status: Terverifikasi). Disajikan untuk analisis edukasi mandiri.
           </p>
         </footer>

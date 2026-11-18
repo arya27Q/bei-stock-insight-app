@@ -90,20 +90,20 @@ export const SectorBenchmark: React.FC<SectorBenchmarkProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Sector & Metric Selector Header */}
-      <div className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5 shadow-2xs dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="flex flex-col gap-4 @2xl:flex-row @2xl:items-center @2xl:justify-between">
+      <div className="rounded-xl sm:rounded-2xl border border-zinc-200 bg-white p-3 sm:p-5 shadow-2xs dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex flex-col gap-3 sm:gap-4 @2xl:flex-row @2xl:items-center @2xl:justify-between">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 block mb-2">
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 block mb-1.5 sm:mb-2">
               Pilih Sektor untuk Dibandingkan:
             </span>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {sectors.map((sec) => (
                 <button
                   key={sec}
                   onClick={() => setSelectedSector(sec)}
-                  className={`rounded-xl px-3.5 py-1.5 text-xs sm:text-sm font-semibold transition-colors cursor-pointer ${
+                  className={`rounded-lg sm:rounded-xl px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-sm font-semibold transition-colors cursor-pointer ${
                     selectedSector === sec
                       ? "bg-zinc-950 text-white shadow-xs dark:bg-zinc-100 dark:text-zinc-950"
                       : "bg-zinc-50 text-zinc-700 border border-zinc-200 hover:bg-zinc-100 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-700"
@@ -116,7 +116,7 @@ export const SectorBenchmark: React.FC<SectorBenchmarkProps> = ({
           </div>
 
           {/* Metric Selector Segmented Control */}
-          <div className="self-start sm:self-auto">
+          <div className="w-full overflow-x-auto sm:w-auto sm:overflow-visible self-start sm:self-auto">
             <SegmentedControl
               options={[
                 { id: "roe", label: "ROE (%)" },
@@ -132,30 +132,30 @@ export const SectorBenchmark: React.FC<SectorBenchmarkProps> = ({
       </div>
 
       {/* Sector Summary Box */}
-      <div className="rounded-2xl border border-zinc-200 bg-white p-5 sm:p-6 shadow-2xs dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-zinc-100 dark:border-zinc-800">
+      <div className="rounded-xl sm:rounded-2xl border border-zinc-200 bg-white p-3.5 sm:p-6 shadow-2xs dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 pb-3 sm:pb-4 border-b border-zinc-100 dark:border-zinc-800">
           <div>
-            <h3 className="text-base sm:text-lg font-bold text-zinc-950 dark:text-zinc-50">
+            <h3 className="text-sm sm:text-lg font-bold text-zinc-950 dark:text-zinc-50">
               Perbandingan Fundamental Sektor {selectedSector}
             </h3>
-            <span className="text-xs sm:text-sm text-zinc-500 font-medium mt-0.5 block">
+            <span className="text-[11px] sm:text-sm text-zinc-500 font-medium mt-0.5 block">
               Indikator acuan: <strong className="text-zinc-800 dark:text-zinc-200">{getMetricLabel()}</strong> • Laporan Q3 2024
             </span>
           </div>
 
-          <div className="flex items-center gap-2.5">
-            <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/25 px-4 py-2 text-right">
-              <span className="text-[11px] text-emerald-700 dark:text-emerald-400 block font-semibold">
-                Median Sektor (Acuan Utama)
+          <div className="flex items-center gap-2 sm:gap-2.5 w-full sm:w-auto">
+            <div className="flex-1 sm:flex-none rounded-xl bg-emerald-500/10 border border-emerald-500/25 px-3 sm:px-4 py-1.5 sm:py-2 text-left sm:text-right">
+              <span className="text-[10px] sm:text-[11px] text-emerald-700 dark:text-emerald-400 block font-semibold">
+                Median Sektor
               </span>
-              <span className="text-base font-mono font-bold text-zinc-950 dark:text-zinc-100 tabular-nums">
+              <span className="text-sm sm:text-base font-mono font-bold text-zinc-950 dark:text-zinc-100 tabular-nums">
                 {sectorMedian}
                 {activeMetric === "per" ? "x" : "%"}
               </span>
             </div>
 
-            <div className="rounded-xl bg-zinc-50 border border-zinc-200 px-3.5 py-2 text-right dark:bg-zinc-800/80 dark:border-zinc-700">
-              <span className="text-[11px] text-zinc-500 block font-medium">Rata-rata Sektor</span>
+            <div className="flex-1 sm:flex-none rounded-xl bg-zinc-50 border border-zinc-200 px-3 sm:px-3.5 py-1.5 sm:py-2 text-left sm:text-right dark:bg-zinc-800/80 dark:border-zinc-700">
+              <span className="text-[10px] sm:text-[11px] text-zinc-500 block font-medium">Rata-rata Sektor</span>
               <span className="text-sm font-mono font-semibold text-zinc-700 dark:text-zinc-300 tabular-nums">
                 {sectorAverage}
                 {activeMetric === "per" ? "x" : "%"}

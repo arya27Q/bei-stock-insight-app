@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { X, MessageSquare } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { X, MessageSquare, History } from "lucide-react";
 import { StockFundamental } from "../../types/stock";
 import { GeneralAiView } from "../modules/GeneralAiView";
 import { StockDetailView } from "../modules/StockDetailView";
+import { ChatHistorySidebar } from "../modules/ChatHistorySidebar";
 
 export interface RightAiPanelProps {
   stock: StockFundamental | null;
@@ -25,18 +26,44 @@ export const RightAiPanel: React.FC<RightAiPanelProps> = ({
   onNavigateToBenchmark,
   stocks,
 }) => {
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [sessionResetKey, setSessionResetKey] = useState(0);
+
   // Escape key handler (R-26 & R-32)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) {
-        onClose();
+        if (isHistoryOpen) {
+          setIsHistoryOpen(false);
+        } else {
+          onClose();
+        }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, isHistoryOpen, onClose]);
 
   if (!isOpen) return null;
+
+  const activeTicker = stock ? stock.ticker : "MARKET";
+
+  const handleSelectSession = (ticker: string) => {
+    if (ticker === "MARKET") {
+      onClearStock();
+      return;
+    }
+    const found = stocks.find((s) => s.ticker.toUpperCase() === ticker.toUpperCase());
+    if (found) {
+      onSelectStock(found);
+    }
+  };
+
+  const handleSessionDeleted = (deletedTicker: string) => {
+    if (deletedTicker.toUpperCase() === activeTicker.toUpperCase()) {
+      setSessionResetKey((prev) => prev + 1);
+    }
+  };
 
   return (
     <>
@@ -47,19 +74,40 @@ export const RightAiPanel: React.FC<RightAiPanelProps> = ({
       />
 
       <aside
-        className="fixed inset-y-0 right-0 z-40 flex w-full sm:w-[480px] lg:w-[490px] xl:w-[540px] 2xl:w-[580px] flex-col justify-between border-l border-zinc-200 bg-white p-4 sm:p-5 shadow-xl dark:border-zinc-800/80 dark:bg-[#16171f] overflow-y-auto"
+        className="fixed inset-y-0 right-0 z-40 flex w-full sm:w-[480px] lg:w-[490px] xl:w-[540px] 2xl:w-[580px] flex-col justify-between border-l border-zinc-200 bg-white p-3 sm:p-5 shadow-xl dark:border-zinc-800/80 dark:bg-[#16171f] overflow-y-auto"
         aria-label="Panel Analis AI dan Detail Emiten"
       >
+        {/* Sidebar Drawer Riwayat Chat AI (Slide-over di dalam Panel AI) */}
+        {isHistoryOpen && (
+          <div className="fixed inset-y-0 right-0 z-50 flex w-full sm:w-[480px] lg:w-[490px] xl:w-[540px] 2xl:w-[580px]">
+            <div className="relative z-10 h-full">
+              <ChatHistorySidebar
+                activeTicker={activeTicker}
+                stocks={stocks}
+                onSelectSession={handleSelectSession}
+                onSessionDeleted={handleSessionDeleted}
+                onClose={() => setIsHistoryOpen(false)}
+                mode="drawer"
+              />
+            </div>
+            <div
+              className="flex-1 bg-black/35 backdrop-blur-2xs cursor-pointer"
+              onClick={() => setIsHistoryOpen(false)}
+              aria-hidden="true"
+            />
+          </div>
+        )}
+
         <div>
-          {/* Top Panel Navigation Bar: Prioritaskan Penjelasan Emiten (Utama), Asisten Umum sebagai Mode Tambahan */}
-          <div className="pb-3.5 border-b border-zinc-200 dark:border-zinc-800 space-y-2.5">
+          {/* Top Panel Navigation Bar */}
+          <div className="pb-3 sm:pb-3.5 border-b border-zinc-200 dark:border-zinc-800 space-y-2 sm:space-y-2.5">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 shadow-xs">
                   <MessageSquare className="h-4 w-4" aria-hidden="true" />
                 </div>
                 <div className="min-w-0">
-                  <h2 className="text-xs sm:text-sm font-bold text-zinc-950 dark:text-zinc-50 leading-snug">
+                  <h2 className="text-xs sm:text-sm font-bold text-zinc-950 dark:text-zinc-50 leading-snug truncate">
                     {stock ? `Profil & AI Insight (${stock.ticker})` : "Asisten Pasar BEI"}
                   </h2>
                   <span className="text-[10px] text-zinc-500 font-medium block leading-snug">
@@ -68,10 +116,18 @@ export const RightAiPanel: React.FC<RightAiPanelProps> = ({
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="rounded bg-[rgba(20,130,102,0.15)] px-2 py-0.5 text-[10px] font-bold text-[rgba(38,166,134,0.95)] border border-[rgba(52,184,150,0.3)] whitespace-nowrap">
-                  Terverifikasi
-                </span>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setIsHistoryOpen(true)}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1.5 text-[11px] font-bold text-emerald-700 hover:bg-emerald-500/20 dark:border-emerald-500/30 dark:bg-emerald-500/15 dark:text-emerald-300 dark:hover:bg-emerald-500/25 transition-colors cursor-pointer"
+                  title="Buka Sidebar Riwayat Chat AI"
+                  aria-label="Buka Sidebar Riwayat Chat AI"
+                >
+                  <History className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span>Riwayat</span>
+                </button>
+
                 <button
                   onClick={onClose}
                   className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 transition-colors cursor-pointer"
@@ -116,17 +172,20 @@ export const RightAiPanel: React.FC<RightAiPanelProps> = ({
           {/* VIEW A: No Stock Selected (General Market AI Assistant) */}
           {!stock && (
             <GeneralAiView
+              key={`general-${sessionResetKey}`}
               stocks={stocks}
               onSelectStock={onSelectStock}
+              onOpenHistory={() => setIsHistoryOpen(true)}
             />
           )}
 
           {/* VIEW B: Specific Stock Selected (Detailed Company Profile & AI) */}
           {stock && (
             <StockDetailView
-              key={stock.ticker}
+              key={`${stock.ticker}-${sessionResetKey}`}
               stock={stock}
               onNavigateToBenchmark={onNavigateToBenchmark}
+              onOpenHistory={() => setIsHistoryOpen(true)}
             />
           )}
         </div>

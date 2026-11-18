@@ -77,6 +77,15 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [isRightAiOpen, setIsRightAiOpen] = useState<boolean>(true);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
 
+  // Khusus layar mobile/tablet (< 1024px), tutup Panel AI secara default saat awal buka agar halaman utama langsung terlihat
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+      queueMicrotask(() => {
+        setIsRightAiOpen(false);
+      });
+    }
+  }, []);
+
   // Keyboard shortcut global: Ctrl + K atau Cmd + K untuk Command Palette
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

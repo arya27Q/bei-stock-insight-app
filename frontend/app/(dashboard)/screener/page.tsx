@@ -9,7 +9,7 @@ export default function ScreenerPage() {
   const { stocks, selectedMetric, selectStock } = useDashboard();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 sm:space-y-6">
       <MarketOverviewRow stocks={stocks} selectedMetric={selectedMetric} />
       <StockScreener stocks={stocks} onSelectStock={selectStock} />
     </div>

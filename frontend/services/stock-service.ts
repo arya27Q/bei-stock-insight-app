@@ -1,4 +1,4 @@
-import { StockFundamental, AIInsightData, MetricDefinition, MetricType, LotSimulationResult } from "../types/stock";
+import { StockFundamental, AIInsightData, MetricDefinition, MetricType, LotSimulationResult, ChatMessage } from "../types/stock";
 import { INITIAL_STOCKS, SECTORS_METADATA } from "@/data/sectors";
 
 export { INITIAL_STOCKS, SECTORS_METADATA };
@@ -442,5 +442,188 @@ export async function fetchStockComparison(tickerA: string, tickerB: string) {
   }
   const json = await res.json();
   return json.data;
+}
+
+const CHAT_STORAGE_PREFIX = "bei_ai_chat_history_";
+
+function formatChatTime(isoString?: string): string {
+  if (!isoString) return "Riwayat";
+  try {
+    const date = new Date(isoString);
+    if (Number.isNaN(date.getTime())) return "Riwayat";
+    return date.toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return "Riwayat";
+  }
+}
+
+export function getStoredChatHistory(ticker: string): ChatMessage[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(`${CHAT_STORAGE_PREFIX}${ticker.toUpperCase()}`);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+export interface ChatSessionSummary {
+  ticker: string;
+  lastMessage: string;
+  messageCount: number;
+  lastActiveAt: string;
+}
+
+export function notifyChatHistoryUpdated(): void {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("bei-ai-history-updated"));
+  }
+}
+
+export function saveStoredChatHistory(ticker: string, messages: ChatMessage[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    // Hanya simpan pesan riil (kecualikan pesan welcome sistem agar tidak dobel)
+    const toStore = messages.filter(
+      (m) => !m.id.startsWith("stock-welcome-") && m.id !== "gen-welcome"
+    );
+    if (toStore.length === 0) {
+      window.localStorage.removeItem(`${CHAT_STORAGE_PREFIX}${ticker.toUpperCase()}`);
+      notifyChatHistoryUpdated();
+      return;
+    }
+    window.localStorage.setItem(
+      `${CHAT_STORAGE_PREFIX}${ticker.toUpperCase()}`,
+      JSON.stringify(toStore.slice(-40))
+    );
+    notifyChatHistoryUpdated();
+  } catch {
+    // Abaikan jika storage penuh atau private browsing
+  }
+}
+
+interface BackendChatLogItem {
+  id: string;
+  sender: string;
+  message: string;
+  createdAt?: string;
+}
+
+export async function fetchAiChatHistory(ticker: string): Promise<ChatMessage[]> {
+  const cleanTicker = ticker.toUpperCase();
+
+  // 1. Untuk emiten spesifik, ambil histori persisten dari database MySQL backend
+  if (cleanTicker !== "MARKET" && cleanTicker !== "ALL") {
+    try {
+      const res = await fetch(`/api/ai/history?ticker=${encodeURIComponent(cleanTicker)}&limit=30`, {
+        cache: "no-store",
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.status === "success" && Array.isArray(json.data) && json.data.length > 0) {
+          const mapped: ChatMessage[] = json.data.map((item: BackendChatLogItem) => ({
+            id: `db-${item.id}`,
+            sender: item.sender === "user" ? "user" : "assistant",
+            text: item.message,
+            time: formatChatTime(item.createdAt),
+          }));
+          saveStoredChatHistory(cleanTicker, mapped);
+          return mapped;
+        }
+      }
+    } catch (err) {
+      console.warn("[fetchAiChatHistory] Gagal memuat histori dari backend, beralih ke cache lokal:", err);
+    }
+  }
+
+  // 2. Fallback ke localStorage (juga digunakan untuk chat pasar umum "MARKET")
+  return getStoredChatHistory(cleanTicker);
+}
+
+export async function clearAiChatHistory(ticker: string): Promise<void> {
+  const cleanTicker = ticker.toUpperCase();
+
+  if (typeof window !== "undefined") {
+    try {
+      window.localStorage.removeItem(`${CHAT_STORAGE_PREFIX}${cleanTicker}`);
+    } catch {
+      // Abaikan error storage
+    }
+  }
+
+  if (cleanTicker !== "MARKET" && cleanTicker !== "ALL") {
+    try {
+      await fetch(`/api/ai/history?ticker=${encodeURIComponent(cleanTicker)}`, {
+        method: "DELETE",
+      });
+    } catch (err) {
+      console.warn("[clearAiChatHistory] Gagal menghapus histori di backend:", err);
+    }
+  }
+
+  notifyChatHistoryUpdated();
+}
+
+export async function fetchAiChatSessions(): Promise<ChatSessionSummary[]> {
+  const sessionMap = new Map<string, ChatSessionSummary>();
+
+  // 1. Ambil seluruh sesi emiten dari database MySQL backend
+  try {
+    const res = await fetch("/api/ai/sessions", { cache: "no-store" });
+    if (res.ok) {
+      const json = await res.json();
+      if (json.status === "success" && Array.isArray(json.data)) {
+        for (const item of json.data as ChatSessionSummary[]) {
+          const key = item.ticker.toUpperCase();
+          sessionMap.set(key, {
+            ticker: key,
+            lastMessage: item.lastMessage,
+            messageCount: item.messageCount,
+            lastActiveAt: item.lastActiveAt,
+          });
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("[fetchAiChatSessions] Gagal memuat sesi dari backend, menggunakan cache lokal:", err);
+  }
+
+  // 2. Gabungkan dengan sesi tersimpan di localStorage (termasuk MARKET dan cache offline)
+  if (typeof window !== "undefined") {
+    try {
+      for (let i = 0; i < window.localStorage.length; i++) {
+        const storageKey = window.localStorage.key(i);
+        if (!storageKey || !storageKey.startsWith(CHAT_STORAGE_PREFIX)) continue;
+
+        const ticker = storageKey.replace(CHAT_STORAGE_PREFIX, "").toUpperCase();
+        const msgs = getStoredChatHistory(ticker);
+        if (msgs.length === 0) continue;
+
+        const lastUserMsg = [...msgs].reverse().find((m) => m.sender === "user");
+        const preview = (lastUserMsg?.text || msgs[msgs.length - 1]?.text || "").slice(0, 100);
+
+        if (!sessionMap.has(ticker)) {
+          sessionMap.set(ticker, {
+            ticker,
+            lastMessage: preview,
+            messageCount: msgs.length,
+            lastActiveAt: new Date().toISOString(),
+          });
+        }
+      }
+    } catch {
+      // Abaikan error storage
+    }
+  }
+
+  // Urutkan sesi paling baru di bagian atas
+  return Array.from(sessionMap.values()).sort(
+    (a, b) => new Date(b.lastActiveAt).getTime() - new Date(a.lastActiveAt).getTime()
+  );
 }
 

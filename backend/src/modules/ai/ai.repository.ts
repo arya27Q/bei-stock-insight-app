@@ -88,20 +88,87 @@ export const aiRepository = {
     }
   },
 
-  // Ambil riwayat chat terbaru untuk suatu emiten
-  async getChatHistory(stockTicker: string, limit: number = 20) {
+  // Ambil riwayat chat terbaru untuk suatu emiten dalam urutan kronologis (lama -> baru)
+  async getChatHistory(stockTicker: string, limit: number = 30) {
     try {
       const ticker = stockTicker.toUpperCase();
       if (ticker === "MARKET" || ticker === "ALL") return [];
 
-      return await prisma.aiChatLog.findMany({
+      const rows = await prisma.aiChatLog.findMany({
         where: { stockTicker: ticker },
         orderBy: { createdAt: "desc" },
         take: limit,
       });
+
+      return rows.reverse();
     } catch (error) {
       console.error(`[aiRepository.getChatHistory] Error fetching logs for ${stockTicker}:`, error);
       return [];
+    }
+  },
+
+  // Ambil daftar ringkasan sesi chat yang dikelompokkan per emiten (terbaru di atas)
+  async getChatSessions() {
+    try {
+      const logs = await prisma.aiChatLog.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 300,
+      });
+
+      const sessionMap = new Map<
+        string,
+        {
+          ticker: string;
+          lastMessage: string;
+          lastUserQuestion: string | null;
+          messageCount: number;
+          lastActiveAt: Date;
+        }
+      >();
+
+      for (const log of logs) {
+        const key = log.stockTicker.toUpperCase();
+        const existing = sessionMap.get(key);
+        if (!existing) {
+          sessionMap.set(key, {
+            ticker: key,
+            lastMessage: log.message,
+            lastUserQuestion: log.sender === "user" ? log.message : null,
+            messageCount: 1,
+            lastActiveAt: log.createdAt,
+          });
+        } else {
+          existing.messageCount += 1;
+          if (!existing.lastUserQuestion && log.sender === "user") {
+            existing.lastUserQuestion = log.message;
+          }
+        }
+      }
+
+      return Array.from(sessionMap.values()).map((s) => ({
+        ticker: s.ticker,
+        lastMessage: (s.lastUserQuestion || s.lastMessage).slice(0, 100),
+        messageCount: s.messageCount,
+        lastActiveAt: s.lastActiveAt.toISOString(),
+      }));
+    } catch (error) {
+      console.error("[aiRepository.getChatSessions] Error fetching sessions:", error);
+      return [];
+    }
+  },
+
+  // Hapus riwayat chat untuk suatu emiten dari tabel ai_chat_logs
+  async clearChatHistory(stockTicker: string) {
+    try {
+      const ticker = stockTicker.toUpperCase();
+      if (ticker === "MARKET" || ticker === "ALL") return { count: 0 };
+
+      return await prisma.aiChatLog.deleteMany({
+        where: { stockTicker: ticker },
+      });
+    } catch (error) {
+      console.error(`[aiRepository.clearChatHistory] Error deleting logs for ${stockTicker}:`, error);
+      return { count: 0 };
     }
   },
 };

@@ -295,27 +295,27 @@ export const StockMap: React.FC<StockMapProps> = ({
         key={stock.ticker}
         onClick={() => onSelectStock(stock)}
         title={`Klik untuk membuka rangkuman AI & konsultasi chatbot ${stock.ticker}`}
-        className={`group relative overflow-hidden min-w-0 rounded-xl p-3.5 text-left transition-all duration-150 cursor-pointer shadow-xs hover:shadow-md hover:brightness-105 active:scale-[0.99] border ${style.border} ${style.bg} ${
+        className={`group relative overflow-hidden min-w-0 rounded-xl p-2.5 sm:p-3.5 text-left transition-all duration-150 cursor-pointer shadow-xs hover:shadow-md hover:brightness-105 active:scale-[0.99] border ${style.border} ${style.bg} ${
           isSelected
             ? "ring-2 ring-white/95 ring-offset-2 ring-offset-[#0d0e13] shadow-lg"
             : ""
-        } text-white flex flex-col justify-between h-[116px] min-h-[116px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white`}
+        } text-white flex flex-col justify-between h-[96px] min-h-[96px] sm:h-[116px] sm:min-h-[116px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white`}
       >
         {/* Baris Atas: Kode Saham & Kapitalisasi Pasar */}
         <div className="min-w-0">
-          <div className="flex items-center justify-between gap-2 min-w-0">
-            <div className="flex items-center gap-1.5 min-w-0">
-              <span className="font-sans text-base @sm:text-lg font-bold tracking-tight text-white leading-none">
+          <div className="flex items-center justify-between gap-1 sm:gap-2 min-w-0">
+            <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
+              <span className="font-sans text-sm sm:text-base @sm:text-lg font-bold tracking-tight text-white leading-none">
                 {stock.ticker}
               </span>
               {isSelected && (
-                <span className="text-[9px] font-bold uppercase tracking-wider bg-white text-zinc-950 px-1.5 py-0.5 rounded shrink-0">
+                <span className="hidden sm:inline-block text-[9px] font-bold uppercase tracking-wider bg-white text-zinc-950 px-1.5 py-0.5 rounded shrink-0">
                   AI Aktif
                 </span>
               )}
             </div>
 
-            <div className="flex items-center gap-1.5 shrink-0">
+            <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
               <span
                 role="button"
                 tabIndex={0}
@@ -330,45 +330,45 @@ export const StockMap: React.FC<StockMapProps> = ({
                   }
                 }}
                 title={isWatchlisted(stock.ticker) ? `Hapus ${stock.ticker} dari watchlist` : `Simpan ${stock.ticker} ke watchlist`}
-                className={`p-1 rounded-md transition-all cursor-pointer ${
+                className={`p-0.5 sm:p-1 rounded-md transition-all cursor-pointer ${
                   isWatchlisted(stock.ticker)
                     ? "text-amber-300 hover:text-amber-200 bg-black/30"
                     : "text-white/60 hover:text-white hover:bg-black/20"
                 }`}
               >
-                <Bookmark className={`h-3.5 w-3.5 ${isWatchlisted(stock.ticker) ? "fill-amber-300" : ""}`} />
+                <Bookmark className={`h-3 w-3 sm:h-3.5 sm:w-3.5 ${isWatchlisted(stock.ticker) ? "fill-amber-300" : ""}`} />
               </span>
 
-              <span className="text-[11px] font-semibold text-white/95 px-2 py-0.5 rounded-md bg-black/20 border border-white/10 tabular-nums whitespace-nowrap shrink-0">
+              <span className="text-[9.5px] sm:text-[11px] font-semibold text-white/95 px-1.5 sm:px-2 py-0.5 rounded-md bg-black/20 border border-white/10 tabular-nums whitespace-nowrap shrink-0">
                 {stock.marketCapLabel}
               </span>
             </div>
           </div>
 
-          {/* Baris Tengah: Badge Sektor Ringkas & Nama Perusahaan Lengkap Tanpa Truncate */}
-          <div className="mt-1.5 flex items-start gap-1.5 min-w-0">
+          {/* Baris Tengah: Badge Sektor Ringkas & Nama Perusahaan */}
+          <div className="mt-1 sm:mt-1.5 flex items-start gap-1 sm:gap-1.5 min-w-0">
             {options?.showSectorTag && (
-              <span className="text-[10px] font-medium text-white/95 bg-black/20 px-1.5 py-0.5 rounded shrink-0 whitespace-nowrap mt-0.5">
+              <span className="hidden sm:inline-block text-[10px] font-medium text-white/95 bg-black/20 px-1.5 py-0.5 rounded shrink-0 whitespace-nowrap mt-0.5">
                 {getShortSectorBadge(stock.sector)}
               </span>
             )}
-            <span className="text-xs font-normal text-white/90 leading-snug min-w-0 block truncate">
+            <span className="text-[10.5px] sm:text-xs font-normal text-white/90 leading-snug min-w-0 block truncate">
               {stock.name}
             </span>
           </div>
         </div>
 
         {/* Baris Bawah: Label Singkat & Sparkline Mini + Angka Metrik Utama */}
-        <div className="mt-3 pt-2.5 border-t border-white/15 flex items-center justify-between gap-2 min-w-0">
-          <span className="text-[11px] font-medium text-white/85 leading-snug min-w-0">
+        <div className="mt-2 sm:mt-3 pt-1.5 sm:pt-2.5 border-t border-white/15 flex items-center justify-between gap-1.5 sm:gap-2 min-w-0">
+          <span className="text-[9.5px] sm:text-[11px] font-medium text-white/85 leading-snug min-w-0 truncate">
             {getMetricShortBadge()}
           </span>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Sparkline SVG Super Mini - Visual Tren Historis Kuartalan */}
             <div
               title={`Tren 4 Kuartal (${activeDef.label}): [${trendData.map((v) => `${v}${activeDef.unit}`).join(" → ")}]`}
-              className="flex items-center rounded bg-black/15 px-1 py-0.5"
+              className="hidden sm:flex items-center rounded bg-black/15 px-1 py-0.5"
             >
               <Sparkline
                 data={trendData}
@@ -377,7 +377,7 @@ export const StockMap: React.FC<StockMapProps> = ({
                 isPositive={isPositiveTrend}
               />
             </div>
-            <span className="font-sans text-base @sm:text-lg font-bold text-white tracking-tight tabular-nums whitespace-nowrap leading-none">
+            <span className="font-sans text-sm sm:text-base @sm:text-lg font-bold text-white tracking-tight tabular-nums whitespace-nowrap leading-none">
               {getMetricDisplay(stock)}
             </span>
           </div>
@@ -387,32 +387,32 @@ export const StockMap: React.FC<StockMapProps> = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {/* 1. Panel Kontrol Terpadu: Indikator Metrik Sejajar Lurus & Filter Tampilan */}
-      <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-2xs dark:border-zinc-800/80 dark:bg-[#16171f] space-y-3">
+      <div className="rounded-xl sm:rounded-2xl border border-zinc-200 bg-white p-3 sm:p-4 shadow-2xs dark:border-zinc-800/80 dark:bg-[#16171f] space-y-2.5 sm:space-y-3">
         {/* Baris Atas: Label Indikator di Kiri + Kontrol Tampilan di Kanan */}
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+          <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold text-zinc-500 dark:text-zinc-400">
             <Layers className="h-3.5 w-3.5 shrink-0 text-[rgba(52,211,153,0.9)]" aria-hidden="true" />
             <span>Pilih Indikator Fundamental:</span>
           </div>
 
           {/* Baris Aksi: Mode Layout, Filter Sektor, & Penjelasan Metrik */}
-          <div className="flex flex-wrap items-center gap-2 shrink-0">
-            <div className="flex items-center rounded-xl border border-zinc-200 bg-zinc-50 p-1 dark:border-zinc-800 dark:bg-[#0d0e13]">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full sm:w-auto min-w-0 max-w-full">
+            <div className="flex items-center rounded-xl border border-zinc-200 bg-zinc-50 p-0.5 sm:p-1 dark:border-zinc-800 dark:bg-[#0d0e13] max-w-full">
               <button
                 onClick={() => {
                   setSelectedSector("all");
                   setLayoutMode("sectors");
                 }}
-                className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
+                className={`flex items-center gap-1 sm:gap-1.5 rounded-lg px-2 sm:px-2.5 py-1 text-[11px] sm:text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
                   layoutMode === "sectors"
                     ? "bg-white text-zinc-950 shadow-2xs dark:bg-[#1e2029] dark:text-zinc-50"
                     : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
                 }`}
                 title="Tampilan Kluster Sektor"
               >
-                <Grid3X3 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                <Grid3X3 className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" aria-hidden="true" />
                 <span>Kluster Sektor</span>
               </button>
               <button
@@ -420,14 +420,14 @@ export const StockMap: React.FC<StockMapProps> = ({
                   setSelectedSector("all");
                   setLayoutMode("market");
                 }}
-                className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
+                className={`flex items-center gap-1 sm:gap-1.5 rounded-lg px-2 sm:px-2.5 py-1 text-[11px] sm:text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
                   layoutMode === "market"
                     ? "bg-white text-zinc-950 shadow-2xs dark:bg-[#1e2029] dark:text-zinc-50"
                     : "text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
                 }`}
                 title="Tampilan Peta Pasar 3x3"
               >
-                <LayoutGrid className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                <LayoutGrid className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" aria-hidden="true" />
                 <span>Peta Pasar (3x3)</span>
               </button>
             </div>
@@ -446,29 +446,30 @@ export const StockMap: React.FC<StockMapProps> = ({
             <button
               type="button"
               onClick={() => setOnlyWatchlist((prev) => !prev)}
-              className={`flex items-center gap-1.5 rounded-xl border px-2.5 py-1.5 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+              className={`flex items-center gap-1 sm:gap-1.5 rounded-xl border px-2 sm:px-2.5 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
                 onlyWatchlist
                   ? "border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300 shadow-xs"
                   : "border-zinc-200 bg-zinc-50 text-zinc-600 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-[#0d0e13] dark:text-zinc-400 dark:hover:bg-zinc-800"
               }`}
               title={onlyWatchlist ? "Tampilkan semua emiten" : "Filter hanya emiten di watchlist"}
             >
-              <Bookmark className={`h-3.5 w-3.5 ${onlyWatchlist ? "fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" : ""}`} />
+              <Bookmark className={`h-3 w-3 sm:h-3.5 sm:w-3.5 ${onlyWatchlist ? "fill-amber-500 text-amber-500 dark:fill-amber-400 dark:text-amber-400" : ""}`} />
               <span suppressHydrationWarning>Watchlist ({watchlist.length})</span>
             </button>
 
             <div className="relative">
               <button
                 onClick={() => setShowTooltip(!showTooltip)}
-                className="flex items-center gap-1 rounded-xl border border-zinc-200 bg-zinc-50 px-2.5 py-1.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-[#0d0e13] dark:text-zinc-300 transition-colors cursor-pointer whitespace-nowrap"
+                className="flex items-center gap-1 rounded-xl border border-zinc-200 bg-zinc-50 px-2 sm:px-2.5 py-1 sm:py-1.5 text-[11px] sm:text-xs font-semibold text-zinc-700 hover:bg-zinc-100 dark:border-zinc-800 dark:bg-[#0d0e13] dark:text-zinc-300 transition-colors cursor-pointer whitespace-nowrap"
                 aria-expanded={showTooltip}
               >
-                <HelpCircle className="h-3.5 w-3.5 text-zinc-500 shrink-0" aria-hidden="true" />
-                <span>Panduan & Arti Metrik</span>
+                <HelpCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-zinc-500 shrink-0" aria-hidden="true" />
+                <span className="sm:hidden">Panduan</span>
+                <span className="hidden sm:inline">Panduan & Arti Metrik</span>
               </button>
 
               {showTooltip && (
-                <div className="absolute right-0 top-10 z-30 w-80 rounded-xl border border-zinc-200 bg-white p-4 shadow-xl dark:border-zinc-700 dark:bg-[#1e2029] text-xs text-zinc-700 dark:text-zinc-200 space-y-2.5">
+                <div className="absolute left-0 sm:left-auto sm:right-0 top-10 z-30 w-[min(86vw,20rem)] sm:w-80 rounded-xl border border-zinc-200 bg-white p-3.5 sm:p-4 shadow-xl dark:border-zinc-700 dark:bg-[#1e2029] text-xs text-zinc-700 dark:text-zinc-200 space-y-2.5">
                   <div>
                     <div className="font-bold text-zinc-950 dark:text-zinc-50 mb-0.5">
                       {activeDef.label} ({activeDef.subLabel})
@@ -492,7 +493,7 @@ export const StockMap: React.FC<StockMapProps> = ({
         </div>
 
         {/* Baris Tengah: 4 Tombol Indikator Sejajar dalam Grid Tanpa Truncate */}
-        <div className="grid grid-cols-1 @sm:grid-cols-2 @5xl:grid-cols-4 gap-2.5">
+        <div className="grid grid-cols-2 @5xl:grid-cols-4 gap-1.5 sm:gap-2.5">
           {(Object.keys(METRIC_DEFINITIONS) as MetricType[]).map((key) => {
             const def = METRIC_DEFINITIONS[key];
             const isSelected = selectedMetric === key;
@@ -500,7 +501,7 @@ export const StockMap: React.FC<StockMapProps> = ({
               <button
                 key={key}
                 onClick={() => handleMetricChange(key)}
-                className={`w-full flex items-center justify-center min-h-[42px] rounded-xl px-3.5 py-2 text-xs font-semibold text-center leading-snug transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 dark:focus-visible:ring-zinc-100 ${
+                className={`w-full flex items-center justify-center min-h-[38px] sm:min-h-[42px] rounded-lg sm:rounded-xl px-2 sm:px-3.5 py-1.5 sm:py-2 text-[11px] sm:text-xs font-semibold text-center leading-snug transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-950 dark:focus-visible:ring-zinc-100 ${
                   isSelected
                     ? "bg-zinc-900 text-white shadow-xs dark:bg-zinc-100 dark:text-zinc-950"
                     : "bg-zinc-50 text-zinc-600 border border-zinc-200 hover:bg-zinc-100 dark:bg-[#0d0e13] dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-[#1e2029]"
@@ -513,21 +514,21 @@ export const StockMap: React.FC<StockMapProps> = ({
         </div>
 
         {/* 2. Bar Legenda Skala Warna Dinamis Sesuai Indikator */}
-        <div className="pt-2.5 border-t border-zinc-100 dark:border-zinc-800/80 flex flex-wrap items-center justify-between gap-2 text-xs">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="font-semibold text-zinc-600 dark:text-zinc-300 text-xs">
+        <div className="pt-2 sm:pt-2.5 border-t border-zinc-100 dark:border-zinc-800/80 flex flex-wrap items-center justify-between gap-1.5 sm:gap-2 text-xs">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <span className="font-semibold text-zinc-600 dark:text-zinc-300 text-[11px] sm:text-xs">
               Arti Warna ({activeDef.label}):
             </span>
             {selectedMetric === "per" && (
-              <span className="text-[11px] text-amber-600 dark:text-amber-400 font-medium">
+              <span className="text-[10px] sm:text-[11px] text-amber-600 dark:text-amber-400 font-medium">
                 *Wajib dibandingkan dengan median sektor sejenis
               </span>
             )}
           </div>
-          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3.5 text-[11px] font-medium text-zinc-600 dark:text-zinc-400">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3.5 text-[10px] sm:text-[11px] font-medium text-zinc-600 dark:text-zinc-400">
             {getLegendItems().map((item, idx) => (
-              <div key={idx} className="flex items-center gap-1.5">
-                <span className={`h-3 w-4 rounded-xs ${item.color} inline-block`} />
+              <div key={idx} className="flex items-center gap-1 sm:gap-1.5">
+                <span className={`h-2.5 w-3 sm:h-3 sm:w-4 rounded-xs ${item.color} inline-block`} />
                 <span>{item.label}</span>
               </div>
             ))}
@@ -537,51 +538,51 @@ export const StockMap: React.FC<StockMapProps> = ({
 
       {/* 3. TAMPILAN A: Kluster Sektor Proporsional (Grid Diperbesar & Tanpa Truncate) */}
       {layoutMode === "sectors" && (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {selectedSector !== "all" ? (
-            <div className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5 dark:border-zinc-800 dark:bg-zinc-900 shadow-2xs">
-              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-zinc-100 dark:border-zinc-800 mb-4">
+            <div className="rounded-xl sm:rounded-2xl border border-zinc-200 bg-white p-3 sm:p-5 dark:border-zinc-800 dark:bg-zinc-900 shadow-2xs">
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-2 sm:pb-3 border-b border-zinc-100 dark:border-zinc-800 mb-2.5 sm:mb-4">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-sm sm:text-base font-bold text-zinc-950 dark:text-zinc-50">
+                  <h2 className="text-xs sm:text-base font-bold text-zinc-950 dark:text-zinc-50">
                     Sektor {selectedSector}
                   </h2>
-                  <span className="rounded-md bg-zinc-100 px-2 py-0.5 text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+                  <span className="rounded-md bg-zinc-100 px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
                     {filteredStocks.length} Emiten
                   </span>
                 </div>
-                <span className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold tabular-nums">
+                <span className="text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 font-semibold tabular-nums">
                   Total: {formatShortCap(filteredStocks.reduce((a, b) => a + b.marketCap, 0))}
                 </span>
               </div>
-              <div className="grid grid-cols-1 @md:grid-cols-2 @4xl:grid-cols-3 gap-3.5">
+              <div className="grid grid-cols-2 @4xl:grid-cols-3 gap-2 sm:gap-3.5">
                 {filteredStocks.map((stock) => renderStockTile(stock))}
               </div>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {sectorGroups.map((group) => (
                 <div
                   key={group.sector}
-                  className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5 dark:border-zinc-800/80 dark:bg-[#16171f] shadow-2xs"
+                  className="rounded-xl sm:rounded-2xl border border-zinc-200 bg-white p-3 sm:p-5 dark:border-zinc-800/80 dark:bg-[#16171f] shadow-2xs"
                 >
-                  <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-zinc-100 dark:border-zinc-800 mb-3.5">
-                    <div className="flex items-center gap-2 min-w-0">
+                  <div className="flex flex-wrap items-center justify-between gap-2 pb-2 sm:pb-3 border-b border-zinc-100 dark:border-zinc-800 mb-2.5 sm:mb-3.5">
+                    <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
                       <span
-                        className={`h-2.5 w-2.5 rounded-full ${getSectorColorDot(group.sector)} shrink-0`}
+                        className={`h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full ${getSectorColorDot(group.sector)} shrink-0`}
                       />
-                      <h2 className="text-sm sm:text-base font-bold text-zinc-950 dark:text-zinc-50">
+                      <h2 className="text-xs sm:text-base font-bold text-zinc-950 dark:text-zinc-50 truncate">
                         Sektor {group.sector}
                       </h2>
-                      <span className="rounded-md bg-zinc-100 px-2 py-0.5 text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 shrink-0">
+                      <span className="rounded-md bg-zinc-100 px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 shrink-0">
                         {group.stocks.length} Emiten
                       </span>
                     </div>
-                    <span className="text-xs text-zinc-500 dark:text-zinc-400 font-semibold tabular-nums shrink-0">
+                    <span className="text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 font-semibold tabular-nums shrink-0">
                       Total: {formatShortCap(group.totalCap)}
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-1 @md:grid-cols-2 @4xl:grid-cols-3 gap-3.5">
+                  <div className="grid grid-cols-2 @4xl:grid-cols-3 gap-2 sm:gap-3.5">
                     {group.stocks.map((stock) => renderStockTile(stock))}
                   </div>
                 </div>
@@ -593,22 +594,22 @@ export const StockMap: React.FC<StockMapProps> = ({
 
       {/* 4. TAMPILAN B: Peta Pasar Terpadu (2 Kolom Saat Panel AI Buka, 3x3 Saat Layar Penuh) */}
       {layoutMode === "market" && (
-        <div className="rounded-2xl border border-zinc-200 bg-white p-4 sm:p-5 dark:border-zinc-800/80 dark:bg-[#16171f] shadow-2xs">
-          <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-zinc-100 dark:border-zinc-800 mb-4">
+        <div className="rounded-xl sm:rounded-2xl border border-zinc-200 bg-white p-3 sm:p-5 dark:border-zinc-800/80 dark:bg-[#16171f] shadow-2xs">
+          <div className="flex flex-wrap items-center justify-between gap-2 pb-2 sm:pb-3 border-b border-zinc-100 dark:border-zinc-800 mb-2.5 sm:mb-4">
             <div className="min-w-0">
-              <h2 className="text-sm sm:text-base font-bold text-zinc-950 dark:text-zinc-50">
+              <h2 className="text-xs sm:text-base font-bold text-zinc-950 dark:text-zinc-50">
                 Peta Panas Saham BEI (Peringkat Kapitalisasi Pasar)
               </h2>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+              <p className="text-[11px] sm:text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                 Diurutkan berdasarkan nilai kapitalisasi pasar terbesar di Bursa Efek Indonesia
               </p>
             </div>
-            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-lg shrink-0">
+            <span className="text-[11px] sm:text-xs font-bold text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg shrink-0">
               {filteredStocks.length} Emiten Terpilih
             </span>
           </div>
 
-          <div className="grid grid-cols-1 @md:grid-cols-2 @4xl:grid-cols-3 gap-3.5">
+          <div className="grid grid-cols-2 @4xl:grid-cols-3 gap-2 sm:gap-3.5">
             {filteredStocks
               .slice()
               .sort((a, b) => b.marketCap - a.marketCap)

@@ -86,9 +86,9 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Top Navbar */}
-      <header className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-zinc-200 dark:border-zinc-800">
+      <header className="flex flex-wrap items-center justify-between gap-2 sm:gap-3 pb-3 sm:pb-4 border-b border-zinc-200 dark:border-zinc-800">
         <div className="flex items-center gap-3">
           <Link
             href="/"
@@ -141,10 +141,10 @@ export default function ProfilePage() {
       )}
 
       {/* Profile Identity Card */}
-      <div className="rounded-3xl border border-zinc-200 bg-white p-6 sm:p-7 shadow-xs dark:border-zinc-800/80 dark:bg-[#16171f]">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
-          <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 text-xl font-bold text-white shadow-md">
+      <div className="rounded-2xl sm:rounded-3xl border border-zinc-200 bg-white p-4 sm:p-7 shadow-xs dark:border-zinc-800/80 dark:bg-[#16171f]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-5">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="flex h-12 w-12 sm:h-16 sm:w-16 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 text-base sm:text-xl font-bold text-white shadow-md">
               {name
                 .split(" ")
                 .map((n) => n[0])
@@ -152,25 +152,25 @@ export default function ProfilePage() {
                 .join("")
                 .toUpperCase() || "IN"}
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-lg sm:text-xl font-bold text-zinc-950 dark:text-zinc-50">
+                <h1 className="text-base sm:text-xl font-bold text-zinc-950 dark:text-zinc-50 truncate">
                   {name}
                 </h1>
-                <span className="rounded-md bg-zinc-100 px-2 py-0.5 text-xs font-semibold text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                <span className="rounded-md bg-zinc-100 px-2 py-0.5 text-[11px] sm:text-xs font-semibold text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
                   {experienceLevel}
                 </span>
               </div>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">{email}</p>
-              <p className="text-[11px] text-zinc-400 mt-1">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 truncate">{email}</p>
+              <p className="text-[10.5px] sm:text-[11px] text-zinc-400 mt-1">
                 Bergabung sejak {user?.joinedDate || "November 2024"} • Basis Riset Q3 2024
               </p>
             </div>
           </div>
 
           {/* Quick Stat: Sektor Prioritas */}
-          <div className="rounded-2xl border border-zinc-200/80 bg-zinc-50 p-4 dark:border-zinc-800/80 dark:bg-[#0d0e13] text-right sm:min-w-[210px]">
-            <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 block">
+          <div className="rounded-xl sm:rounded-2xl border border-zinc-200/80 bg-zinc-50 p-3 sm:p-4 dark:border-zinc-800/80 dark:bg-[#0d0e13] text-left sm:text-right sm:min-w-[210px]">
+            <span className="text-[10.5px] sm:text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 block">
               Sektor Prioritas Pantauan
             </span>
             <span className="text-sm font-bold text-zinc-950 dark:text-zinc-50 block mt-0.5">
@@ -184,10 +184,10 @@ export default function ProfilePage() {
       </div>
 
       {/* 2-Column Grid: Form Pengaturan & Simulasi Keterjangkauan Lot */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Kolom Kiri: Form Ubah Profil (2 Kolom) */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-xs dark:border-zinc-800/80 dark:bg-[#16171f]">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+          <div className="rounded-2xl sm:rounded-3xl border border-zinc-200 bg-white p-4 sm:p-6 shadow-xs dark:border-zinc-800/80 dark:bg-[#16171f]">
             <div className="flex items-center gap-2 pb-3.5 border-b border-zinc-100 dark:border-zinc-800 mb-5">
               <Sliders className="h-4 w-4 text-emerald-500" aria-hidden="true" />
               <h2 className="text-sm font-bold text-zinc-950 dark:text-zinc-50">
@@ -319,12 +319,12 @@ export default function ProfilePage() {
           </div>
 
           {/* Watchlist Saham Pilihan Dinamis */}
-          <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-xs dark:border-zinc-800/80 dark:bg-[#16171f]">
-            <div className="flex items-center justify-between pb-3.5 border-b border-zinc-100 dark:border-zinc-800 mb-4">
+          <div className="rounded-2xl sm:rounded-3xl border border-zinc-200 bg-white p-4 sm:p-6 shadow-xs dark:border-zinc-800/80 dark:bg-[#16171f]">
+            <div className="flex items-center justify-between pb-3 sm:pb-3.5 border-b border-zinc-100 dark:border-zinc-800 mb-3 sm:mb-4">
               <div className="flex items-center gap-2">
                 <Bookmark className="h-4 w-4 text-emerald-500 fill-emerald-500" aria-hidden="true" />
-                <h2 className="text-sm font-bold text-zinc-950 dark:text-zinc-50">
-                  Daftar Saham Pantauan (*Watchlist*)
+                <h2 className="text-xs sm:text-sm font-bold text-zinc-950 dark:text-zinc-50">
+                  Daftar Saham Pantauan (Watchlist)
                 </h2>
                 <span suppressHydrationWarning className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
                   {watchlistStocks.length} Saham
@@ -417,8 +417,8 @@ export default function ProfilePage() {
         </div>
 
         {/* Kolom Kanan: Panduan Satuan Lot Saham BEI (1 Lot = 100 Lembar) */}
-        <div className="space-y-6">
-          <div className="rounded-3xl border border-emerald-500/30 bg-gradient-to-b from-emerald-500/5 to-white dark:from-emerald-950/20 dark:to-[#16171f] p-6 shadow-xs border-zinc-200 dark:border-zinc-800 space-y-4">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="rounded-2xl sm:rounded-3xl border border-emerald-500/30 bg-gradient-to-b from-emerald-500/5 to-white dark:from-emerald-950/20 dark:to-[#16171f] p-4 sm:p-6 shadow-xs border-zinc-200 dark:border-zinc-800 space-y-3 sm:space-y-4">
             <div className="flex items-center gap-2 pb-3 border-b border-zinc-100 dark:border-zinc-800">
               <Sparkles className="h-4 w-4 text-emerald-500" aria-hidden="true" />
               <h3 className="text-sm font-bold text-zinc-950 dark:text-zinc-50">
