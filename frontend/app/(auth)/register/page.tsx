@@ -66,9 +66,10 @@ export default function RegisterPage() {
       });
       setIsLoading(false);
       router.push("/");
-    } catch (err: any) {
+    } catch (err: unknown) {
       setIsLoading(false);
-      setErrorMsg(err.message || "Gagal mendaftarkan akun. Silakan coba kembali.");
+      const message = err instanceof Error ? err.message : "Gagal mendaftarkan akun. Silakan coba kembali.";
+      setErrorMsg(message);
     }
   };
 

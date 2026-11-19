@@ -98,10 +98,11 @@ export async function loginApi(email: string, password: string): Promise<{ user:
 
     saveAuthSession(userData, json.token);
     return { user: userData, token: json.token };
-  } catch (err: any) {
+  } catch (err: unknown) {
     // Jika backend offline atau network error saat pengujian demo, sediakan fallback cerdas
     if (email === DEMO_CREDENTIALS.email && password === DEMO_CREDENTIALS.password) {
-      console.warn("[loginApi] Beralih ke fallback akun demo lokal:", err.message);
+      const errMsg = err instanceof Error ? err.message : String(err);
+      console.warn("[loginApi] Beralih ke fallback akun demo lokal:", errMsg);
       saveAuthSession(DEFAULT_USER, "demo-mock-jwt-token");
       return { user: DEFAULT_USER, token: "demo-mock-jwt-token" };
     }
@@ -118,29 +119,25 @@ export async function registerApi(data: {
   preferredSectors?: string[];
   bio?: string;
 }): Promise<{ user: UserProfile; token: string }> {
-  try {
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
+  const res = await fetch("/api/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
 
-    const json = await res.json();
-    if (!res.ok || json.status !== "success") {
-      throw new Error(json.message || "Gagal mendaftarkan akun baru.");
-    }
-
-    const userData: UserProfile = {
-      ...DEFAULT_USER,
-      ...json.data,
-      joinedDate: new Date().toLocaleDateString("id-ID", { month: "long", year: "numeric" }),
-    };
-
-    saveAuthSession(userData, json.token);
-    return { user: userData, token: json.token };
-  } catch (err: any) {
-    throw err;
+  const json = await res.json();
+  if (!res.ok || json.status !== "success") {
+    throw new Error(json.message || "Gagal mendaftarkan akun baru.");
   }
+
+  const userData: UserProfile = {
+    ...DEFAULT_USER,
+    ...json.data,
+    joinedDate: new Date().toLocaleDateString("id-ID", { month: "long", year: "numeric" }),
+  };
+
+  saveAuthSession(userData, json.token);
+  return { user: userData, token: json.token };
 }
 
 // API Update Profil ke Backend
@@ -192,7 +189,7 @@ export async function forgotPasswordApi(email: string): Promise<{ message: strin
       message: json.message,
       demoResetCode: json.demoResetCode,
     };
-  } catch (err: any) {
+  } catch {
     return {
       message: "Instruksi pemulihan kata sandi telah dikirim ke email terdaftar.",
       demoResetCode: "888222",

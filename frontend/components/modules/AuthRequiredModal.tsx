@@ -64,9 +64,10 @@ export function AuthRequiredModal({
         onClose();
         if (onSuccess) onSuccess();
       }, 500);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setIsLoading(false);
-      setErrorMsg(err.message || "Gagal masuk. Periksa kembali email dan kata sandi.");
+      const msg = err instanceof Error ? err.message : "Gagal masuk. Periksa kembali email dan kata sandi.";
+      setErrorMsg(msg);
     }
   };
 
@@ -102,9 +103,10 @@ export function AuthRequiredModal({
         onClose();
         if (onSuccess) onSuccess();
       }, 500);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setIsLoading(false);
-      setErrorMsg(err.message || "Gagal mendaftar. Silakan coba kembali.");
+      const msg = err instanceof Error ? err.message : "Gagal mendaftar. Silakan coba kembali.";
+      setErrorMsg(msg);
     }
   };
 
@@ -119,9 +121,10 @@ export function AuthRequiredModal({
         onClose();
         if (onSuccess) onSuccess();
       }, 400);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setIsLoading(false);
-      setErrorMsg(err.message || "Gagal masuk akun demo.");
+      const msg = err instanceof Error ? err.message : "Gagal masuk akun demo.";
+      setErrorMsg(msg);
     }
   };
 
