@@ -12,7 +12,6 @@ import {
   ArrowRight,
   ArrowLeft,
   ShieldCheck,
-  CheckCircle2,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -20,8 +19,8 @@ export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
 
-  const [email, setEmail] = useState("arya@beistockinsight.id");
-  const [password, setPassword] = useState("password123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -185,17 +184,6 @@ export default function LoginPage() {
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </button>
           </form>
-
-          {/* Akun Demo Praktis */}
-          <div className="rounded-2xl border border-zinc-200/80 bg-zinc-50 p-3.5 dark:border-zinc-800/80 dark:bg-[#0d0e13] text-xs space-y-1.5">
-            <div className="flex items-center gap-1.5 font-semibold text-zinc-800 dark:text-zinc-200">
-              <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" aria-hidden="true" />
-              <span>Akses Cepat Mode Demo:</span>
-            </div>
-            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed">
-              Formulir di atas sudah terisi akun investor default. Tekan tombol <strong>Masuk ke Dashboard</strong> untuk langsung mengeksplorasi seluruh fitur.
-            </p>
-          </div>
 
           {/* Footer Register Link */}
           <div className="text-center pt-2 border-t border-zinc-100 dark:border-zinc-800/80 text-xs text-zinc-500 dark:text-zinc-400">
