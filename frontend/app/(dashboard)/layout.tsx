@@ -6,6 +6,8 @@ import { DashboardProvider, useDashboard } from "@/context/DashboardContext";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { RightAiPanel } from "@/components/layout/RightAiPanel";
 import { CommandPaletteModal } from "@/components/modules/CommandPaletteModal";
+import { AuthRequiredModal } from "@/components/modules/AuthRequiredModal";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Search,
   Menu,
@@ -37,7 +39,12 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     isCommandPaletteOpen,
     openCommandPalette,
     closeCommandPalette,
+    isAuthModalOpen,
+    authModalReason,
+    openAuthModal,
+    closeAuthModal,
   } = useDashboard();
+  const { user, isAuthenticated } = useAuth();
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-slate-100 font-sans text-zinc-900 dark:bg-[#16171f] dark:text-zinc-100 flex">
@@ -110,16 +117,29 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
               {pageTitle}
             </span>
 
-            <Link
-              href="/profile"
-              title="Profil Investor & Pengaturan"
-              className="flex h-9 sm:h-10 items-center gap-2 rounded-xl border border-zinc-200 bg-white px-2 sm:px-3 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-[#1e2029] dark:text-zinc-200 dark:hover:bg-zinc-800 transition-colors shrink-0 cursor-pointer"
-            >
-              <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold text-[10px]">
+            {isAuthenticated && user ? (
+              <Link
+                href="/profile"
+                title="Profil Investor & Pengaturan"
+                className="flex h-9 sm:h-10 items-center gap-2 rounded-xl border border-zinc-200 bg-white px-2 sm:px-3 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-[#1e2029] dark:text-zinc-200 dark:hover:bg-zinc-800 transition-colors shrink-0 cursor-pointer"
+              >
+                <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold text-[10px]">
+                  {user.name ? user.name.split(" ").map((w) => w[0]).slice(0, 2).join("") : "U"}
+                </div>
+                <span className="hidden md:inline max-w-[90px] truncate">{user.name.split(" ")[0]}</span>
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => openAuthModal("Akses Fitur Investor")}
+                title="Masuk atau Daftar Akun Investor"
+                className="flex h-9 sm:h-10 items-center gap-1.5 sm:gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 px-3 py-1.5 text-xs font-bold text-white transition-all shadow-md shadow-emerald-900/20 shrink-0 cursor-pointer"
+              >
                 <User className="h-3.5 w-3.5" aria-hidden="true" />
-              </div>
-              <span className="hidden md:inline">Profil</span>
-            </Link>
+                <span className="hidden sm:inline">Masuk / Daftar</span>
+                <span className="sm:hidden">Masuk</span>
+              </button>
+            )}
 
             <button
               onClick={toggleRightAi}
@@ -190,6 +210,13 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
           setIsRightAiOpen(true);
         }}
         watchlist={watchlist}
+      />
+
+      {/* 5. Auth Required Gate Modal */}
+      <AuthRequiredModal
+        isOpen={isAuthModalOpen}
+        onClose={closeAuthModal}
+        reason={authModalReason}
       />
     </div>
   );

@@ -4,6 +4,7 @@ import React from "react";
 import { Send, User, Bot, RefreshCw, Sparkles, ArrowRight, Trash2, History } from "lucide-react";
 import { StockFundamental } from "../../types/stock";
 import { useGeneralAiChat } from "../../hooks/useGeneralAiChat";
+import { useDashboard } from "@/context/DashboardContext";
 import { Avatar } from "../ui/Avatar";
 import { FormattedChatText } from "../ui/FormattedChatText";
 
@@ -25,6 +26,7 @@ export const GeneralAiView: React.FC<GeneralAiViewProps> = ({
   onSelectStock,
   onOpenHistory,
 }) => {
+  const { requireAuth } = useDashboard();
   const {
     generalMessages,
     generalInput,
@@ -60,7 +62,7 @@ export const GeneralAiView: React.FC<GeneralAiViewProps> = ({
             <button
               key={idx}
               type="button"
-              onClick={() => handleSendGeneral(prompt)}
+              onClick={() => requireAuth(() => handleSendGeneral(prompt), "Konsultasi Asisten AI")}
               disabled={isGeneralSending}
               className="group w-full flex items-center justify-between gap-3 rounded-xl border border-zinc-200/90 bg-white p-3 text-left text-xs font-medium leading-relaxed text-zinc-700 hover:border-emerald-500/40 hover:bg-zinc-50 hover:text-zinc-950 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-emerald-500/40 dark:hover:bg-[#1c202d] dark:hover:text-zinc-100 transition-all cursor-pointer shadow-2xs"
             >
@@ -197,7 +199,7 @@ export const GeneralAiView: React.FC<GeneralAiViewProps> = ({
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          handleSendGeneral();
+          requireAuth(() => handleSendGeneral(), "Konsultasi Asisten AI");
         }}
         className="flex items-center gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800"
       >

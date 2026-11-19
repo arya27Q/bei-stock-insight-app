@@ -32,7 +32,7 @@ interface StockScreenerProps {
 }
 
 export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectStock }) => {
-  const { isWatchlisted, toggleWatchlist } = useDashboard();
+  const { isWatchlisted, toggleWatchlist, requireAuth } = useDashboard();
   const {
     viewMode,
     setViewMode,
@@ -206,7 +206,7 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
 
           {/* Tombol Export CSV */}
           <button
-            onClick={handleExportCsv}
+            onClick={() => requireAuth(handleExportCsv, "Ekspor Data Screener (CSV)")}
             className="inline-flex items-center gap-1.5 sm:gap-2 rounded-xl border border-zinc-200 bg-white px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-[11px] sm:text-sm font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
           >
             <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true" />
@@ -362,7 +362,7 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                toggleWatchlist(stock.ticker);
+                                requireAuth(() => toggleWatchlist(stock.ticker), "Simpan Daftar Pantauan (Watchlist)");
                               }}
                               title={isWatchlisted(stock.ticker) ? "Hapus dari Watchlist" : "Simpan ke Watchlist"}
                               className={`p-1 rounded-md transition-all cursor-pointer ${
@@ -512,12 +512,12 @@ export const StockScreener: React.FC<StockScreenerProps> = ({ stocks, onSelectSt
                       tabIndex={0}
                       onClick={(e) => {
                         e.stopPropagation();
-                        toggleWatchlist(stock.ticker);
+                        requireAuth(() => toggleWatchlist(stock.ticker), "Simpan Daftar Pantauan (Watchlist)");
                       }}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" || e.key === " ") {
                           e.stopPropagation();
-                          toggleWatchlist(stock.ticker);
+                          requireAuth(() => toggleWatchlist(stock.ticker), "Simpan Daftar Pantauan (Watchlist)");
                         }
                       }}
                       title={isWatchlisted(stock.ticker) ? "Hapus dari Watchlist" : "Simpan ke Watchlist"}

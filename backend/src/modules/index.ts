@@ -3,6 +3,7 @@ import { healthRouter } from "./health/health.route.js";
 import { stockRouter } from "./stocks/stock.route.js";
 import { aiRouter } from "./ai/ai.route.js";
 import { watchlistRouter } from "./watchlist/watchlist.route.js";
+import { authRouter } from "./auth/auth.route.js";
 
 export const apiRouter = Router();
 
@@ -11,3 +12,4 @@ apiRouter.use("/health", healthRouter);
 apiRouter.use("/stocks", stockRouter);
 apiRouter.use("/ai", aiRouter);
 apiRouter.use("/watchlist", watchlistRouter);
+apiRouter.use("/auth", authRouter);

@@ -30,7 +30,7 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
 
@@ -56,16 +56,20 @@ export default function RegisterPage() {
     }
 
     setIsLoading(true);
-    setTimeout(() => {
-      register({
+    try {
+      await register({
         name,
         email,
+        password,
         experienceLevel,
         preferredSectors: ["Keuangan", "Barang Konsumsi Primer"],
       });
       setIsLoading(false);
-      router.push("/profile");
-    }, 600);
+      router.push("/");
+    } catch (err: any) {
+      setIsLoading(false);
+      setErrorMsg(err.message || "Gagal mendaftarkan akun. Silakan coba kembali.");
+    }
   };
 
   return (
