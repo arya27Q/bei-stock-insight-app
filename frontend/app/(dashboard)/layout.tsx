@@ -62,7 +62,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
         } ${isRightAiOpen ? "lg:pr-[490px] xl:pr-[540px] 2xl:pr-[580px]" : ""}`}
       >
         {/* Top Header */}
-        <header className="shrink-0 z-30 flex h-14 sm:h-20 items-center justify-between gap-2 sm:gap-3 bg-white px-2.5 sm:px-6 dark:bg-[#16171f] border-b border-zinc-200/80 dark:border-zinc-800/80">
+        <header className="@container shrink-0 z-30 flex h-14 sm:h-20 items-center justify-between gap-2 sm:gap-3 bg-white px-2.5 sm:px-6 dark:bg-[#16171f] border-b border-zinc-200/80 dark:border-zinc-800/80">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
             {/* Tombol Buka Menu Mobile */}
             <button
@@ -92,13 +92,13 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
               type="button"
               data-testid="header-command-palette-btn"
               onClick={openCommandPalette}
-              className="relative w-full max-w-md flex items-center justify-between rounded-xl border border-transparent bg-zinc-100/90 pl-2.5 pr-2 py-1.5 sm:pl-3.5 sm:pr-2.5 sm:py-2 text-[11px] sm:text-sm text-zinc-500 hover:text-zinc-800 hover:bg-zinc-200/70 dark:bg-[#1e2029] dark:text-zinc-400 dark:hover:text-zinc-200 dark:hover:bg-zinc-800 transition-all text-left cursor-pointer group"
+              className="relative w-full max-w-md min-w-[120px] flex items-center justify-between gap-2 rounded-xl border border-transparent bg-zinc-100/90 pl-2.5 pr-2 py-1.5 sm:pl-3.5 sm:pr-2.5 sm:py-2 text-[11px] sm:text-sm text-zinc-500 hover:text-zinc-800 hover:bg-zinc-200/70 dark:bg-[#1e2029] dark:text-zinc-400 dark:hover:text-zinc-200 dark:hover:bg-zinc-800 transition-all text-left cursor-pointer group overflow-hidden"
               aria-label="Buka Pencarian Cepat Saham (Shortcut Ctrl + K)"
             >
-              <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+              <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
                 <Search className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-zinc-400 group-hover:text-emerald-500 transition-colors shrink-0" aria-hidden="true" />
-                <span className="truncate sm:hidden">Cari saham...</span>
-                <span className="truncate hidden sm:inline">Cari emiten (BBCA, BBRI, TLKM)...</span>
+                <span className="truncate @xl:hidden">Cari saham...</span>
+                <span className="truncate hidden @xl:inline">Cari emiten (BBCA, BBRI, TLKM)...</span>
               </div>
               <div className="flex items-center gap-1 shrink-0">
                 <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded-lg border border-zinc-200 bg-white px-1.5 py-0.5 font-mono text-[10px] font-semibold text-zinc-500 shadow-2xs dark:border-zinc-700/80 dark:bg-zinc-800 dark:text-zinc-400">
@@ -110,7 +110,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
           {/* Kanan: Judul Fitur Aktif & Tombol Buka/Tutup Panel AI */}
           <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
-            <span className="hidden xl:inline text-xs font-semibold text-zinc-400">
+            <span className="hidden @3xl:inline text-xs font-semibold text-zinc-400 truncate max-w-[200px]">
               {pageTitle}
             </span>
 

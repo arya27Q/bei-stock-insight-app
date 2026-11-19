@@ -183,9 +183,9 @@ export default function ProfilePage() {
       )}
 
       {/* Profile Identity Card */}
-      <div className="rounded-2xl sm:rounded-3xl border border-zinc-200 bg-white p-4 sm:p-7 shadow-xs dark:border-zinc-800/80 dark:bg-[#16171f]">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-5">
-          <div className="flex items-center gap-3 sm:gap-4">
+      <div className="rounded-2xl sm:rounded-3xl border border-zinc-200 bg-white p-4 sm:p-6 shadow-xs dark:border-zinc-800/80 dark:bg-[#16171f]">
+        <div className="flex flex-col @xl:flex-row @xl:items-center justify-between gap-3.5 sm:gap-5">
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
             <div className="flex h-12 w-12 sm:h-16 sm:w-16 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 text-base sm:text-xl font-bold text-white shadow-md">
               {name
                 .split(" ")
@@ -211,7 +211,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Quick Stat: Sektor Prioritas */}
-          <div className="rounded-xl sm:rounded-2xl border border-zinc-200/80 bg-zinc-50 p-3 sm:p-4 dark:border-zinc-800/80 dark:bg-[#0d0e13] text-left sm:text-right sm:min-w-[210px]">
+          <div className="rounded-xl sm:rounded-2xl border border-zinc-200/80 bg-zinc-50 p-3 sm:p-4 dark:border-zinc-800/80 dark:bg-[#0d0e13] text-left @xl:text-right @xl:min-w-[210px] shrink-0">
             <span className="text-[10.5px] sm:text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 block">
               Sektor Prioritas Pantauan
             </span>
@@ -225,10 +225,10 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* 2-Column Grid: Form Pengaturan & Simulasi Keterjangkauan Lot */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        {/* Kolom Kiri: Form Ubah Profil (2 Kolom) */}
-        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+      {/* Responsive Container Grid: 1 kolom saat Panel AI kanan terbuka, 3 kolom saat area utama lebar (@4xl >= 896px) */}
+      <div className="grid grid-cols-1 @4xl:grid-cols-3 gap-4 sm:gap-6">
+        {/* Kolom Kiri: Form Ubah Profil (2 Kolom pada @4xl) */}
+        <div className="@4xl:col-span-2 space-y-4 sm:space-y-6 min-w-0">
           <div className="rounded-2xl sm:rounded-3xl border border-zinc-200 bg-white p-4 sm:p-6 shadow-xs dark:border-zinc-800/80 dark:bg-[#16171f]">
             <div className="flex items-center gap-2 pb-3.5 border-b border-zinc-100 dark:border-zinc-800 mb-5">
               <Sliders className="h-4 w-4 text-emerald-500" aria-hidden="true" />
@@ -238,7 +238,7 @@ export default function ProfilePage() {
             </div>
 
             <form onSubmit={handleSave} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 @lg:grid-cols-2 gap-4">
                 <div>
                   <label
                     htmlFor="profile-name"
@@ -278,8 +278,8 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
+              <div className="grid grid-cols-1 @lg:grid-cols-2 gap-4">
+                <div className="min-w-0">
                   <label
                     className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5"
                   >
@@ -299,7 +299,7 @@ export default function ProfilePage() {
                   />
                 </div>
 
-                <div>
+                <div className="min-w-0">
                   <label
                     className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5"
                   >
@@ -335,23 +335,23 @@ export default function ProfilePage() {
                 />
               </div>
 
-              <div className="pt-2 flex items-center justify-between border-t border-zinc-100 dark:border-zinc-800">
+              <div className="pt-3 flex flex-col @lg:flex-row @lg:items-center justify-between gap-3 border-t border-zinc-100 dark:border-zinc-800">
                 <label className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-400 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={notifications}
                     onChange={(e) => setNotifications(e.target.checked)}
-                    className="h-4 w-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-800"
+                    className="h-4 w-4 shrink-0 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-800"
                   />
                   <span className="flex items-center gap-1.5">
-                    <Bell className="h-3.5 w-3.5 text-zinc-400" aria-hidden="true" />
-                    Notifikasi pembaruan rilis laporan keuangan kuartalan
+                    <Bell className="h-3.5 w-3.5 shrink-0 text-zinc-400" aria-hidden="true" />
+                    <span>Notifikasi pembaruan rilis laporan keuangan kuartalan</span>
                   </span>
                 </label>
 
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-900 px-4 py-2 text-xs font-semibold text-white hover:bg-zinc-800 dark:bg-emerald-600 dark:text-white dark:hover:bg-emerald-500 transition-colors shadow-xs cursor-pointer"
+                  className="w-full @lg:w-auto shrink-0 inline-flex items-center justify-center gap-1.5 rounded-xl bg-zinc-900 px-4 py-2 text-xs font-semibold text-white hover:bg-zinc-800 dark:bg-emerald-600 dark:text-white dark:hover:bg-emerald-500 transition-colors shadow-xs cursor-pointer"
                 >
                   <Save className="h-3.5 w-3.5" aria-hidden="true" />
                   <span>Simpan Perubahan</span>
@@ -362,19 +362,19 @@ export default function ProfilePage() {
 
           {/* Watchlist Saham Pilihan Dinamis */}
           <div className="rounded-2xl sm:rounded-3xl border border-zinc-200 bg-white p-4 sm:p-6 shadow-xs dark:border-zinc-800/80 dark:bg-[#16171f]">
-            <div className="flex items-center justify-between pb-3 sm:pb-3.5 border-b border-zinc-100 dark:border-zinc-800 mb-3 sm:mb-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-3 sm:pb-3.5 border-b border-zinc-100 dark:border-zinc-800 mb-3 sm:mb-4">
               <div className="flex items-center gap-2">
-                <Bookmark className="h-4 w-4 text-emerald-500 fill-emerald-500" aria-hidden="true" />
+                <Bookmark className="h-4 w-4 shrink-0 text-emerald-500 fill-emerald-500" aria-hidden="true" />
                 <h2 className="text-xs sm:text-sm font-bold text-zinc-950 dark:text-zinc-50">
                   Daftar Saham Pantauan (Watchlist)
                 </h2>
-                <span suppressHydrationWarning className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                <span suppressHydrationWarning className="shrink-0 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
                   {watchlistStocks.length} Saham
                 </span>
               </div>
               <Link
                 href="/market-map"
-                className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
+                className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 shrink-0"
               >
                 <span>Buka Peta Pasar</span>
                 <span>→</span>
@@ -403,7 +403,7 @@ export default function ProfilePage() {
                 </Link>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 @lg:grid-cols-2 gap-3">
                 {watchlistStocks.map((stock) => (
                   <div
                     key={stock.ticker}
@@ -433,7 +433,7 @@ export default function ProfilePage() {
                           toggleWatchlist(stock.ticker);
                         }}
                         title={`Hapus ${stock.ticker} dari watchlist`}
-                        className="p-1 rounded-lg text-zinc-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+                        className="p-1 rounded-lg text-zinc-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer shrink-0"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
@@ -443,11 +443,11 @@ export default function ProfilePage() {
                       {stock.name}
                     </span>
 
-                    <div className="mt-2.5 pt-2 border-t border-zinc-200/60 dark:border-zinc-800/60 flex items-center justify-between text-xs">
-                      <span className="text-emerald-600 dark:text-emerald-400 font-semibold tabular-nums">
+                    <div className="mt-2.5 pt-2 border-t border-zinc-200/60 dark:border-zinc-800/60 flex flex-wrap items-center justify-between gap-1.5 text-xs">
+                      <span className="text-emerald-600 dark:text-emerald-400 font-semibold tabular-nums whitespace-nowrap">
                         ROE {stock.roe}% • PER {stock.per}x
                       </span>
-                      <span className="text-zinc-500 dark:text-zinc-400 text-[11px] font-mono tabular-nums">
+                      <span className="text-zinc-500 dark:text-zinc-400 text-[11px] font-mono tabular-nums whitespace-nowrap">
                         Rp {(stock.pricePerLot || (stock.pricePerShare || 1000) * 100).toLocaleString("id-ID")}/lot
                       </span>
                     </div>
@@ -459,10 +459,10 @@ export default function ProfilePage() {
         </div>
 
         {/* Kolom Kanan: Panduan Satuan Lot Saham BEI (1 Lot = 100 Lembar) */}
-        <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-4 sm:space-y-6 min-w-0">
           <div className="rounded-2xl sm:rounded-3xl border border-emerald-500/30 bg-gradient-to-b from-emerald-500/5 to-white dark:from-emerald-950/20 dark:to-[#16171f] p-4 sm:p-6 shadow-xs border-zinc-200 dark:border-zinc-800 space-y-3 sm:space-y-4">
             <div className="flex items-center gap-2 pb-3 border-b border-zinc-100 dark:border-zinc-800">
-              <Sparkles className="h-4 w-4 text-emerald-500" aria-hidden="true" />
+              <Sparkles className="h-4 w-4 shrink-0 text-emerald-500" aria-hidden="true" />
               <h3 className="text-sm font-bold text-zinc-950 dark:text-zinc-50">
                 Ketentuan Satuan Lot Saham BEI
               </h3>
@@ -472,24 +472,24 @@ export default function ProfilePage() {
               Di Bursa Efek Indonesia, perdagangan saham resmi dilakukan dalam kelipatan <strong>1 lot (100 lembar)</strong>. Berikut rincian nilai modal minimum 1 lot untuk saham pantauan kamu:
             </p>
 
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 @lg:grid-cols-2 @4xl:grid-cols-1 gap-3">
               {(watchlistStocks.length > 0 ? watchlistStocks : []).map((stock) => (
                 <div
                   key={stock.ticker}
                   className="rounded-2xl border border-zinc-200 bg-white p-3.5 dark:border-zinc-800 dark:bg-[#0d0e13] space-y-1.5 shadow-2xs"
                 >
-                  <div className="flex items-center justify-between text-xs font-bold">
-                    <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between gap-2 text-xs font-bold">
+                    <div className="flex items-center gap-2 min-w-0">
                       <Avatar ticker={stock.ticker} sector={stock.sector} size="sm" />
-                      <span className="text-zinc-950 dark:text-zinc-100">{stock.ticker}</span>
+                      <span className="text-zinc-950 dark:text-zinc-100 truncate">{stock.ticker}</span>
                     </div>
-                    <span className="text-zinc-500 dark:text-zinc-400 font-normal">
+                    <span className="text-zinc-500 dark:text-zinc-400 font-normal whitespace-nowrap shrink-0">
                       Rp {(stock.pricePerShare || 1000).toLocaleString("id-ID")}/lbr
                     </span>
                   </div>
-                  <div className="flex items-center justify-between text-xs font-semibold text-emerald-600 dark:text-emerald-400 pt-1.5 border-t border-zinc-100 dark:border-zinc-800/80">
-                    <span>Modal 1 Lot (100 lbr):</span>
-                    <span className="font-mono tabular-nums">
+                  <div className="flex items-center justify-between gap-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400 pt-1.5 border-t border-zinc-100 dark:border-zinc-800/80">
+                    <span className="whitespace-nowrap">Modal 1 Lot (100 lbr):</span>
+                    <span className="font-mono tabular-nums whitespace-nowrap shrink-0">
                       Rp {(stock.pricePerLot || (stock.pricePerShare || 1000) * 100).toLocaleString("id-ID")}
                     </span>
                   </div>
@@ -497,7 +497,7 @@ export default function ProfilePage() {
               ))}
 
               {watchlistStocks.length === 0 && (
-                <div className="p-4 text-center text-xs text-zinc-400">
+                <div className="col-span-full p-4 text-center text-xs text-zinc-400">
                   Tambahkan saham ke watchlist untuk melihat hitungan modal per lot.
                 </div>
               )}
