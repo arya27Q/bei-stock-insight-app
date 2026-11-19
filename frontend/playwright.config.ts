@@ -8,7 +8,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: isCI,
   retries: isCI ? 2 : 1,
-  workers: isCI ? 1 : undefined,
+  workers: isCI ? 1 : 4,
   reporter: isCI
     ? [["list"], ["html", { open: "never", outputFolder: "playwright-report" }]]
     : [["list"], ["html", { open: "on-failure", outputFolder: "playwright-report" }]],
@@ -18,18 +18,25 @@ export default defineConfig({
     baseURL: BASE_URL,
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
-    video: "retain-on-failure",
     actionTimeout: 15_000,
     navigationTimeout: 30_000,
   },
   projects: [
     {
       name: "chromium-desktop",
-      use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } },
+      use: {
+        ...devices["Desktop Chrome"],
+        ...(isCI ? {} : { channel: "chrome" }),
+        viewport: { width: 1440, height: 900 },
+      },
     },
     {
       name: "chromium-mobile",
-      use: { ...devices["Pixel 7"], viewport: { width: 390, height: 844 } },
+      use: {
+        ...devices["Pixel 7"],
+        ...(isCI ? {} : { channel: "chrome" }),
+        viewport: { width: 390, height: 844 },
+      },
     },
   ],
   webServer: [
@@ -40,7 +47,7 @@ export default defineConfig({
       timeout: 60_000,
     },
     {
-      command: isCI ? "npm run start" : "npm run dev",
+      command: "npm run start",
       url: BASE_URL,
       reuseExistingServer: !isCI,
       timeout: 120_000,
