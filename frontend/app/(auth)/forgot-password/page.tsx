@@ -34,9 +34,10 @@ export default function ForgotPasswordPage() {
       setIsLoading(false);
       setDemoCode(res.demoResetCode || "");
       setIsSubmitted(true);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setIsLoading(false);
-      setErrorMsg(err.message || "Gagal memproses permintaan reset.");
+      const message = err instanceof Error ? err.message : "Gagal memproses permintaan reset.";
+      setErrorMsg(message);
     }
   };
 

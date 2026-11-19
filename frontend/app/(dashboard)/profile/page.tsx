@@ -59,14 +59,15 @@ export default function ProfilePage() {
   const [isSaved, setIsSaved] = useState(false);
 
   React.useEffect(() => {
-    if (user) {
+    if (!user) return;
+    queueMicrotask(() => {
       setName(user.name);
       setEmail(user.email);
       setExperienceLevel(user.experienceLevel || "Pemula");
       setPreferredSector(user.preferredSectors?.[0] || "Keuangan");
       setBio(user.bio || "");
       setNotifications(user.notificationsEnabled ?? true);
-    }
+    });
   }, [user]);
 
   const handleSave = async (e: React.FormEvent) => {

@@ -17,21 +17,27 @@ export function useAuth() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    // Sinkronisasi inisial dari browser storage
-    setUser(getStoredUser());
-    setIsLoaded(true);
+    // Sinkronisasi inisial dari browser storage via microtask untuk mencegah cascading render
+    queueMicrotask(() => {
+      setUser(getStoredUser());
+      setIsLoaded(true);
+    });
 
     const handleAuthChange = (e: Event) => {
       const customEvent = e as CustomEvent<{ user: UserProfile | null }>;
       setUser(customEvent.detail?.user ?? getStoredUser());
     };
 
+    const handleStorageChange = () => {
+      setUser(getStoredUser());
+    };
+
     window.addEventListener(AUTH_CHANGE_EVENT, handleAuthChange);
-    window.addEventListener("storage", () => setUser(getStoredUser()));
+    window.addEventListener("storage", handleStorageChange);
 
     return () => {
       window.removeEventListener(AUTH_CHANGE_EVENT, handleAuthChange);
-      window.removeEventListener("storage", () => setUser(getStoredUser()));
+      window.removeEventListener("storage", handleStorageChange);
     };
   }, []);
 

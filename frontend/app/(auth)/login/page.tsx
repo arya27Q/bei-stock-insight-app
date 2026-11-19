@@ -45,9 +45,10 @@ export default function LoginPage() {
       await login(email, password);
       setIsLoading(false);
       router.push("/");
-    } catch (err: any) {
+    } catch (err: unknown) {
       setIsLoading(false);
-      setErrorMsg(err.message || "Gagal masuk. Periksa kembali email dan kata sandi Anda.");
+      const message = err instanceof Error ? err.message : "Gagal masuk. Periksa kembali email dan kata sandi Anda.";
+      setErrorMsg(message);
     }
   };
 
