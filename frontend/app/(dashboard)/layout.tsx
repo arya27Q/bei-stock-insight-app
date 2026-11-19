@@ -33,7 +33,6 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     isRightAiOpen,
     setIsRightAiOpen,
     toggleRightAi,
-    openGeneralAi,
     pageTitle,
     watchlist,
     isCommandPaletteOpen,
@@ -50,13 +49,10 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
     <div className="fixed inset-0 overflow-hidden bg-slate-100 font-sans text-zinc-900 dark:bg-[#16171f] dark:text-zinc-100 flex">
       {/* 1. Left Sidebar Navigation */}
       <Sidebar
-        isAiPanelOpen={isRightAiOpen}
-        setIsAiPanelOpen={setIsRightAiOpen}
         isMobileOpen={isMobileSidebarOpen}
         setIsMobileOpen={setIsMobileSidebarOpen}
         isCollapsed={isSidebarCollapsed}
         setIsCollapsed={() => toggleSidebar()}
-        onOpenGeneralAi={openGeneralAi}
       />
 
       {/* 2. Main Shell Frame */}
@@ -94,6 +90,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
             {/* Quick Search & Command Palette Trigger (Ctrl + K) */}
             <button
               type="button"
+              data-testid="header-command-palette-btn"
               onClick={openCommandPalette}
               className="relative w-full max-w-md flex items-center justify-between rounded-xl border border-transparent bg-zinc-100/90 pl-2.5 pr-2 py-1.5 sm:pl-3.5 sm:pr-2.5 sm:py-2 text-[11px] sm:text-sm text-zinc-500 hover:text-zinc-800 hover:bg-zinc-200/70 dark:bg-[#1e2029] dark:text-zinc-400 dark:hover:text-zinc-200 dark:hover:bg-zinc-800 transition-all text-left cursor-pointer group"
               aria-label="Buka Pencarian Cepat Saham (Shortcut Ctrl + K)"
@@ -120,6 +117,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
             {isAuthenticated && user ? (
               <Link
                 href="/profile"
+                data-testid="header-profile-link"
                 title="Profil Investor & Pengaturan"
                 className="flex h-9 sm:h-10 items-center gap-2 rounded-xl border border-zinc-200 bg-white px-2 sm:px-3 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-[#1e2029] dark:text-zinc-200 dark:hover:bg-zinc-800 transition-colors shrink-0 cursor-pointer"
               >
@@ -131,6 +129,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
             ) : (
               <button
                 type="button"
+                data-testid="header-auth-btn"
                 onClick={() => openAuthModal("Akses Fitur Investor")}
                 title="Masuk atau Daftar Akun Investor"
                 className="flex h-9 sm:h-10 items-center gap-1.5 sm:gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 px-3 py-1.5 text-xs font-bold text-white transition-all shadow-md shadow-emerald-900/20 shrink-0 cursor-pointer"
@@ -142,6 +141,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
             )}
 
             <button
+              data-testid="header-toggle-ai-btn"
               onClick={toggleRightAi}
               className={`flex h-9 sm:h-10 items-center gap-1.5 sm:gap-2 rounded-xl px-2.5 sm:px-3.5 text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer ${
                 isRightAiOpen

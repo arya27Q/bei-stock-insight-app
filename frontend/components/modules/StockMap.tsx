@@ -41,7 +41,7 @@ export const StockMap: React.FC<StockMapProps> = ({
     if (onSelectMetric) onSelectMetric(metric);
   };
 
-  const { watchlist, isWatchlisted, toggleWatchlist } = useDashboard();
+  const { watchlist, isWatchlisted, toggleWatchlist, requireAuth } = useDashboard();
   const [selectedSector, setSelectedSector] = useState<string>("all");
   const [onlyWatchlist, setOnlyWatchlist] = useState<boolean>(false);
   const [layoutMode, setLayoutMode] = useState<ViewLayoutMode>("sectors");
@@ -293,6 +293,7 @@ export const StockMap: React.FC<StockMapProps> = ({
     return (
       <button
         key={stock.ticker}
+        data-testid={`stock-tile-${stock.ticker}`}
         onClick={() => onSelectStock(stock)}
         title={`Klik untuk membuka rangkuman AI & konsultasi chatbot ${stock.ticker}`}
         className={`group relative overflow-hidden min-w-0 rounded-xl p-2.5 sm:p-3.5 text-left transition-all duration-150 cursor-pointer shadow-xs hover:shadow-md hover:brightness-105 active:scale-[0.99] border ${style.border} ${style.bg} ${
@@ -319,14 +320,15 @@ export const StockMap: React.FC<StockMapProps> = ({
               <span
                 role="button"
                 tabIndex={0}
+                data-testid={`watchlist-toggle-${stock.ticker}`}
                 onClick={(e) => {
                   e.stopPropagation();
-                  toggleWatchlist(stock.ticker);
+                  requireAuth(() => toggleWatchlist(stock.ticker), "Simpan Daftar Pantauan (Watchlist)");
                 }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.stopPropagation();
-                    toggleWatchlist(stock.ticker);
+                    requireAuth(() => toggleWatchlist(stock.ticker), "Simpan Daftar Pantauan (Watchlist)");
                   }
                 }}
                 title={isWatchlisted(stock.ticker) ? `Hapus ${stock.ticker} dari watchlist` : `Simpan ${stock.ticker} ke watchlist`}

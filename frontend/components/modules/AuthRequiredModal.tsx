@@ -114,6 +114,7 @@ export function AuthRequiredModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="auth-modal-title"
+      data-testid="auth-required-modal"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-3 sm:p-4 animate-in fade-in duration-200 overflow-y-auto"
     >
       <div className="relative w-full max-w-md rounded-2xl sm:rounded-3xl border border-zinc-800 bg-[#16171f] p-5 sm:p-7 shadow-2xl text-zinc-100 my-auto">
@@ -147,6 +148,7 @@ export function AuthRequiredModal({
         <div className="grid grid-cols-2 gap-1 rounded-xl bg-[#0d0e13] p-1 border border-zinc-800 mb-4">
           <button
             type="button"
+            data-testid="auth-modal-tab-login"
             onClick={() => {
               setActiveTab("login");
               setErrorMsg("");
@@ -161,6 +163,7 @@ export function AuthRequiredModal({
           </button>
           <button
             type="button"
+            data-testid="auth-modal-tab-register"
             onClick={() => {
               setActiveTab("register");
               setErrorMsg("");
@@ -177,7 +180,7 @@ export function AuthRequiredModal({
 
         {/* Alert Feedback */}
         {errorMsg && (
-          <div className="mb-4 flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-400 animate-in fade-in">
+          <div data-testid="auth-modal-error" className="mb-4 flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-400 animate-in fade-in">
             <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
             <span>{errorMsg}</span>
           </div>

@@ -1,0 +1,82 @@
+name: Playwright E2E Tests
+
+on:
+  pull_request:
+    branches: [main, feat/stocks-and-ai-engine]
+  push:
+    branches: [main, feat/stocks-and-ai-engine]
+
+jobs:
+  e2e-playwright:
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+          MYSQL_DATABASE: bei_stock_insight
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+
+      - name: Install Backend Dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Push Prisma Schema & Seed MySQL Database
+        working-directory: ./backend
+        env:
+          DATABASE_URL: "mysql://root:@127.0.0.1:3306/bei_stock_insight"
+          JWT_SECRET: "ci_test_jwt_secret_key_2026"
+        run: |
+          npx prisma db push
+          npm run db:seed
+          npm run build
+
+      - name: Install Frontend Dependencies & Playwright Browsers
+        working-directory: ./frontend
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Build Frontend Production Bundle
+        working-directory: ./frontend
+        env:
+          BACKEND_URL: "http://127.0.0.1:5000"
+        run: npm run build
+
+      - name: Run Playwright E2E Suite
+        working-directory: ./frontend
+        env:
+          CI: "true"
+          DATABASE_URL: "mysql://root:@127.0.0.1:3306/bei_stock_insight"
+          JWT_SECRET: "ci_test_jwt_secret_key_2026"
+          BACKEND_URL: "http://127.0.0.1:5000"
+        run: npm run test:e2e:ci
+
+      - name: Upload Playwright Report & Traces on Failure
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-e2e-report
+          path: frontend/playwright-report/
+          retention-days: 14

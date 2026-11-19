@@ -7,6 +7,10 @@ node_modules/
 # Testing & Coverage
 coverage/
 */coverage/
+playwright-report/
+*/playwright-report/
+test-results/
+*/test-results/
 
 # Next.js build
 .next/
