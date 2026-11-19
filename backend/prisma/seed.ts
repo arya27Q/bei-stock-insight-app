@@ -8,7 +8,6 @@ dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 import { PrismaClient } from "../src/generated/client/index.js";
 import { MOCK_STOCKS } from "../src/data/mock-stocks.js";
-import { hashPassword } from "../src/modules/auth/auth.utils.js";
 
 const prisma = new PrismaClient();
 
@@ -167,35 +166,11 @@ async function main() {
   });
   console.log("[✓] Seed Lot Simulation untuk BBCA berhasil.");
 
-  // 5. Seed Tabel users (Akun Demo Resmi Pengujian)
-  const demoEmail = "arya@beistockinsight.id";
-  await prisma.user.upsert({
-    where: { email: demoEmail },
-    update: {
-      name: "Arya Pratama",
-      password: hashPassword("password123"),
-      experienceLevel: "Pemula",
-      initialCapital: 2500000,
-      initialCapitalLabel: "Rp 2.500.000",
-      preferredSectors: ["Keuangan", "Barang Konsumsi Primer"],
-      bio: "Investor ritel pemula yang fokus pada saham dividen dan perbankan unggulan BEI.",
-      notificationsEnabled: true,
-    },
-    create: {
-      email: demoEmail,
-      name: "Arya Pratama",
-      password: hashPassword("password123"),
-      experienceLevel: "Pemula",
-      initialCapital: 2500000,
-      initialCapitalLabel: "Rp 2.500.000",
-      preferredSectors: ["Keuangan", "Barang Konsumsi Primer"],
-      bio: "Investor ritel pemula yang fokus pada saham dividen dan perbankan unggulan BEI.",
-      notificationsEnabled: true,
-    },
-  });
-  console.log(`[✓] Seed Demo User (${demoEmail} / password123) berhasil.`);
+  // 5. Kosongkan Tabel users agar pendaftaran & pengujian akun dimulai dari bersih (0 akun)
+  await prisma.user.deleteMany();
+  console.log("[✓] Tabel users dikosongkan (0 akun terdaftar) siap untuk pengujian manual.");
 
-  console.log("\nProses Seeding 5 Tabel Lengkap Selesai 100%!");
+  console.log("\nProses Seeding Selesai 100%!");
 }
 
 main()

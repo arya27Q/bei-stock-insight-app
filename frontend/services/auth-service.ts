@@ -76,38 +76,27 @@ export function clearAuthSession(): void {
 
 // API Login ke Backend Express
 export async function loginApi(email: string, password: string): Promise<{ user: UserProfile; token: string }> {
-  try {
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+  const res = await fetch("/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
 
-    const json = await res.json();
-    if (!res.ok || json.status !== "success") {
-      throw new Error(json.message || "Gagal masuk ke akun investor.");
-    }
-
-    const userData: UserProfile = {
-      ...DEFAULT_USER,
-      ...json.data,
-      joinedDate: json.data?.createdAt
-        ? new Date(json.data.createdAt).toLocaleDateString("id-ID", { month: "long", year: "numeric" })
-        : "November 2024",
-    };
-
-    saveAuthSession(userData, json.token);
-    return { user: userData, token: json.token };
-  } catch (err: unknown) {
-    // Jika backend offline atau network error saat pengujian demo, sediakan fallback cerdas
-    if (email === DEMO_CREDENTIALS.email && password === DEMO_CREDENTIALS.password) {
-      const errMsg = err instanceof Error ? err.message : String(err);
-      console.warn("[loginApi] Beralih ke fallback akun demo lokal:", errMsg);
-      saveAuthSession(DEFAULT_USER, "demo-mock-jwt-token");
-      return { user: DEFAULT_USER, token: "demo-mock-jwt-token" };
-    }
-    throw err;
+  const json = await res.json();
+  if (!res.ok || json.status !== "success") {
+    throw new Error(json.message || "Gagal masuk ke akun investor.");
   }
+
+  const userData: UserProfile = {
+    ...DEFAULT_USER,
+    ...json.data,
+    joinedDate: json.data?.createdAt
+      ? new Date(json.data.createdAt).toLocaleDateString("id-ID", { month: "long", year: "numeric" })
+      : "November 2024",
+  };
+
+  saveAuthSession(userData, json.token);
+  return { user: userData, token: json.token };
 }
 
 // API Register ke Backend Express
@@ -173,28 +162,21 @@ export async function updateProfileApi(updated: Partial<UserProfile>): Promise<U
 
 // API Forgot Password
 export async function forgotPasswordApi(email: string): Promise<{ message: string; demoResetCode?: string }> {
-  try {
-    const res = await fetch("/api/auth/forgot-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
+  const res = await fetch("/api/auth/forgot-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
 
-    const json = await res.json();
-    if (!res.ok || json.status !== "success") {
-      throw new Error(json.message || "Gagal memproses permintaan reset kata sandi.");
-    }
-
-    return {
-      message: json.message,
-      demoResetCode: json.demoResetCode,
-    };
-  } catch {
-    return {
-      message: "Instruksi pemulihan kata sandi telah dikirim ke email terdaftar.",
-      demoResetCode: "888222",
-    };
+  const json = await res.json();
+  if (!res.ok || json.status !== "success") {
+    throw new Error(json.message || "Gagal memproses permintaan reset kata sandi.");
   }
+
+  return {
+    message: json.message,
+    demoResetCode: json.demoResetCode,
+  };
 }
 
 // API Reset Password (Verifikasi Kode OTP & Sandi Baru)

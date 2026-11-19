@@ -22,6 +22,8 @@ function extractVerifiedEmail(req: Request): string | null {
   return null;
 }
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export const authController = {
   // POST /api/auth/register
   async register(req: Request, res: Response) {
@@ -32,8 +34,8 @@ export const authController = {
         res.status(400).json({ status: "error", message: "Nama lengkap wajib diisi (maksimal 120 karakter)." });
         return;
       }
-      if (!email || typeof email !== "string" || !email.includes("@") || email.trim().length > 255) {
-        res.status(400).json({ status: "error", message: "Alamat email tidak valid." });
+      if (!email || typeof email !== "string" || !EMAIL_REGEX.test(email.trim()) || email.trim().length > 255) {
+        res.status(400).json({ status: "error", message: "Email Anda salah. Gunakan format email yang valid." });
         return;
       }
       if (!password || typeof password !== "string" || password.length < 6 || password.length > 128) {
@@ -46,7 +48,10 @@ export const authController = {
 
       const existing = await authRepository.findByEmail(email);
       if (existing) {
-        res.status(409).json({ status: "error", message: "Alamat email sudah terdaftar. Silakan masuk." });
+        res.status(409).json({
+          status: "error",
+          message: "Akun Anda sudah terdaftar. Silakan masuk menggunakan akun tersebut.",
+        });
         return;
       }
 
@@ -84,9 +89,25 @@ export const authController = {
         return;
       }
 
+      if (!EMAIL_REGEX.test(email.trim())) {
+        res.status(400).json({ status: "error", message: "Email Anda salah. Periksa kembali format email Anda." });
+        return;
+      }
+
       const user = await authRepository.findByEmail(email);
-      if (!user || !verifyPassword(password, user.password)) {
-        res.status(401).json({ status: "error", message: "Email atau kata sandi yang Anda masukkan tidak sesuai." });
+      if (!user) {
+        res.status(404).json({
+          status: "error",
+          message: "Email Anda belum terdaftar. Silakan daftar akun terlebih dahulu.",
+        });
+        return;
+      }
+
+      if (!verifyPassword(password, user.password)) {
+        res.status(401).json({
+          status: "error",
+          message: "Kata sandi Anda salah. Silakan periksa kembali kata sandi Anda.",
+        });
         return;
       }
 
@@ -167,16 +188,16 @@ export const authController = {
   async forgotPassword(req: Request, res: Response) {
     try {
       const { email } = req.body;
-      if (!email || typeof email !== "string" || !email.includes("@")) {
-        res.status(400).json({ status: "error", message: "Alamat email tidak valid." });
+      if (!email || typeof email !== "string" || !EMAIL_REGEX.test(email.trim())) {
+        res.status(400).json({ status: "error", message: "Email Anda salah. Periksa kembali format email Anda." });
         return;
       }
 
       const user = await authRepository.findByEmail(email);
       if (!user) {
-        res.json({
-          status: "success",
-          message: "Jika email terdaftar, instruksi pemulihan kata sandi telah dikirim.",
+        res.status(404).json({
+          status: "error",
+          message: "Email Anda belum terdaftar. Silakan daftar akun terlebih dahulu.",
         });
         return;
       }

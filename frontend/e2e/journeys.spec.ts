@@ -59,12 +59,19 @@ test.describe("BEI Stock Insight - End-to-End Critical User Journeys (J-01 s.d. 
     await expect(modal).toBeVisible();
     await expect(modal.getByText(/Akses Fitur Terbatas/i)).toBeVisible();
 
-    // Failure state: masukkan kredensial salah
+    // Failure state 1: email belum terdaftar
     await modal.locator('input[type="email"]').fill("tidakada@beistockinsight.id");
     await modal.locator('input[type="password"]').fill("salah123");
     await modal.getByRole("button", { name: /Masuk Sekarang/i }).click();
 
-    await expect(page.getByTestId("auth-modal-error")).toBeVisible();
+    await expect(page.getByTestId("auth-modal-error")).toContainText(/Email Anda belum terdaftar/i);
+
+    // Failure state 2: email terdaftar namun kata sandi salah
+    await modal.locator('input[type="email"]').fill(E2E_TEST_USER.email);
+    await modal.locator('input[type="password"]').fill("salah123");
+    await modal.getByRole("button", { name: /Masuk Sekarang/i }).click();
+
+    await expect(page.getByTestId("auth-modal-error")).toContainText(/Kata sandi Anda salah/i);
   });
 
   // =========================================================================
@@ -75,13 +82,20 @@ test.describe("BEI Stock Insight - End-to-End Critical User Journeys (J-01 s.d. 
   }) => {
     await page.goto("/register");
 
-    // Failure state: konfirmasi kata sandi tidak cocok
+    // Failure state 1: konfirmasi kata sandi tidak cocok
     await page.getByLabel(/Nama Lengkap/i).fill("Investor Uji");
     await page.getByLabel(/Alamat Email/i).fill("uji@beistockinsight.id");
     await page.getByLabel(/^Kata Sandi$/i).fill("rahasia123");
     await page.getByLabel(/Ulangi Kata Sandi/i).fill("berbeda123");
     await page.getByRole("button", { name: /Daftar Akun Investor/i }).click();
     await expect(page.getByText(/Konfirmasi kata sandi tidak cocok/i)).toBeVisible();
+
+    // Failure state 2: mendaftarkan email yang sudah terdaftar
+    await page.getByLabel(/Alamat Email/i).fill(E2E_TEST_USER.email);
+    await page.getByLabel(/^Kata Sandi$/i).fill("rahasia123");
+    await page.getByLabel(/Ulangi Kata Sandi/i).fill("rahasia123");
+    await page.getByRole("button", { name: /Daftar Akun Investor/i }).click();
+    await expect(page.getByText(/Akun Anda sudah terdaftar/i)).toBeVisible();
 
     // Halaman Forgot Password
     await page.goto("/forgot-password");
