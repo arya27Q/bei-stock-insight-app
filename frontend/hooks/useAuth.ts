@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import {
   UserProfile,
-  DEMO_CREDENTIALS,
   getStoredUser,
   loginApi,
   registerApi,
@@ -77,10 +76,6 @@ export function useAuth() {
     return res;
   }, []);
 
-  const quickDemoLogin = useCallback(async () => {
-    return login(DEMO_CREDENTIALS.email, DEMO_CREDENTIALS.password);
-  }, [login]);
-
   return {
     user,
     isLoaded,
@@ -89,6 +84,5 @@ export function useAuth() {
     register,
     logout,
     updateProfile,
-    quickDemoLogin,
   };
 }

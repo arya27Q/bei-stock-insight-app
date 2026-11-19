@@ -10,7 +10,6 @@ import {
   User,
   ArrowRight,
   ShieldCheck,
-  Zap,
   X,
   AlertCircle,
   CheckCircle2,
@@ -31,11 +30,11 @@ export function AuthRequiredModal({
   reason = "Fitur Riset Fundamental & Analisis AI",
   onSuccess,
 }: AuthRequiredModalProps) {
-  const { login, register, quickDemoLogin } = useAuth();
+  const { login, register } = useAuth();
 
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
-  const [email, setEmail] = useState("arya@beistockinsight.id");
-  const [password, setPassword] = useState("password123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [experienceLevel, setExperienceLevel] = useState<"Pemula" | "Menengah" | "Mahir">("Pemula");
   const [showPassword, setShowPassword] = useState(false);
@@ -106,24 +105,6 @@ export function AuthRequiredModal({
     } catch (err: unknown) {
       setIsLoading(false);
       const msg = err instanceof Error ? err.message : "Gagal mendaftar. Silakan coba kembali.";
-      setErrorMsg(msg);
-    }
-  };
-
-  const handleQuickDemo = async () => {
-    setErrorMsg("");
-    setIsLoading(true);
-    try {
-      await quickDemoLogin();
-      setSuccessMsg("Masuk dengan akun demo berhasil!");
-      setTimeout(() => {
-        setIsLoading(false);
-        onClose();
-        if (onSuccess) onSuccess();
-      }, 400);
-    } catch (err: unknown) {
-      setIsLoading(false);
-      const msg = err instanceof Error ? err.message : "Gagal masuk akun demo.";
       setErrorMsg(msg);
     }
   };
@@ -275,22 +256,6 @@ export function AuthRequiredModal({
                 </>
               )}
             </button>
-
-            {/* Tombol Demo Cepat 1-Klik */}
-            <div className="pt-2 border-t border-zinc-800/80">
-              <button
-                type="button"
-                onClick={handleQuickDemo}
-                disabled={isLoading}
-                className="w-full flex items-center justify-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 py-2 text-xs font-semibold text-emerald-400 hover:bg-emerald-500/20 transition-colors cursor-pointer"
-              >
-                <Zap className="h-3.5 w-3.5 text-emerald-400" aria-hidden="true" />
-                <span>Coba Cepat Akun Demo (1-Klik)</span>
-              </button>
-              <p className="mt-1.5 text-center text-[10px] text-zinc-500">
-                Otomatis masuk sebagai <span className="text-zinc-300">Arya Pratama</span> (arya@beistockinsight.id)
-              </p>
-            </div>
           </form>
         )}
 
@@ -361,7 +326,7 @@ export function AuthRequiredModal({
               </label>
               <select
                 value={experienceLevel}
-                onChange={(e) => setExperienceLevel(e.target.value as any)}
+                onChange={(e) => setExperienceLevel(e.target.value as "Pemula" | "Menengah" | "Mahir")}
                 className="w-full rounded-xl border border-zinc-800 bg-[#0d0e13] px-3 py-2 text-xs text-zinc-100 focus:border-emerald-500 focus:outline-none cursor-pointer"
               >
                 <option value="Pemula">Pemula (Baru memulai riset saham)</option>
