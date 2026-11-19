@@ -28,12 +28,6 @@ export const authRepository = {
     });
   },
 
-  async findById(id: string) {
-    return prisma.user.findUnique({
-      where: { id },
-    });
-  },
-
   async createUser(data: CreateUserInput) {
     return prisma.user.create({
       data: {

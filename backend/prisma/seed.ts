@@ -8,13 +8,7 @@ dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 import { PrismaClient } from "../src/generated/client/index.js";
 import { MOCK_STOCKS } from "../src/data/mock-stocks.js";
-import crypto from "crypto";
-
-function hashPassword(password: string): string {
-  const salt = crypto.randomBytes(16).toString("hex");
-  const derivedKey = crypto.scryptSync(password, salt, 64).toString("hex");
-  return `${salt}:${derivedKey}`;
-}
+import { hashPassword } from "../src/modules/auth/auth.utils.js";
 
 const prisma = new PrismaClient();
 

@@ -18,13 +18,10 @@ import {
 interface SidebarProps {
   activeTab?: "map" | "screener" | "benchmark" | "profile";
   setActiveTab?: (tab: "map" | "screener" | "benchmark" | "profile") => void;
-  isAiPanelOpen?: boolean;
-  setIsAiPanelOpen?: (open: boolean) => void;
   isMobileOpen: boolean;
   setIsMobileOpen: (open: boolean) => void;
   isCollapsed: boolean;
   setIsCollapsed: (collapsed: boolean) => void;
-  onOpenGeneralAi?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({

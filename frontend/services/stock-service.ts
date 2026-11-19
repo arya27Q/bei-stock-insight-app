@@ -264,19 +264,6 @@ export async function fetchStocks(): Promise<StockFundamental[]> {
   }
 }
 
-export async function fetchStockDetail(ticker: string): Promise<StockFundamental | null> {
-  try {
-    const res = await fetch(`/api/stocks/${ticker}`, { cache: "no-store" });
-    if (!res.ok) throw new Error("Emiten tidak ditemukan");
-    const json = await res.json();
-    const existing = INITIAL_STOCKS.find((s) => s.ticker === ticker.toUpperCase());
-    return { ...existing, ...json.data, period: "Q3 2024" };
-  } catch {
-    const found = INITIAL_STOCKS.find((s) => s.ticker === ticker.toUpperCase());
-    return found || null;
-  }
-}
-
 export function buildTransparentInsight(stock: StockFundamental): AIInsightData {
   const sectorMedianRoe = getSectorMedian(INITIAL_STOCKS, stock.sector, "roe");
   const sectorMedianPer = getSectorMedian(INITIAL_STOCKS, stock.sector, "per");
@@ -429,17 +416,6 @@ export async function simulateLotPurchase(
     throw new Error(errorJson.message || "Gagal menghitung simulasi lot");
   }
 
-  const json = await res.json();
-  return json.data;
-}
-
-// Ambil data perbandingan 2 emiten langsung dari backend endpoint & database MySQL
-export async function fetchStockComparison(tickerA: string, tickerB: string) {
-  const res = await fetch(`/api/stocks/compare?tickerA=${encodeURIComponent(tickerA)}&tickerB=${encodeURIComponent(tickerB)}`);
-  if (!res.ok) {
-    const errorJson = await res.json().catch(() => ({}));
-    throw new Error(errorJson.message || "Gagal memuat komparasi saham");
-  }
   const json = await res.json();
   return json.data;
 }
