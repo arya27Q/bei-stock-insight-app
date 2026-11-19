@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { StockFundamental, MetricType } from "@/types/stock";
 import { INITIAL_STOCKS } from "@/services/stock-service";
 import { useStocks, useStockSearch } from "@/hooks";
+import { useAuth } from "@/hooks/useAuth";
 import {
   getStoredWatchlist,
   saveStoredWatchlist,
@@ -52,6 +53,13 @@ interface DashboardContextType {
   setIsCommandPaletteOpen: (v: boolean) => void;
   openCommandPalette: () => void;
   closeCommandPalette: () => void;
+
+  // Fitur Penguncian & Modal Autentikasi Pengguna
+  isAuthModalOpen: boolean;
+  authModalReason: string;
+  openAuthModal: (reason?: string) => void;
+  closeAuthModal: () => void;
+  requireAuth: (action: () => void, reason?: string) => boolean;
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
@@ -76,6 +84,32 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
   const [isRightAiOpen, setIsRightAiOpen] = useState<boolean>(true);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
+
+  // Auth State & Interception Gate
+  const { isAuthenticated } = useAuth();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [authModalReason, setAuthModalReason] = useState<string>("Fitur Riset Fundamental & Analisis AI");
+
+  const openAuthModal = useCallback((reason = "Fitur Riset Fundamental & Analisis AI") => {
+    setAuthModalReason(reason);
+    setIsAuthModalOpen(true);
+  }, []);
+
+  const closeAuthModal = useCallback(() => {
+    setIsAuthModalOpen(false);
+  }, []);
+
+  const requireAuth = useCallback(
+    (action: () => void, reason = "Fitur Riset Fundamental & Analisis AI") => {
+      if (isAuthenticated) {
+        action();
+        return true;
+      }
+      openAuthModal(reason);
+      return false;
+    },
+    [isAuthenticated, openAuthModal]
+  );
 
   // Khusus layar mobile/tablet (< 1024px), tutup Panel AI secara default saat awal buka agar halaman utama langsung terlihat
   useEffect(() => {
@@ -247,6 +281,11 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       setIsCommandPaletteOpen,
       openCommandPalette,
       closeCommandPalette,
+      isAuthModalOpen,
+      authModalReason,
+      openAuthModal,
+      closeAuthModal,
+      requireAuth,
     }),
     [
       stocks,
@@ -276,6 +315,11 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       isCommandPaletteOpen,
       openCommandPalette,
       closeCommandPalette,
+      isAuthModalOpen,
+      authModalReason,
+      openAuthModal,
+      closeAuthModal,
+      requireAuth,
     ]
   );
 

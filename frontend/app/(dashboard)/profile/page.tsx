@@ -58,9 +58,20 @@ export default function ProfilePage() {
   const [notifications, setNotifications] = useState(user?.notificationsEnabled ?? true);
   const [isSaved, setIsSaved] = useState(false);
 
-  const handleSave = (e: React.FormEvent) => {
+  React.useEffect(() => {
+    if (user) {
+      setName(user.name);
+      setEmail(user.email);
+      setExperienceLevel(user.experienceLevel || "Pemula");
+      setPreferredSector(user.preferredSectors?.[0] || "Keuangan");
+      setBio(user.bio || "");
+      setNotifications(user.notificationsEnabled ?? true);
+    }
+  }, [user]);
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    updateProfile({
+    await updateProfile({
       name,
       email,
       experienceLevel,
@@ -72,8 +83,8 @@ export default function ProfilePage() {
     setTimeout(() => setIsSaved(false), 3000);
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.push("/login");
   };
 
@@ -81,6 +92,36 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-[#0d0e13] flex items-center justify-center text-xs text-zinc-400">
         Memuat profil pengguna...
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="rounded-3xl border border-zinc-200 bg-white p-8 sm:p-12 text-center shadow-xs dark:border-zinc-800/80 dark:bg-[#16171f] max-w-lg mx-auto my-12 space-y-5">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">
+          <User className="h-7 w-7" aria-hidden="true" />
+        </div>
+        <div>
+          <h2 className="text-lg font-bold text-zinc-950 dark:text-zinc-50">Profil Investor Belum Masuk</h2>
+          <p className="mt-1.5 text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+            Silakan masuk atau daftarkan akun investor Anda untuk mengelola preferensi riset, portofolio watchlist, dan panduan lot saham.
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <Link
+            href="/login"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-emerald-500 transition-colors shadow-sm cursor-pointer"
+          >
+            <span>Masuk Akun</span>
+          </Link>
+          <Link
+            href="/register"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-[#0d0e13] px-5 py-2.5 text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+          >
+            <span>Daftar Akun Baru</span>
+          </Link>
+        </div>
       </div>
     );
   }

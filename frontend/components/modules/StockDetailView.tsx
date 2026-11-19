@@ -70,7 +70,7 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
     setShowTechnicalDetails,
   } = useStockInsight(stock.ticker, stock.name);
 
-  const { isWatchlisted, toggleWatchlist } = useDashboard();
+  const { isWatchlisted, toggleWatchlist, requireAuth } = useDashboard();
   const watchlisted = isWatchlisted(stock.ticker);
 
   const [isReportModalOpen, setIsReportModalOpen] = React.useState(false);
@@ -101,7 +101,7 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
 
               <button
                 type="button"
-                onClick={() => toggleWatchlist(stock.ticker)}
+                onClick={() => requireAuth(() => toggleWatchlist(stock.ticker), "Simpan Daftar Pantauan (Watchlist)")}
                 className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-semibold transition-all cursor-pointer ${
                   watchlisted
                     ? "bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30"
@@ -115,7 +115,7 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
 
               <button
                 type="button"
-                onClick={() => setIsReportModalOpen(true)}
+                onClick={() => requireAuth(() => setIsReportModalOpen(true), "Ekspor Laporan Riset PDF")}
                 className="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-semibold bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/20 dark:bg-emerald-500/15 dark:text-emerald-300 dark:hover:bg-emerald-500/25 border border-emerald-500/25 transition-all cursor-pointer"
                 title="Cetak Ringkasan Riset / Unduh PDF"
               >
@@ -552,7 +552,7 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
               <button
                 type="button"
                 key={idx}
-                onClick={() => handleSendStock(chip)}
+                onClick={() => requireAuth(() => handleSendStock(chip), "Konsultasi Asisten AI")}
                 disabled={isStockSending}
                 className="group w-full flex items-center justify-between gap-3 rounded-xl border border-zinc-200/90 bg-zinc-50/70 p-3 text-left text-xs font-medium leading-relaxed text-zinc-700 hover:border-emerald-500/40 hover:bg-zinc-100 hover:text-zinc-950 dark:border-zinc-800 dark:bg-[#16171f] dark:text-zinc-300 dark:hover:border-emerald-500/40 dark:hover:bg-[#1c202d] dark:hover:text-zinc-100 transition-all cursor-pointer shadow-2xs"
               >
@@ -627,7 +627,7 @@ export const StockDetailView: React.FC<StockDetailViewProps> = ({
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            handleSendStock();
+            requireAuth(() => handleSendStock(), "Konsultasi Asisten AI");
           }}
           className="mt-3 flex items-center gap-2 pt-3 border-t border-zinc-100 dark:border-zinc-800"
         >

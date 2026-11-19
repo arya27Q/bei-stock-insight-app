@@ -1,55 +1,79 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   UserProfile,
-  DEFAULT_USER,
+  DEMO_CREDENTIALS,
   getStoredUser,
-  saveStoredUser,
-  clearStoredUser,
+  loginApi,
+  registerApi,
+  updateProfileApi,
+  logoutApi,
+  AUTH_CHANGE_EVENT,
 } from "../services/auth-service";
 
 export function useAuth() {
   const [user, setUser] = useState<UserProfile | null>(() => getStoredUser());
-  const [isLoaded] = useState(true);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  const login = useCallback((email: string, name?: string) => {
-    const newUser: UserProfile = {
-      ...DEFAULT_USER,
-      email,
-      name: name || (email.split("@")[0].toUpperCase() || "Investor BEI"),
+  useEffect(() => {
+    // Sinkronisasi inisial dari browser storage
+    setUser(getStoredUser());
+    setIsLoaded(true);
+
+    const handleAuthChange = (e: Event) => {
+      const customEvent = e as CustomEvent<{ user: UserProfile | null }>;
+      setUser(customEvent.detail?.user ?? getStoredUser());
     };
-    saveStoredUser(newUser);
-    setUser(newUser);
+
+    window.addEventListener(AUTH_CHANGE_EVENT, handleAuthChange);
+    window.addEventListener("storage", () => setUser(getStoredUser()));
+
+    return () => {
+      window.removeEventListener(AUTH_CHANGE_EVENT, handleAuthChange);
+      window.removeEventListener("storage", () => setUser(getStoredUser()));
+    };
   }, []);
 
-  const register = useCallback((data: Partial<UserProfile>) => {
-    const newUser: UserProfile = {
-      ...DEFAULT_USER,
-      ...data,
-      name: data.name || "Investor Baru",
-      email: data.email || "investor@beistockinsight.id",
-      joinedDate: new Date().toLocaleDateString("id-ID", { month: "long", year: "numeric" }),
-    };
-    saveStoredUser(newUser);
-    setUser(newUser);
+  const login = useCallback(async (email: string, password = "password123") => {
+    const res = await loginApi(email, password);
+    setUser(res.user);
+    return res.user;
   }, []);
 
-  const logout = useCallback(() => {
-    clearStoredUser();
+  const register = useCallback(
+    async (data: {
+      name: string;
+      email: string;
+      password?: string;
+      experienceLevel?: "Pemula" | "Menengah" | "Mahir";
+      preferredSectors?: string[];
+      bio?: string;
+    }) => {
+      const res = await registerApi({
+        ...data,
+        password: data.password || "password123",
+      });
+      setUser(res.user);
+      return res.user;
+    },
+    []
+  );
+
+  const logout = useCallback(async () => {
+    await logoutApi();
     setUser(null);
   }, []);
 
-  const updateProfile = useCallback((updated: Partial<UserProfile>) => {
-    setUser((prev) => {
-      const merged: UserProfile = {
-        ...(prev || DEFAULT_USER),
-        ...updated,
-      };
-      saveStoredUser(merged);
-      return merged;
-    });
+  const updateProfile = useCallback(async (updated: Partial<UserProfile>) => {
+    const res = await updateProfileApi(updated);
+    setUser(res);
+    return res;
   }, []);
+
+  const quickDemoLogin = useCallback(async () => {
+    return login(DEMO_CREDENTIALS.email, DEMO_CREDENTIALS.password);
+  }, [login]);
 
   return {
     user,
@@ -59,5 +83,6 @@ export function useAuth() {
     register,
     logout,
     updateProfile,
+    quickDemoLogin,
   };
 }

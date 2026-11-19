@@ -136,3 +136,23 @@ model Watchlist {
   @@index([stockTicker])
   @@map("watchlists")
 }
+
+// 6. Tabel Akun & Profil Pengguna / Investor
+model User {
+  id                   String      @id @default(uuid()) @db.VarChar(36)
+  name                 String      @db.VarChar(255)
+  email                String      @unique @db.VarChar(255)
+  password             String      @db.VarChar(255)
+  experienceLevel      String      @default("Pemula") @db.VarChar(50)
+  initialCapital       Float?      @default(2500000)
+  initialCapitalLabel  String?     @default("Rp 2.500.000") @db.VarChar(50)
+  preferredSectors     Json?
+  bio                  String?     @db.Text
+  notificationsEnabled Boolean     @default(true)
+  resetToken           String?     @db.VarChar(255)
+  resetTokenExpires    DateTime?
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+
+  @@map("users")
+}

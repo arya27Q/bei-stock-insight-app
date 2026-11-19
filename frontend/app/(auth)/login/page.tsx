@@ -27,7 +27,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
 
@@ -41,11 +41,14 @@ export default function LoginPage() {
     }
 
     setIsLoading(true);
-    setTimeout(() => {
-      login(email);
+    try {
+      await login(email, password);
       setIsLoading(false);
       router.push("/");
-    }, 600);
+    } catch (err: any) {
+      setIsLoading(false);
+      setErrorMsg(err.message || "Gagal masuk. Periksa kembali email dan kata sandi Anda.");
+    }
   };
 
   return (

@@ -55,6 +55,7 @@ model Stock {
   aiInsights     AiInsight[]
   aiChatLogs     AiChatLog[]
   lotSimulations LotSimulation[]
+  watchlists     Watchlist[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -118,4 +119,40 @@ model LotSimulation {
 
   @@index([stockTicker])
   @@map("lot_simulations")
+}
+
+// 5. Tabel Daftar Pantauan (Watchlist) Saham Pengguna
+model Watchlist {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  userEmail   String   @default("investor@beistockinsight.id") @db.VarChar(255)
+  stockTicker String   @db.VarChar(10)
+  notes       String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  stock Stock @relation(fields: [stockTicker], references: [ticker], onDelete: Cascade)
+
+  @@unique([userEmail, stockTicker])
+  @@index([userEmail])
+  @@index([stockTicker])
+  @@map("watchlists")
+}
+
+// 6. Tabel Akun & Profil Pengguna / Investor
+model User {
+  id                   String    @id @default(uuid()) @db.VarChar(36)
+  name                 String    @db.VarChar(255)
+  email                String    @unique @db.VarChar(255)
+  password             String    @db.VarChar(255)
+  experienceLevel      String    @default("Pemula") @db.VarChar(50)
+  initialCapital       Float?    @default(2500000)
+  initialCapitalLabel  String?   @default("Rp 2.500.000") @db.VarChar(50)
+  preferredSectors     Json?
+  bio                  String?   @db.Text
+  notificationsEnabled Boolean   @default(true)
+  resetToken           String?   @db.VarChar(255)
+  resetTokenExpires    DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@map("users")
 }

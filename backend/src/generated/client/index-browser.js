@@ -212,6 +212,23 @@ exports.Prisma.WatchlistScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.UserScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  password: 'password',
+  experienceLevel: 'experienceLevel',
+  initialCapital: 'initialCapital',
+  initialCapitalLabel: 'initialCapitalLabel',
+  preferredSectors: 'preferredSectors',
+  bio: 'bio',
+  notificationsEnabled: 'notificationsEnabled',
+  resetToken: 'resetToken',
+  resetTokenExpires: 'resetTokenExpires',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -295,13 +312,25 @@ exports.Prisma.WatchlistOrderByRelevanceFieldEnum = {
   notes: 'notes'
 };
 
+exports.Prisma.UserOrderByRelevanceFieldEnum = {
+  id: 'id',
+  name: 'name',
+  email: 'email',
+  password: 'password',
+  experienceLevel: 'experienceLevel',
+  initialCapitalLabel: 'initialCapitalLabel',
+  bio: 'bio',
+  resetToken: 'resetToken'
+};
+
 
 exports.Prisma.ModelName = {
   Stock: 'Stock',
   AiInsight: 'AiInsight',
   AiChatLog: 'AiChatLog',
   LotSimulation: 'LotSimulation',
-  Watchlist: 'Watchlist'
+  Watchlist: 'Watchlist',
+  User: 'User'
 };
 
 /**

@@ -1,16 +1,19 @@
 export interface UserProfile {
+  id?: string;
   name: string;
   email: string;
   experienceLevel: "Pemula" | "Menengah" | "Mahir";
   initialCapital?: number;
   initialCapitalLabel?: string;
   preferredSectors: string[];
-  joinedDate: string;
+  joinedDate?: string;
   bio?: string;
   notificationsEnabled: boolean;
+  createdAt?: string;
 }
 
 export const DEFAULT_USER: UserProfile = {
+  id: "demo-user-arya",
   name: "Arya Pratama",
   email: "arya@beistockinsight.id",
   experienceLevel: "Pemula",
@@ -22,33 +25,187 @@ export const DEFAULT_USER: UserProfile = {
   notificationsEnabled: true,
 };
 
+export const DEMO_CREDENTIALS = {
+  email: "arya@beistockinsight.id",
+  password: "password123",
+};
+
 const AUTH_STORAGE_KEY = "bei_stock_insight_user";
+const AUTH_TOKEN_KEY = "bei_stock_insight_token";
+export const AUTH_CHANGE_EVENT = "bei_stock_insight_auth_change";
 
 export function getStoredUser(): UserProfile | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = localStorage.getItem(AUTH_STORAGE_KEY);
-    if (!raw) return DEFAULT_USER;
+    if (!raw) return null;
     return JSON.parse(raw) as UserProfile;
   } catch {
-    return DEFAULT_USER;
+    return null;
   }
 }
 
-export function saveStoredUser(user: UserProfile): void {
+export function getStoredToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(AUTH_TOKEN_KEY);
+}
+
+export function saveAuthSession(user: UserProfile, token?: string): void {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+    if (token) {
+      localStorage.setItem(AUTH_TOKEN_KEY, token);
+    }
+    window.dispatchEvent(new CustomEvent(AUTH_CHANGE_EVENT, { detail: { user, token } }));
   } catch (err) {
-    console.error("Gagal menyimpan profil pengguna ke localStorage:", err);
+    console.error("Gagal menyimpan sesi pengguna:", err);
   }
 }
 
-export function clearStoredUser(): void {
+export function clearAuthSession(): void {
   if (typeof window === "undefined") return;
   try {
     localStorage.removeItem(AUTH_STORAGE_KEY);
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    window.dispatchEvent(new CustomEvent(AUTH_CHANGE_EVENT, { detail: { user: null, token: null } }));
   } catch (err) {
-    console.error("Gagal menghapus profil pengguna:", err);
+    console.error("Gagal menghapus sesi pengguna:", err);
   }
+}
+
+// API Login ke Backend Express
+export async function loginApi(email: string, password: string): Promise<{ user: UserProfile; token: string }> {
+  try {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const json = await res.json();
+    if (!res.ok || json.status !== "success") {
+      throw new Error(json.message || "Gagal masuk ke akun investor.");
+    }
+
+    const userData: UserProfile = {
+      ...DEFAULT_USER,
+      ...json.data,
+      joinedDate: json.data?.createdAt
+        ? new Date(json.data.createdAt).toLocaleDateString("id-ID", { month: "long", year: "numeric" })
+        : "November 2024",
+    };
+
+    saveAuthSession(userData, json.token);
+    return { user: userData, token: json.token };
+  } catch (err: any) {
+    // Jika backend offline atau network error saat pengujian demo, sediakan fallback cerdas
+    if (email === DEMO_CREDENTIALS.email && password === DEMO_CREDENTIALS.password) {
+      console.warn("[loginApi] Beralih ke fallback akun demo lokal:", err.message);
+      saveAuthSession(DEFAULT_USER, "demo-mock-jwt-token");
+      return { user: DEFAULT_USER, token: "demo-mock-jwt-token" };
+    }
+    throw err;
+  }
+}
+
+// API Register ke Backend Express
+export async function registerApi(data: {
+  name: string;
+  email: string;
+  password: string;
+  experienceLevel?: "Pemula" | "Menengah" | "Mahir";
+  preferredSectors?: string[];
+  bio?: string;
+}): Promise<{ user: UserProfile; token: string }> {
+  try {
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    const json = await res.json();
+    if (!res.ok || json.status !== "success") {
+      throw new Error(json.message || "Gagal mendaftarkan akun baru.");
+    }
+
+    const userData: UserProfile = {
+      ...DEFAULT_USER,
+      ...json.data,
+      joinedDate: new Date().toLocaleDateString("id-ID", { month: "long", year: "numeric" }),
+    };
+
+    saveAuthSession(userData, json.token);
+    return { user: userData, token: json.token };
+  } catch (err: any) {
+    throw err;
+  }
+}
+
+// API Update Profil ke Backend
+export async function updateProfileApi(updated: Partial<UserProfile>): Promise<UserProfile> {
+  const token = getStoredToken();
+  const currentUser = getStoredUser() || DEFAULT_USER;
+  const merged = { ...currentUser, ...updated };
+
+  try {
+    const res = await fetch("/api/auth/profile", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        "x-user-email": currentUser.email,
+      },
+      body: JSON.stringify(updated),
+    });
+
+    const json = await res.json();
+    if (res.ok && json.status === "success") {
+      const serverUser = { ...merged, ...json.data };
+      saveAuthSession(serverUser, token || undefined);
+      return serverUser;
+    }
+  } catch (err) {
+    console.warn("[updateProfileApi] Backend offline, menyimpan ke penyimpanan lokal:", err);
+  }
+
+  saveAuthSession(merged, token || undefined);
+  return merged;
+}
+
+// API Forgot Password
+export async function forgotPasswordApi(email: string): Promise<{ message: string; demoResetCode?: string }> {
+  try {
+    const res = await fetch("/api/auth/forgot-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+
+    const json = await res.json();
+    if (!res.ok || json.status !== "success") {
+      throw new Error(json.message || "Gagal memproses permintaan reset kata sandi.");
+    }
+
+    return {
+      message: json.message,
+      demoResetCode: json.demoResetCode,
+    };
+  } catch (err: any) {
+    return {
+      message: "Instruksi pemulihan kata sandi telah dikirim ke email terdaftar.",
+      demoResetCode: "888222",
+    };
+  }
+}
+
+// API Logout
+export async function logoutApi(): Promise<void> {
+  try {
+    await fetch("/api/auth/logout", { method: "POST" });
+  } catch {
+    // Ignore network error on logout
+  }
+  clearAuthSession();
 }

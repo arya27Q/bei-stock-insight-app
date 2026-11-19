@@ -10,14 +10,16 @@ import {
   KeyRound,
   ShieldCheck,
 } from "lucide-react";
+import { forgotPasswordApi } from "@/services/auth-service";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [demoCode, setDemoCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
 
@@ -27,10 +29,15 @@ export default function ForgotPasswordPage() {
     }
 
     setIsLoading(true);
-    setTimeout(() => {
+    try {
+      const res = await forgotPasswordApi(email);
       setIsLoading(false);
+      setDemoCode(res.demoResetCode || "");
       setIsSubmitted(true);
-    }, 700);
+    } catch (err: any) {
+      setIsLoading(false);
+      setErrorMsg(err.message || "Gagal memproses permintaan reset.");
+    }
   };
 
   return (
@@ -118,6 +125,12 @@ export default function ForgotPasswordPage() {
                   Kami telah mengirimkan instruksi pengaturan ulang kata sandi ke alamat email:
                   <strong className="block text-zinc-900 dark:text-white mt-1">{email}</strong>
                 </p>
+                {demoCode && (
+                  <div className="mt-2 rounded-xl bg-[#0d0e13] border border-emerald-500/30 p-2.5 text-center">
+                    <span className="text-[10px] text-zinc-400 block">Kode Verifikasi Reset (Demo):</span>
+                    <span className="font-mono text-base font-bold text-emerald-400 tracking-widest">{demoCode}</span>
+                  </div>
+                )}
               </div>
 
               <p className="text-center text-[11px] text-zinc-400">

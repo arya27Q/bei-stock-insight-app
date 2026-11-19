@@ -1,5 +1,20 @@
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
+
 import { PrismaClient } from "../src/generated/client/index.js";
 import { MOCK_STOCKS } from "../src/data/mock-stocks.js";
+import crypto from "crypto";
+
+function hashPassword(password: string): string {
+  const salt = crypto.randomBytes(16).toString("hex");
+  const derivedKey = crypto.scryptSync(password, salt, 64).toString("hex");
+  return `${salt}:${derivedKey}`;
+}
 
 const prisma = new PrismaClient();
 
@@ -158,7 +173,35 @@ async function main() {
   });
   console.log("[✓] Seed Lot Simulation untuk BBCA berhasil.");
 
-  console.log("\nProses Seeding 4 Tabel Lengkap Selesai 100%!");
+  // 5. Seed Tabel users (Akun Demo Resmi Pengujian)
+  const demoEmail = "arya@beistockinsight.id";
+  await prisma.user.upsert({
+    where: { email: demoEmail },
+    update: {
+      name: "Arya Pratama",
+      password: hashPassword("password123"),
+      experienceLevel: "Pemula",
+      initialCapital: 2500000,
+      initialCapitalLabel: "Rp 2.500.000",
+      preferredSectors: ["Keuangan", "Barang Konsumsi Primer"],
+      bio: "Investor ritel pemula yang fokus pada saham dividen dan perbankan unggulan BEI.",
+      notificationsEnabled: true,
+    },
+    create: {
+      email: demoEmail,
+      name: "Arya Pratama",
+      password: hashPassword("password123"),
+      experienceLevel: "Pemula",
+      initialCapital: 2500000,
+      initialCapitalLabel: "Rp 2.500.000",
+      preferredSectors: ["Keuangan", "Barang Konsumsi Primer"],
+      bio: "Investor ritel pemula yang fokus pada saham dividen dan perbankan unggulan BEI.",
+      notificationsEnabled: true,
+    },
+  });
+  console.log(`[✓] Seed Demo User (${demoEmail} / password123) berhasil.`);
+
+  console.log("\nProses Seeding 5 Tabel Lengkap Selesai 100%!");
 }
 
 main()
