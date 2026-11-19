@@ -6,6 +6,7 @@ import { StockFundamental, MetricType } from "@/types/stock";
 import { INITIAL_STOCKS } from "@/services/stock-service";
 import { useStocks, useStockSearch } from "@/hooks";
 import { useAuth } from "@/hooks/useAuth";
+import { showFeedbackPopup } from "@/components/ui/ActionFeedbackPopup";
 import {
   getStoredWatchlist,
   saveStoredWatchlist,
@@ -176,6 +177,16 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     async (ticker: string) => {
       if (!ticker) return;
       const cleanTicker = ticker.toUpperCase().trim();
+      const isCurrentlyWatchlisted = watchlist.includes(cleanTicker);
+
+      showFeedbackPopup({
+        status: "loading",
+        title: isCurrentlyWatchlisted
+          ? `Menghapus ${cleanTicker} dari Watchlist...`
+          : `Menyimpan ${cleanTicker} ke Watchlist...`,
+        message: "Menyinkronkan daftar saham pantauan Anda.",
+        ticker: cleanTicker,
+      });
 
       // Optimistic UI update
       setWatchlist((prev) =>
@@ -186,11 +197,28 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
       // Sinkronisasi API & storage sesuai email user aktif
       const res = await toggleWatchlistApi(cleanTicker, user?.email);
-      if (res && res.tickers) {
-        setWatchlist(res.tickers);
+      const finalTickers = res?.tickers;
+      if (finalTickers) {
+        setWatchlist(finalTickers);
       }
+
+      const isNowSaved = finalTickers
+        ? finalTickers.includes(cleanTicker)
+        : !isCurrentlyWatchlisted;
+
+      showFeedbackPopup({
+        status: isNowSaved ? "watchlist-add" : "watchlist-remove",
+        title: isNowSaved
+          ? `${cleanTicker} Tersimpan di Watchlist!`
+          : `${cleanTicker} Dihapus dari Watchlist`,
+        message: isNowSaved
+          ? `Emiten ${cleanTicker} berhasil disimpan ke daftar saham pantauan Anda.`
+          : `Emiten ${cleanTicker} telah dikeluarkan dari daftar saham pantauan.`,
+        ticker: cleanTicker,
+        durationMs: 2800,
+      });
     },
-    [user?.email]
+    [user?.email, watchlist]
   );
 
   const watchlistStocks = useMemo(() => {
