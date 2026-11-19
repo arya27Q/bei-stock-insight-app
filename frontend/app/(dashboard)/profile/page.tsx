@@ -133,7 +133,7 @@ export default function ProfilePage() {
       <header className="flex flex-wrap items-center justify-between gap-2 sm:gap-3 pb-3 sm:pb-4 border-b border-zinc-200 dark:border-zinc-800">
         <div className="flex items-center gap-3">
           <Link
-            href="/"
+            href="/market-map"
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-600 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />

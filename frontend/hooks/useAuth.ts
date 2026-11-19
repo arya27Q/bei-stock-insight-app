@@ -12,7 +12,8 @@ import {
 } from "../services/auth-service";
 
 export function useAuth() {
-  const [user, setUser] = useState<UserProfile | null>(() => getStoredUser());
+  // Inisialisasi awal seragam (null) agar HTML Server (SSR) dan Client Hydration sinkron tanpa hydration mismatch
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {

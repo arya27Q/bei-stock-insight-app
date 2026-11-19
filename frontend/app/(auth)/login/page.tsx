@@ -56,7 +56,7 @@ export default function LoginPage() {
       {/* Header Back Link */}
       <div className="mx-auto w-full max-w-md flex items-center justify-between">
         <Link
-          href="/"
+          href="/market-map"
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
