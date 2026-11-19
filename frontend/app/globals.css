@@ -56,3 +56,15 @@ button:disabled, select:disabled, input:disabled {
   outline-offset: 2px;
 }
 
+/* Prevent Chrome/Edge autofill from forcing a white background in dark mode */
+@media (prefers-color-scheme: dark) {
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 40px #0d0e13 inset !important;
+    -webkit-text-fill-color: #f4f4f5 !important;
+    caret-color: #f4f4f5;
+  }
+}
+

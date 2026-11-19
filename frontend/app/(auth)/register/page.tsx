@@ -130,7 +130,7 @@ export default function RegisterPage() {
                   placeholder="Contoh: Arya Pratama"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50 pl-10 pr-4 py-2.5 text-xs sm:text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-950 focus:bg-white focus:outline-none dark:border-zinc-800 dark:bg-[#0d0e13] dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-emerald-500"
+                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50 pl-10 pr-4 py-2.5 text-xs sm:text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-950 focus:bg-white focus:outline-none dark:border-zinc-800 dark:bg-[#0d0e13] dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-emerald-500 dark:focus:bg-[#0d0e13]"
                 />
                 <User
                   className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400"
@@ -154,7 +154,7 @@ export default function RegisterPage() {
                   placeholder="nama@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50 pl-10 pr-4 py-2.5 text-xs sm:text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-950 focus:bg-white focus:outline-none dark:border-zinc-800 dark:bg-[#0d0e13] dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-emerald-500"
+                  className="w-full rounded-xl border border-zinc-200 bg-zinc-50 pl-10 pr-4 py-2.5 text-xs sm:text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-950 focus:bg-white focus:outline-none dark:border-zinc-800 dark:bg-[#0d0e13] dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-emerald-500 dark:focus:bg-[#0d0e13]"
                 />
                 <Mail
                   className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400"
@@ -179,7 +179,7 @@ export default function RegisterPage() {
                     placeholder="Minimal 6 karakter"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-xl border border-zinc-200 bg-zinc-50 pl-10 pr-10 py-2.5 text-xs sm:text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-950 focus:bg-white focus:outline-none dark:border-zinc-800 dark:bg-[#0d0e13] dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-emerald-500"
+                    className="w-full rounded-xl border border-zinc-200 bg-zinc-50 pl-10 pr-10 py-2.5 text-xs sm:text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-950 focus:bg-white focus:outline-none dark:border-zinc-800 dark:bg-[#0d0e13] dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-emerald-500 dark:focus:bg-[#0d0e13]"
                   />
                   <Lock
                     className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400"
@@ -203,7 +203,7 @@ export default function RegisterPage() {
                     placeholder="Ulangi kata sandi"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full rounded-xl border border-zinc-200 bg-zinc-50 pl-10 pr-10 py-2.5 text-xs sm:text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-950 focus:bg-white focus:outline-none dark:border-zinc-800 dark:bg-[#0d0e13] dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-emerald-500"
+                    className="w-full rounded-xl border border-zinc-200 bg-zinc-50 pl-10 pr-10 py-2.5 text-xs sm:text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-950 focus:bg-white focus:outline-none dark:border-zinc-800 dark:bg-[#0d0e13] dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-emerald-500 dark:focus:bg-[#0d0e13]"
                   />
                   <Lock
                     className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400"
