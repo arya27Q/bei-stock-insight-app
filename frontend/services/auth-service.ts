@@ -1,3 +1,5 @@
+import { showFeedbackPopup, hideFeedbackPopup } from "@/components/ui/ActionFeedbackPopup";
+
 export interface UserProfile {
   id?: string;
   name: string;
@@ -23,11 +25,6 @@ export const DEFAULT_USER: UserProfile = {
   joinedDate: "November 2024",
   bio: "Investor ritel pemula yang fokus pada saham dividen dan perbankan unggulan BEI.",
   notificationsEnabled: true,
-};
-
-export const DEMO_CREDENTIALS = {
-  email: "arya@beistockinsight.id",
-  password: "password123",
 };
 
 const AUTH_STORAGE_KEY = "bei_stock_insight_user";
@@ -76,27 +73,45 @@ export function clearAuthSession(): void {
 
 // API Login ke Backend Express
 export async function loginApi(email: string, password: string): Promise<{ user: UserProfile; token: string }> {
-  const res = await fetch("/api/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
+  showFeedbackPopup({
+    status: "loading",
+    title: "Memproses Login Akun...",
+    message: "Memverifikasi kredensial investor ke server BEI Stock Insight.",
   });
 
-  const json = await res.json();
-  if (!res.ok || json.status !== "success") {
-    throw new Error(json.message || "Gagal masuk ke akun investor.");
+  try {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const json = await res.json();
+    if (!res.ok || json.status !== "success") {
+      hideFeedbackPopup();
+      throw new Error(json.message || "Gagal masuk ke akun investor.");
+    }
+
+    const userData: UserProfile = {
+      ...DEFAULT_USER,
+      ...json.data,
+      joinedDate: json.data?.createdAt
+        ? new Date(json.data.createdAt).toLocaleDateString("id-ID", { month: "long", year: "numeric" })
+        : "November 2024",
+    };
+
+    saveAuthSession(userData, json.token);
+    showFeedbackPopup({
+      status: "success",
+      title: "Login Akun Berhasil!",
+      message: `Selamat datang kembali, ${userData.name}. Sesi riset Anda telah aktif.`,
+      durationMs: 3200,
+    });
+    return { user: userData, token: json.token };
+  } catch (err) {
+    hideFeedbackPopup();
+    throw err;
   }
-
-  const userData: UserProfile = {
-    ...DEFAULT_USER,
-    ...json.data,
-    joinedDate: json.data?.createdAt
-      ? new Date(json.data.createdAt).toLocaleDateString("id-ID", { month: "long", year: "numeric" })
-      : "November 2024",
-  };
-
-  saveAuthSession(userData, json.token);
-  return { user: userData, token: json.token };
 }
 
 // API Register ke Backend Express
@@ -108,25 +123,43 @@ export async function registerApi(data: {
   preferredSectors?: string[];
   bio?: string;
 }): Promise<{ user: UserProfile; token: string }> {
-  const res = await fetch("/api/auth/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+  showFeedbackPopup({
+    status: "loading",
+    title: "Mendaftarkan Akun Investor...",
+    message: "Menyimpan profil dan preferensi riset Anda ke database.",
   });
 
-  const json = await res.json();
-  if (!res.ok || json.status !== "success") {
-    throw new Error(json.message || "Gagal mendaftarkan akun baru.");
+  try {
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    const json = await res.json();
+    if (!res.ok || json.status !== "success") {
+      hideFeedbackPopup();
+      throw new Error(json.message || "Gagal mendaftarkan akun baru.");
+    }
+
+    const userData: UserProfile = {
+      ...DEFAULT_USER,
+      ...json.data,
+      joinedDate: new Date().toLocaleDateString("id-ID", { month: "long", year: "numeric" }),
+    };
+
+    saveAuthSession(userData, json.token);
+    showFeedbackPopup({
+      status: "success",
+      title: "Pendaftaran Akun Sukses!",
+      message: `Akun investor ${userData.name} berhasil terdaftar dan langsung aktif.`,
+      durationMs: 3500,
+    });
+    return { user: userData, token: json.token };
+  } catch (err) {
+    hideFeedbackPopup();
+    throw err;
   }
-
-  const userData: UserProfile = {
-    ...DEFAULT_USER,
-    ...json.data,
-    joinedDate: new Date().toLocaleDateString("id-ID", { month: "long", year: "numeric" }),
-  };
-
-  saveAuthSession(userData, json.token);
-  return { user: userData, token: json.token };
 }
 
 // API Update Profil ke Backend
@@ -134,6 +167,12 @@ export async function updateProfileApi(updated: Partial<UserProfile>): Promise<U
   const token = getStoredToken();
   const currentUser = getStoredUser() || DEFAULT_USER;
   const merged = { ...currentUser, ...updated };
+
+  showFeedbackPopup({
+    status: "loading",
+    title: "Menyimpan Profil Investor...",
+    message: "Memperbarui preferensi riset dan identitas akun Anda.",
+  });
 
   try {
     const res = await fetch("/api/auth/profile", {
@@ -150,6 +189,12 @@ export async function updateProfileApi(updated: Partial<UserProfile>): Promise<U
     if (res.ok && json.status === "success") {
       const serverUser = { ...merged, ...json.data };
       saveAuthSession(serverUser, token || undefined);
+      showFeedbackPopup({
+        status: "success",
+        title: "Profil Berhasil Disimpan!",
+        message: "Preferensi investasi dan profil akun Anda telah diperbarui.",
+        durationMs: 2800,
+      });
       return serverUser;
     }
   } catch (err) {
@@ -157,6 +202,12 @@ export async function updateProfileApi(updated: Partial<UserProfile>): Promise<U
   }
 
   saveAuthSession(merged, token || undefined);
+  showFeedbackPopup({
+    status: "success",
+    title: "Profil Berhasil Disimpan!",
+    message: "Preferensi investasi dan profil akun Anda telah diperbarui.",
+    durationMs: 2800,
+  });
   return merged;
 }
 

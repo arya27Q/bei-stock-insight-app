@@ -72,6 +72,11 @@ test.describe("BEI Stock Insight - End-to-End Critical User Journeys (J-01 s.d. 
     await modal.getByRole("button", { name: /Masuk Sekarang/i }).click();
 
     await expect(page.getByTestId("auth-modal-error")).toContainText(/Kata sandi Anda salah/i);
+
+    // Happy path: masuk dengan kata sandi benar dan pastikan popup Login Akun Berhasil muncul
+    await modal.locator('input[type="password"]').fill(E2E_TEST_USER.password);
+    await modal.getByRole("button", { name: /Masuk Sekarang/i }).click();
+    await expect(page.getByTestId("feedback-popup")).toContainText(/Login Akun Berhasil/i);
   });
 
   // =========================================================================
@@ -187,6 +192,11 @@ test.describe("BEI Stock Insight - End-to-End Critical User Journeys (J-01 s.d. 
   test("J-07b (Happy Path): User terotentikasi mengakses /profile dan menyimpan perubahan preferensi", async ({
     authenticatedPage: page,
   }) => {
+    await page.goto("/market-map");
+    await expect(page.getByTestId("header-profile-link")).toBeVisible();
+    await page.getByTestId("watchlist-toggle-BMRI").first().click();
+    await expect(page.getByTestId("feedback-popup")).toContainText(/Watchlist/i);
+
     await page.goto("/profile");
     await expect(page.getByText(/Preferensi & Identitas Investor/i)).toBeVisible();
     await expect(page.getByText(/Ketentuan Satuan Lot Saham BEI/i)).toBeVisible();
@@ -195,6 +205,7 @@ test.describe("BEI Stock Insight - End-to-End Critical User Journeys (J-01 s.d. 
     await expect(
       page.getByText(/Profil dan preferensi investasi kamu berhasil disimpan/i)
     ).toBeVisible();
+    await expect(page.getByTestId("feedback-popup")).toContainText(/Profil Berhasil Disimpan/i);
   });
 
   // =========================================================================
