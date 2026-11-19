@@ -8,18 +8,18 @@ const allowedOrigins = [
 
 export const corsMiddleware = cors({
   origin: (origin, callback) => {
-    // Izinkan request tanpa origin (seperti curl, mobile app, atau server-to-server rewrite)
+    // Izinkan request tanpa origin (seperti curl, mobile app, atau server-to-server Next.js rewrite)
     if (!origin) return callback(null, true);
-    
-    // Izinkan origin lokal atau custom domain frontend
-    const isAllowed = allowedOrigins.some((allowed) => origin === allowed || origin.endsWith(".vercel.app"));
-    if (isAllowed) {
+
+    // Izinkan origin terdaftar di allowedOrigins
+    const isAllowed = allowedOrigins.some((allowed) => origin === allowed);
+    if (isAllowed || process.env.NODE_ENV !== "production") {
       return callback(null, true);
     }
-    
-    return callback(null, true); // Fallback permisif untuk lingkungan development
+
+    return callback(new Error("Origin tidak diizinkan oleh kebijakan CORS"));
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  allowedHeaders: ["Content-Type", "Authorization", "x-user-email"],
 });

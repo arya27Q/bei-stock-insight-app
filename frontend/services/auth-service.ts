@@ -197,6 +197,26 @@ export async function forgotPasswordApi(email: string): Promise<{ message: strin
   }
 }
 
+// API Reset Password (Verifikasi Kode OTP & Sandi Baru)
+export async function resetPasswordApi(
+  email: string,
+  code: string,
+  newPassword: string
+): Promise<{ message: string }> {
+  const res = await fetch("/api/auth/reset-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, code, newPassword }),
+  });
+
+  const json = await res.json();
+  if (!res.ok || json.status !== "success") {
+    throw new Error(json.message || "Gagal memperbarui kata sandi.");
+  }
+
+  return { message: json.message };
+}
+
 // API Logout
 export async function logoutApi(): Promise<void> {
   try {
