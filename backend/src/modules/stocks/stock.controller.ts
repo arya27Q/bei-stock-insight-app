@@ -141,10 +141,18 @@ export const stockController = {
     const { budget, feePercent = 0.15 } = req.body;
 
     const targetBudget = Number(budget);
-    if (!targetBudget || targetBudget <= 0) {
+    const parsedFee = Number(feePercent);
+    if (!targetBudget || targetBudget <= 0 || !Number.isFinite(targetBudget)) {
       res.status(400).json({
         status: "error",
         message: "Target modal pembelian (budget) harus berupa angka positif.",
+      });
+      return;
+    }
+    if (Number.isNaN(parsedFee) || parsedFee < 0 || parsedFee > 10) {
+      res.status(400).json({
+        status: "error",
+        message: "Persentase biaya broker (feePercent) harus berada di antara 0% hingga 10%.",
       });
       return;
     }

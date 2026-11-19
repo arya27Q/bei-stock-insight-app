@@ -62,10 +62,18 @@ export const aiController = {
     try {
       const { ticker, question } = req.body;
 
-      if (!question || typeof question !== "string") {
+      if (!question || typeof question !== "string" || !question.trim()) {
         res.status(400).json({
           status: "error",
           message: "Parameter question wajib disertakan.",
+        });
+        return;
+      }
+
+      if (question.length > 1000) {
+        res.status(400).json({
+          status: "error",
+          message: "Pertanyaan maksimal 1000 karakter.",
         });
         return;
       }

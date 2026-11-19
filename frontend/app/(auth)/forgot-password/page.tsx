@@ -2,20 +2,25 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Mail,
+  Lock,
   ArrowRight,
   ArrowLeft,
   CheckCircle2,
   KeyRound,
   ShieldCheck,
 } from "lucide-react";
-import { forgotPasswordApi } from "@/services/auth-service";
+import { forgotPasswordApi, resetPasswordApi } from "@/services/auth-service";
 
 export default function ForgotPasswordPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [demoCode, setDemoCode] = useState("");
+  const [resetCode, setResetCode] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [isResetDone, setIsResetDone] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -32,11 +37,41 @@ export default function ForgotPasswordPage() {
     try {
       const res = await forgotPasswordApi(email);
       setIsLoading(false);
-      setDemoCode(res.demoResetCode || "");
+      if (res.demoResetCode) {
+        setResetCode(res.demoResetCode);
+      }
       setIsSubmitted(true);
     } catch (err: unknown) {
       setIsLoading(false);
       const message = err instanceof Error ? err.message : "Gagal memproses permintaan reset.";
+      setErrorMsg(message);
+    }
+  };
+
+  const handleResetConfirm = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg("");
+
+    if (!resetCode.trim()) {
+      setErrorMsg("Kode pemulihan wajib diisi.");
+      return;
+    }
+    if (!newPassword || newPassword.length < 6) {
+      setErrorMsg("Kata sandi baru minimal 6 karakter.");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await resetPasswordApi(email, resetCode.trim(), newPassword);
+      setIsLoading(false);
+      setIsResetDone(true);
+      setTimeout(() => {
+        router.push("/login");
+      }, 1200);
+    } catch (err: unknown) {
+      setIsLoading(false);
+      const message = err instanceof Error ? err.message : "Gagal mengatur ulang kata sandi.";
       setErrorMsg(message);
     }
   };
@@ -120,19 +155,74 @@ export default function ForgotPasswordPage() {
               <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-4 text-center space-y-2">
                 <CheckCircle2 className="mx-auto h-8 w-8 text-emerald-500" aria-hidden="true" />
                 <h2 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
-                  Tautan Pemulihan Terkirim
+                  {isResetDone ? "Kata Sandi Berhasil Diperbarui" : "Kode Pemulihan Terkirim"}
                 </h2>
                 <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">
-                  Kami telah mengirimkan instruksi pengaturan ulang kata sandi ke alamat email:
-                  <strong className="block text-zinc-900 dark:text-white mt-1">{email}</strong>
+                  {isResetDone ? (
+                    "Mengalihkan Anda ke halaman masuk..."
+                  ) : (
+                    <>
+                      Masukkan kode verifikasi 6 digit dan kata sandi baru untuk akun:
+                      <strong className="block text-zinc-900 dark:text-white mt-1">{email}</strong>
+                    </>
+                  )}
                 </p>
-                {demoCode && (
-                  <div className="mt-2 rounded-xl bg-[#0d0e13] border border-emerald-500/30 p-2.5 text-center">
-                    <span className="text-[10px] text-zinc-400 block">Kode Verifikasi Reset (Demo):</span>
-                    <span className="font-mono text-base font-bold text-emerald-400 tracking-widest">{demoCode}</span>
-                  </div>
-                )}
               </div>
+
+              {!isResetDone && (
+                <form onSubmit={handleResetConfirm} className="space-y-3.5">
+                  <div>
+                    <label
+                      htmlFor="reset-code"
+                      className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5"
+                    >
+                      Kode Verifikasi (6 Digit)
+                    </label>
+                    <input
+                      id="reset-code"
+                      type="text"
+                      required
+                      placeholder="Masukkan 6 digit kode"
+                      value={resetCode}
+                      onChange={(e) => setResetCode(e.target.value)}
+                      className="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-2.5 text-xs sm:text-sm font-mono tracking-widest text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-950 focus:bg-white focus:outline-none dark:border-zinc-800 dark:bg-[#0d0e13] dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-emerald-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="new-password"
+                      className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1.5"
+                    >
+                      Kata Sandi Baru
+                    </label>
+                    <div className="relative">
+                      <input
+                        id="new-password"
+                        type="password"
+                        required
+                        placeholder="Minimal 6 karakter"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="w-full rounded-xl border border-zinc-200 bg-zinc-50 pl-10 pr-4 py-2.5 text-xs sm:text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-950 focus:bg-white focus:outline-none dark:border-zinc-800 dark:bg-[#0d0e13] dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-emerald-500"
+                      />
+                      <Lock
+                        className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400"
+                        aria-hidden="true"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-zinc-900 py-3 text-xs sm:text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-emerald-600 dark:text-white dark:hover:bg-emerald-500 transition-colors shadow-sm disabled:opacity-60 cursor-pointer"
+                  >
+                    <span>{isLoading ? "Memperbarui Sandi..." : "Simpan Kata Sandi Baru"}</span>
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                </form>
+              )}
 
               <p className="text-center text-[11px] text-zinc-400">
                 Tidak menerima email? Cek folder spam atau{" "}

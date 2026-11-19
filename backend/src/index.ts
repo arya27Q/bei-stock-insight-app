@@ -10,8 +10,16 @@ const PORT = Number(process.env.PORT) || 5000;
 
 app.disable("x-powered-by");
 app.use(corsMiddleware);
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "100kb" }));
+app.use(express.urlencoded({ extended: true, limit: "100kb" }));
+
+// Security Headers standar untuk mencegah MIME sniffing & clickjacking
+app.use((_req: Request, res: Response, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  next();
+});
 
 // Logger request sederhana untuk pemantauan endpoint
 app.use((req: Request, _res: Response, next) => {

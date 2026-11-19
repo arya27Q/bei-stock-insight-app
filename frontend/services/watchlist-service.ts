@@ -1,5 +1,15 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+import { getStoredToken } from "./auth-service";
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
 const WATCHLIST_STORAGE_KEY = "bei_stock_insight_watchlist";
+
+function buildAuthHeaders(): Record<string, string> {
+  const token = getStoredToken();
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+}
 
 export const DEFAULT_WATCHLIST_TICKERS = ["BBCA", "BBRI", "ICBP", "TLKM"];
 
@@ -40,7 +50,7 @@ export async function fetchWatchlist(email: string = "investor@beistockinsight.i
   try {
     const res = await fetch(`${API_BASE_URL}/watchlist?email=${encodeURIComponent(email)}`, {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: buildAuthHeaders(),
       cache: "no-store",
     });
 
@@ -87,7 +97,7 @@ export async function toggleWatchlistApi(
   try {
     const res = await fetch(`${API_BASE_URL}/watchlist/toggle`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: buildAuthHeaders(),
       body: JSON.stringify({ email, ticker: cleanTicker }),
     });
 

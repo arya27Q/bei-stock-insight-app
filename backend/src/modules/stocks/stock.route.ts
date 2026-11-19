@@ -1,10 +1,14 @@
 import { Router } from "express";
 import { stockController } from "./stock.controller.js";
+import { createRateLimiter } from "../../config/rate-limit.js";
 
 export const stockRouter = Router();
 
+// Batasi sinkronisasi eksternal Yahoo Finance maks 5 kali per menit per IP
+const syncLimiter = createRateLimiter(5, 60 * 1000);
+
 // POST /api/stocks/sync - Sinkronisasi harga live dari Yahoo Finance
-stockRouter.post("/sync", stockController.syncYahooPrices);
+stockRouter.post("/sync", syncLimiter, stockController.syncYahooPrices);
 
 // POST /api/stocks/:ticker/simulate-lot - Hitung simulasi lot modal & simpan ke lot_simulations
 stockRouter.post("/:ticker/simulate-lot", stockController.simulateLot);

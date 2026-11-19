@@ -8,24 +8,41 @@ function sanitizeUser(user: any) {
   return safe;
 }
 
+const VALID_EXPERIENCE_LEVELS = ["Pemula", "Menengah", "Mahir"];
+
+function extractVerifiedEmail(req: Request): string | null {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const token = authHeader.substring(7).trim();
+    const payload = verifyToken(token);
+    if (payload?.email) {
+      return payload.email;
+    }
+  }
+  return null;
+}
+
 export const authController = {
   // POST /api/auth/register
   async register(req: Request, res: Response) {
     try {
       const { name, email, password, experienceLevel, preferredSectors, bio } = req.body;
 
-      if (!name || typeof name !== "string" || !name.trim()) {
-        res.status(400).json({ status: "error", message: "Nama lengkap wajib diisi." });
+      if (!name || typeof name !== "string" || !name.trim() || name.trim().length > 120) {
+        res.status(400).json({ status: "error", message: "Nama lengkap wajib diisi (maksimal 120 karakter)." });
         return;
       }
-      if (!email || typeof email !== "string" || !email.includes("@")) {
+      if (!email || typeof email !== "string" || !email.includes("@") || email.trim().length > 255) {
         res.status(400).json({ status: "error", message: "Alamat email tidak valid." });
         return;
       }
-      if (!password || typeof password !== "string" || password.length < 6) {
-        res.status(400).json({ status: "error", message: "Kata sandi minimal 6 karakter." });
+      if (!password || typeof password !== "string" || password.length < 6 || password.length > 128) {
+        res.status(400).json({ status: "error", message: "Kata sandi wajib antara 6 hingga 128 karakter." });
         return;
       }
+
+      const safeExp = VALID_EXPERIENCE_LEVELS.includes(experienceLevel) ? experienceLevel : "Pemula";
+      const safeBio = typeof bio === "string" ? bio.slice(0, 1000) : "Investor baru di Bursa Efek Indonesia.";
 
       const existing = await authRepository.findByEmail(email);
       if (existing) {
@@ -38,9 +55,9 @@ export const authController = {
         name: name.trim(),
         email: email.trim(),
         passwordHash,
-        experienceLevel: experienceLevel || "Pemula",
-        preferredSectors: Array.isArray(preferredSectors) ? preferredSectors : ["Keuangan", "Barang Konsumsi Primer"],
-        bio: bio || "Investor baru di Bursa Efek Indonesia.",
+        experienceLevel: safeExp,
+        preferredSectors: Array.isArray(preferredSectors) ? preferredSectors.slice(0, 10) : ["Keuangan", "Barang Konsumsi Primer"],
+        bio: safeBio,
       });
 
       const token = generateToken({ id: newUser.id, email: newUser.email, name: newUser.name });
@@ -51,7 +68,7 @@ export const authController = {
         token,
         data: sanitizeUser(newUser),
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("[authController.register] Error:", err);
       res.status(500).json({ status: "error", message: "Terjadi kesalahan saat memproses pendaftaran." });
     }
@@ -62,20 +79,14 @@ export const authController = {
     try {
       const { email, password } = req.body;
 
-      if (!email || !password) {
+      if (!email || !password || typeof email !== "string" || typeof password !== "string") {
         res.status(400).json({ status: "error", message: "Email dan kata sandi wajib diisi." });
         return;
       }
 
       const user = await authRepository.findByEmail(email);
-      if (!user) {
-        res.status(401).json({ status: "error", message: "Akun dengan email tersebut belum terdaftar." });
-        return;
-      }
-
-      const isMatch = verifyPassword(password, user.password);
-      if (!isMatch) {
-        res.status(401).json({ status: "error", message: "Kata sandi yang Anda masukkan salah." });
+      if (!user || !verifyPassword(password, user.password)) {
+        res.status(401).json({ status: "error", message: "Email atau kata sandi yang Anda masukkan tidak sesuai." });
         return;
       }
 
@@ -87,7 +98,7 @@ export const authController = {
         token,
         data: sanitizeUser(user),
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("[authController.login] Error:", err);
       res.status(500).json({ status: "error", message: "Terjadi kesalahan saat memproses login." });
     }
@@ -96,21 +107,10 @@ export const authController = {
   // GET /api/auth/me
   async getMe(req: Request, res: Response) {
     try {
-      const authHeader = req.headers.authorization;
-      const emailHeader = req.headers["x-user-email"] as string;
-
-      let email = emailHeader;
-
-      if (authHeader && authHeader.startsWith("Bearer ")) {
-        const token = authHeader.substring(7);
-        const payload = verifyToken(token);
-        if (payload) {
-          email = payload.email;
-        }
-      }
+      const email = extractVerifiedEmail(req);
 
       if (!email) {
-        res.status(401).json({ status: "error", message: "Sesi tidak terotentikasi." });
+        res.status(401).json({ status: "error", message: "Sesi tidak terotentikasi atau token tidak valid." });
         return;
       }
 
@@ -124,7 +124,7 @@ export const authController = {
         status: "success",
         data: sanitizeUser(user),
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("[authController.getMe] Error:", err);
       res.status(500).json({ status: "error", message: "Terjadi kesalahan saat memuat data profil." });
     }
@@ -133,34 +133,23 @@ export const authController = {
   // PUT /api/auth/profile
   async updateProfile(req: Request, res: Response) {
     try {
-      const authHeader = req.headers.authorization;
-      const emailHeader = (req.headers["x-user-email"] as string) || req.body.email;
-
-      let email = emailHeader;
-
-      if (authHeader && authHeader.startsWith("Bearer ")) {
-        const token = authHeader.substring(7);
-        const payload = verifyToken(token);
-        if (payload) {
-          email = payload.email;
-        }
-      }
+      const email = extractVerifiedEmail(req);
 
       if (!email) {
-        res.status(401).json({ status: "error", message: "Email pengguna diperlukan untuk memperbarui profil." });
+        res.status(401).json({ status: "error", message: "Token autentikasi diperlukan untuk memperbarui profil." });
         return;
       }
 
       const { name, experienceLevel, initialCapital, initialCapitalLabel, preferredSectors, bio, notificationsEnabled } = req.body;
 
       const updated = await authRepository.updateProfile(email, {
-        name,
-        experienceLevel,
-        initialCapital,
-        initialCapitalLabel,
-        preferredSectors,
-        bio,
-        notificationsEnabled,
+        name: typeof name === "string" ? name.trim().slice(0, 120) : undefined,
+        experienceLevel: VALID_EXPERIENCE_LEVELS.includes(experienceLevel) ? experienceLevel : undefined,
+        initialCapital: typeof initialCapital === "number" && initialCapital >= 0 ? initialCapital : undefined,
+        initialCapitalLabel: typeof initialCapitalLabel === "string" ? initialCapitalLabel.slice(0, 50) : undefined,
+        preferredSectors: Array.isArray(preferredSectors) ? preferredSectors.slice(0, 10) : undefined,
+        bio: typeof bio === "string" ? bio.slice(0, 1000) : undefined,
+        notificationsEnabled: typeof notificationsEnabled === "boolean" ? notificationsEnabled : undefined,
       });
 
       res.json({
@@ -168,7 +157,7 @@ export const authController = {
         message: "Profil investor berhasil diperbarui.",
         data: sanitizeUser(updated),
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("[authController.updateProfile] Error:", err);
       res.status(500).json({ status: "error", message: "Gagal memperbarui profil pengguna." });
     }
@@ -178,14 +167,13 @@ export const authController = {
   async forgotPassword(req: Request, res: Response) {
     try {
       const { email } = req.body;
-      if (!email || !email.includes("@")) {
+      if (!email || typeof email !== "string" || !email.includes("@")) {
         res.status(400).json({ status: "error", message: "Alamat email tidak valid." });
         return;
       }
 
       const user = await authRepository.findByEmail(email);
       if (!user) {
-        // Demi keamanan, tetap berikan pesan umum agar tidak mengungkap keberadaan email
         res.json({
           status: "success",
           message: "Jika email terdaftar, instruksi pemulihan kata sandi telah dikirim.",
@@ -201,9 +189,9 @@ export const authController = {
       res.json({
         status: "success",
         message: "Instruksi dan kode pemulihan kata sandi telah dikirim ke email terdaftar.",
-        demoResetCode: resetCode, // Memudahkan pengujian saat demo langsung
+        ...(process.env.NODE_ENV !== "production" ? { demoResetCode: resetCode } : {}),
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("[authController.forgotPassword] Error:", err);
       res.status(500).json({ status: "error", message: "Terjadi kesalahan saat memproses permintaan." });
     }

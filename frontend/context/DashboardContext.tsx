@@ -86,7 +86,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
 
   // Auth State & Interception Gate
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [authModalReason, setAuthModalReason] = useState<string>("Fitur Riset Fundamental & Analisis AI");
 
@@ -151,8 +151,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
-    // 2. Ambil data terbaru dari backend MySQL
-    fetchWatchlist().then((list) => {
+    // 2. Ambil data terbaru dari backend MySQL sesuai email user aktif
+    fetchWatchlist(user?.email).then((list) => {
       if (isMounted && list && list.length > 0) {
         setWatchlist(list);
         saveStoredWatchlist(list);
@@ -162,7 +162,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [user?.email]);
 
   const isWatchlisted = useCallback(
     (ticker: string) => {
@@ -184,13 +184,13 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
           : [cleanTicker, ...prev]
       );
 
-      // Sinkronisasi API & storage
-      const res = await toggleWatchlistApi(cleanTicker);
+      // Sinkronisasi API & storage sesuai email user aktif
+      const res = await toggleWatchlistApi(cleanTicker, user?.email);
       if (res && res.tickers) {
         setWatchlist(res.tickers);
       }
     },
-    []
+    [user?.email]
   );
 
   const watchlistStocks = useMemo(() => {
