@@ -209,7 +209,7 @@ export const authController = {
 
       res.json({
         status: "success",
-        message: "Kode pemulihan 6 digit berhasil dibuat (Mode Simulasi Tanpa SMTP).",
+        message: "Kode pemulihan 6 digit berhasil dibuat untuk akun terdaftar.",
         demoResetCode: resetCode,
       });
     } catch (err: unknown) {

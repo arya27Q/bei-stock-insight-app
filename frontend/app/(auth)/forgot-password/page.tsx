@@ -161,10 +161,7 @@ export default function ForgotPasswordPage() {
                   {isResetDone ? (
                     "Mengalihkan Anda ke halaman masuk..."
                   ) : (
-                    <>
-                      Kode verifikasi 6 digit (Mode Simulasi tanpa SMTP) telah otomatis diisi untuk akun:
-                      <strong className="block text-zinc-900 dark:text-white mt-1">{email}</strong>
-                    </>
+                    <strong className="block text-zinc-900 dark:text-white">{email}</strong>
                   )}
                 </p>
               </div>
