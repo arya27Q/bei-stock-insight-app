@@ -84,9 +84,10 @@ model AiInsight {
   @@map("ai_insights")
 }
 
-// 3. Tabel Riwayat Chat Analisis AI per Emiten
+// 3. Tabel Riwayat Chat Analisis AI per Emiten & Pengguna
 model AiChatLog {
   id          String  @id @default(uuid()) @db.VarChar(36)
+  userEmail   String  @default("guest@beistockinsight.id") @db.VarChar(255)
   stockTicker String  @db.VarChar(10)
   sender      String  @default("user") @db.VarChar(20)
   message     String  @db.Text
@@ -96,6 +97,7 @@ model AiChatLog {
   createdAt DateTime @default(now())
 
   @@index([stockTicker])
+  @@index([userEmail, stockTicker])
   @@map("ai_chat_logs")
 }
 

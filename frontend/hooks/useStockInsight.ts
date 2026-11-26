@@ -8,6 +8,7 @@ import {
   getStoredChatHistory,
   saveStoredChatHistory,
 } from "../services/stock-service";
+import { AUTH_CHANGE_EVENT } from "../services/auth-service";
 
 export interface UseStockInsightReturn {
   insight: AIInsightData | null;
@@ -62,34 +63,40 @@ export function useStockInsight(ticker: string, stockName?: string): UseStockIns
     };
   }, [ticker]);
 
-  // 2. Muat histori chat persisten emiten dari MySQL backend (+ cache lokal)
+  // 2. Muat histori chat persisten emiten milik akun aktif dari MySQL backend (+ cache lokal)
   useEffect(() => {
     let isCancelled = false;
     const welcomeMsg = buildWelcomeMessage(ticker, stockName);
-    const cached = getStoredChatHistory(ticker);
 
-    queueMicrotask(() => {
-      if (!isCancelled) {
-        setStockMessages(cached.length > 0 ? [welcomeMsg, ...cached] : [welcomeMsg]);
-        setIsLoadingHistory(true);
-      }
-    });
-
-    fetchAiChatHistory(ticker)
-      .then((history) => {
+    const loadAccountHistory = () => {
+      const cached = getStoredChatHistory(ticker);
+      queueMicrotask(() => {
         if (!isCancelled) {
-          setStockMessages(history.length > 0 ? [welcomeMsg, ...history] : [welcomeMsg]);
+          setStockMessages(cached.length > 0 ? [welcomeMsg, ...cached] : [welcomeMsg]);
+          setIsLoadingHistory(true);
         }
-      })
-      .catch(() => {
-        // Tetap tampilkan cache lokal bila jaringan gagal
-      })
-      .finally(() => {
-        if (!isCancelled) setIsLoadingHistory(false);
       });
+
+      fetchAiChatHistory(ticker)
+        .then((history) => {
+          if (!isCancelled) {
+            setStockMessages(history.length > 0 ? [welcomeMsg, ...history] : [welcomeMsg]);
+          }
+        })
+        .catch(() => {
+          // Tetap tampilkan cache lokal bila jaringan gagal
+        })
+        .finally(() => {
+          if (!isCancelled) setIsLoadingHistory(false);
+        });
+    };
+
+    loadAccountHistory();
+    window.addEventListener(AUTH_CHANGE_EVENT, loadAccountHistory);
 
     return () => {
       isCancelled = true;
+      window.removeEventListener(AUTH_CHANGE_EVENT, loadAccountHistory);
     };
   }, [ticker, stockName]);
 

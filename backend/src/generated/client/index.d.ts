@@ -3833,6 +3833,7 @@ export namespace Prisma {
 
   export type AiChatLogMinAggregateOutputType = {
     id: string | null
+    userEmail: string | null
     stockTicker: string | null
     sender: string | null
     message: string | null
@@ -3842,6 +3843,7 @@ export namespace Prisma {
 
   export type AiChatLogMaxAggregateOutputType = {
     id: string | null
+    userEmail: string | null
     stockTicker: string | null
     sender: string | null
     message: string | null
@@ -3851,6 +3853,7 @@ export namespace Prisma {
 
   export type AiChatLogCountAggregateOutputType = {
     id: number
+    userEmail: number
     stockTicker: number
     sender: number
     message: number
@@ -3862,6 +3865,7 @@ export namespace Prisma {
 
   export type AiChatLogMinAggregateInputType = {
     id?: true
+    userEmail?: true
     stockTicker?: true
     sender?: true
     message?: true
@@ -3871,6 +3875,7 @@ export namespace Prisma {
 
   export type AiChatLogMaxAggregateInputType = {
     id?: true
+    userEmail?: true
     stockTicker?: true
     sender?: true
     message?: true
@@ -3880,6 +3885,7 @@ export namespace Prisma {
 
   export type AiChatLogCountAggregateInputType = {
     id?: true
+    userEmail?: true
     stockTicker?: true
     sender?: true
     message?: true
@@ -3962,6 +3968,7 @@ export namespace Prisma {
 
   export type AiChatLogGroupByOutputType = {
     id: string
+    userEmail: string
     stockTicker: string
     sender: string
     message: string
@@ -3988,6 +3995,7 @@ export namespace Prisma {
 
   export type AiChatLogSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    userEmail?: boolean
     stockTicker?: boolean
     sender?: boolean
     message?: boolean
@@ -4000,6 +4008,7 @@ export namespace Prisma {
 
   export type AiChatLogSelectScalar = {
     id?: boolean
+    userEmail?: boolean
     stockTicker?: boolean
     sender?: boolean
     message?: boolean
@@ -4007,7 +4016,7 @@ export namespace Prisma {
     createdAt?: boolean
   }
 
-  export type AiChatLogOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "stockTicker" | "sender" | "message" | "period" | "createdAt", ExtArgs["result"]["aiChatLog"]>
+  export type AiChatLogOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userEmail" | "stockTicker" | "sender" | "message" | "period" | "createdAt", ExtArgs["result"]["aiChatLog"]>
   export type AiChatLogInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     stock?: boolean | StockDefaultArgs<ExtArgs>
   }
@@ -4019,6 +4028,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      userEmail: string
       stockTicker: string
       sender: string
       message: string
@@ -4395,6 +4405,7 @@ export namespace Prisma {
    */
   interface AiChatLogFieldRefs {
     readonly id: FieldRef<"AiChatLog", 'String'>
+    readonly userEmail: FieldRef<"AiChatLog", 'String'>
     readonly stockTicker: FieldRef<"AiChatLog", 'String'>
     readonly sender: FieldRef<"AiChatLog", 'String'>
     readonly message: FieldRef<"AiChatLog", 'String'>
@@ -7864,6 +7875,7 @@ export namespace Prisma {
 
   export const AiChatLogScalarFieldEnum: {
     id: 'id',
+    userEmail: 'userEmail',
     stockTicker: 'stockTicker',
     sender: 'sender',
     message: 'message',
@@ -8012,6 +8024,7 @@ export namespace Prisma {
 
   export const AiChatLogOrderByRelevanceFieldEnum: {
     id: 'id',
+    userEmail: 'userEmail',
     stockTicker: 'stockTicker',
     sender: 'sender',
     message: 'message',
@@ -8449,6 +8462,7 @@ export namespace Prisma {
     OR?: AiChatLogWhereInput[]
     NOT?: AiChatLogWhereInput | AiChatLogWhereInput[]
     id?: StringFilter<"AiChatLog"> | string
+    userEmail?: StringFilter<"AiChatLog"> | string
     stockTicker?: StringFilter<"AiChatLog"> | string
     sender?: StringFilter<"AiChatLog"> | string
     message?: StringFilter<"AiChatLog"> | string
@@ -8459,6 +8473,7 @@ export namespace Prisma {
 
   export type AiChatLogOrderByWithRelationInput = {
     id?: SortOrder
+    userEmail?: SortOrder
     stockTicker?: SortOrder
     sender?: SortOrder
     message?: SortOrder
@@ -8473,6 +8488,7 @@ export namespace Prisma {
     AND?: AiChatLogWhereInput | AiChatLogWhereInput[]
     OR?: AiChatLogWhereInput[]
     NOT?: AiChatLogWhereInput | AiChatLogWhereInput[]
+    userEmail?: StringFilter<"AiChatLog"> | string
     stockTicker?: StringFilter<"AiChatLog"> | string
     sender?: StringFilter<"AiChatLog"> | string
     message?: StringFilter<"AiChatLog"> | string
@@ -8483,6 +8499,7 @@ export namespace Prisma {
 
   export type AiChatLogOrderByWithAggregationInput = {
     id?: SortOrder
+    userEmail?: SortOrder
     stockTicker?: SortOrder
     sender?: SortOrder
     message?: SortOrder
@@ -8498,6 +8515,7 @@ export namespace Prisma {
     OR?: AiChatLogScalarWhereWithAggregatesInput[]
     NOT?: AiChatLogScalarWhereWithAggregatesInput | AiChatLogScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"AiChatLog"> | string
+    userEmail?: StringWithAggregatesFilter<"AiChatLog"> | string
     stockTicker?: StringWithAggregatesFilter<"AiChatLog"> | string
     sender?: StringWithAggregatesFilter<"AiChatLog"> | string
     message?: StringWithAggregatesFilter<"AiChatLog"> | string
@@ -9183,6 +9201,7 @@ export namespace Prisma {
 
   export type AiChatLogCreateInput = {
     id?: string
+    userEmail?: string
     sender?: string
     message: string
     period?: string | null
@@ -9192,6 +9211,7 @@ export namespace Prisma {
 
   export type AiChatLogUncheckedCreateInput = {
     id?: string
+    userEmail?: string
     stockTicker: string
     sender?: string
     message: string
@@ -9201,6 +9221,7 @@ export namespace Prisma {
 
   export type AiChatLogUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userEmail?: StringFieldUpdateOperationsInput | string
     sender?: StringFieldUpdateOperationsInput | string
     message?: StringFieldUpdateOperationsInput | string
     period?: NullableStringFieldUpdateOperationsInput | string | null
@@ -9210,6 +9231,7 @@ export namespace Prisma {
 
   export type AiChatLogUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userEmail?: StringFieldUpdateOperationsInput | string
     stockTicker?: StringFieldUpdateOperationsInput | string
     sender?: StringFieldUpdateOperationsInput | string
     message?: StringFieldUpdateOperationsInput | string
@@ -9219,6 +9241,7 @@ export namespace Prisma {
 
   export type AiChatLogCreateManyInput = {
     id?: string
+    userEmail?: string
     stockTicker: string
     sender?: string
     message: string
@@ -9228,6 +9251,7 @@ export namespace Prisma {
 
   export type AiChatLogUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userEmail?: StringFieldUpdateOperationsInput | string
     sender?: StringFieldUpdateOperationsInput | string
     message?: StringFieldUpdateOperationsInput | string
     period?: NullableStringFieldUpdateOperationsInput | string | null
@@ -9236,6 +9260,7 @@ export namespace Prisma {
 
   export type AiChatLogUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userEmail?: StringFieldUpdateOperationsInput | string
     stockTicker?: StringFieldUpdateOperationsInput | string
     sender?: StringFieldUpdateOperationsInput | string
     message?: StringFieldUpdateOperationsInput | string
@@ -10079,6 +10104,7 @@ export namespace Prisma {
 
   export type AiChatLogCountOrderByAggregateInput = {
     id?: SortOrder
+    userEmail?: SortOrder
     stockTicker?: SortOrder
     sender?: SortOrder
     message?: SortOrder
@@ -10088,6 +10114,7 @@ export namespace Prisma {
 
   export type AiChatLogMaxOrderByAggregateInput = {
     id?: SortOrder
+    userEmail?: SortOrder
     stockTicker?: SortOrder
     sender?: SortOrder
     message?: SortOrder
@@ -10097,6 +10124,7 @@ export namespace Prisma {
 
   export type AiChatLogMinOrderByAggregateInput = {
     id?: SortOrder
+    userEmail?: SortOrder
     stockTicker?: SortOrder
     sender?: SortOrder
     message?: SortOrder
@@ -10931,6 +10959,7 @@ export namespace Prisma {
 
   export type AiChatLogCreateWithoutStockInput = {
     id?: string
+    userEmail?: string
     sender?: string
     message: string
     period?: string | null
@@ -10939,6 +10968,7 @@ export namespace Prisma {
 
   export type AiChatLogUncheckedCreateWithoutStockInput = {
     id?: string
+    userEmail?: string
     sender?: string
     message: string
     period?: string | null
@@ -11074,6 +11104,7 @@ export namespace Prisma {
     OR?: AiChatLogScalarWhereInput[]
     NOT?: AiChatLogScalarWhereInput | AiChatLogScalarWhereInput[]
     id?: StringFilter<"AiChatLog"> | string
+    userEmail?: StringFilter<"AiChatLog"> | string
     stockTicker?: StringFilter<"AiChatLog"> | string
     sender?: StringFilter<"AiChatLog"> | string
     message?: StringFilter<"AiChatLog"> | string
@@ -11959,6 +11990,7 @@ export namespace Prisma {
 
   export type AiChatLogCreateManyStockInput = {
     id?: string
+    userEmail?: string
     sender?: string
     message: string
     period?: string | null
@@ -12031,6 +12063,7 @@ export namespace Prisma {
 
   export type AiChatLogUpdateWithoutStockInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userEmail?: StringFieldUpdateOperationsInput | string
     sender?: StringFieldUpdateOperationsInput | string
     message?: StringFieldUpdateOperationsInput | string
     period?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12039,6 +12072,7 @@ export namespace Prisma {
 
   export type AiChatLogUncheckedUpdateWithoutStockInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userEmail?: StringFieldUpdateOperationsInput | string
     sender?: StringFieldUpdateOperationsInput | string
     message?: StringFieldUpdateOperationsInput | string
     period?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12047,6 +12081,7 @@ export namespace Prisma {
 
   export type AiChatLogUncheckedUpdateManyWithoutStockInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userEmail?: StringFieldUpdateOperationsInput | string
     sender?: StringFieldUpdateOperationsInput | string
     message?: StringFieldUpdateOperationsInput | string
     period?: NullableStringFieldUpdateOperationsInput | string | null

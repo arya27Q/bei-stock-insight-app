@@ -65,8 +65,14 @@ export const aiRepository = {
     }
   },
 
-  // Simpan riwayat interaksi chat ke tabel ai_chat_logs
-  async saveChatLog(stockTicker: string, message: string, sender: "user" | "assistant" = "user", period: string = "Q3 2024") {
+  // Simpan riwayat interaksi chat ke tabel ai_chat_logs per akun pengguna
+  async saveChatLog(
+    stockTicker: string,
+    message: string,
+    sender: "user" | "assistant" = "user",
+    period: string = "Q3 2024",
+    userEmail: string = "guest@beistockinsight.id"
+  ) {
     try {
       const ticker = stockTicker.toUpperCase();
       // Lewati foreign key check jika ticker umum "MARKET"
@@ -76,6 +82,7 @@ export const aiRepository = {
 
       return await prisma.aiChatLog.create({
         data: {
+          userEmail: userEmail.toLowerCase().trim(),
           stockTicker: ticker,
           sender,
           message,
@@ -88,14 +95,21 @@ export const aiRepository = {
     }
   },
 
-  // Ambil riwayat chat terbaru untuk suatu emiten dalam urutan kronologis (lama -> baru)
-  async getChatHistory(stockTicker: string, limit: number = 30) {
+  // Ambil riwayat chat terbaru untuk suatu emiten milik akun tertentu (lama -> baru)
+  async getChatHistory(
+    stockTicker: string,
+    limit: number = 30,
+    userEmail: string = "guest@beistockinsight.id"
+  ) {
     try {
       const ticker = stockTicker.toUpperCase();
       if (ticker === "MARKET" || ticker === "ALL") return [];
 
       const rows = await prisma.aiChatLog.findMany({
-        where: { stockTicker: ticker },
+        where: {
+          stockTicker: ticker,
+          userEmail: userEmail.toLowerCase().trim(),
+        },
         orderBy: { createdAt: "desc" },
         take: limit,
       });
@@ -107,10 +121,13 @@ export const aiRepository = {
     }
   },
 
-  // Ambil daftar ringkasan sesi chat yang dikelompokkan per emiten (terbaru di atas)
-  async getChatSessions() {
+  // Ambil daftar ringkasan sesi chat milik akun tertentu yang dikelompokkan per emiten (terbaru di atas)
+  async getChatSessions(userEmail: string = "guest@beistockinsight.id") {
     try {
       const logs = await prisma.aiChatLog.findMany({
+        where: {
+          userEmail: userEmail.toLowerCase().trim(),
+        },
         orderBy: { createdAt: "desc" },
         take: 300,
       });
@@ -157,14 +174,20 @@ export const aiRepository = {
     }
   },
 
-  // Hapus riwayat chat untuk suatu emiten dari tabel ai_chat_logs
-  async clearChatHistory(stockTicker: string) {
+  // Hapus riwayat chat milik akun tertentu untuk suatu emiten dari tabel ai_chat_logs
+  async clearChatHistory(
+    stockTicker: string,
+    userEmail: string = "guest@beistockinsight.id"
+  ) {
     try {
       const ticker = stockTicker.toUpperCase();
       if (ticker === "MARKET" || ticker === "ALL") return { count: 0 };
 
       return await prisma.aiChatLog.deleteMany({
-        where: { stockTicker: ticker },
+        where: {
+          stockTicker: ticker,
+          userEmail: userEmail.toLowerCase().trim(),
+        },
       });
     } catch (error) {
       console.error(`[aiRepository.clearChatHistory] Error deleting logs for ${stockTicker}:`, error);

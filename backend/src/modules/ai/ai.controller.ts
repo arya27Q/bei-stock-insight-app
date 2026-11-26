@@ -2,6 +2,30 @@ import { Request, Response } from "express";
 import { stockRepository } from "../stocks/stock.repository.js";
 import { aiRepository } from "./ai.repository.js";
 import { geminiService } from "../../services/gemini.service.js";
+import { verifyToken } from "../auth/auth.utils.js";
+
+function resolveAiUserEmail(req: Request): string {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const payload = verifyToken(authHeader.substring(7).trim());
+    if (payload?.email) {
+      return payload.email.toLowerCase().trim();
+    }
+  }
+  const headerEmail = req.headers["x-user-email"];
+  if (typeof headerEmail === "string" && headerEmail.includes("@")) {
+    return headerEmail.toLowerCase().trim();
+  }
+  const queryEmail = req.query.email;
+  if (typeof queryEmail === "string" && queryEmail.includes("@")) {
+    return queryEmail.toLowerCase().trim();
+  }
+  const bodyEmail = req.body?.email;
+  if (typeof bodyEmail === "string" && bodyEmail.includes("@")) {
+    return bodyEmail.toLowerCase().trim();
+  }
+  return "guest@beistockinsight.id";
+}
 
 export const aiController = {
   // POST /api/ai/insight - Generate ringkasan analitis fundamental otomatis via Gemini / Fallback
@@ -86,15 +110,17 @@ export const aiController = {
         stockContext = stockResult?.data || null;
       }
 
-      // Catat pertanyaan pengguna ke tabel ai_chat_logs
-      aiRepository.saveChatLog(cleanTicker, question, "user", stockContext?.period || "Q3 2024")
+      const userEmail = resolveAiUserEmail(req);
+
+      // Catat pertanyaan pengguna ke tabel ai_chat_logs sesuai akun aktif
+      aiRepository.saveChatLog(cleanTicker, question, "user", stockContext?.period || "Q3 2024", userEmail)
         .catch((err) => console.warn("[aiController.chat] Gagal simpan chat log user:", err));
 
       // Panggil Gemini AI atau mesin analitis cerdas
       const result = await geminiService.chat(cleanTicker, question, stockContext);
 
-      // Catat respons asisten AI ke tabel ai_chat_logs
-      aiRepository.saveChatLog(cleanTicker, result.answer, "assistant", stockContext?.period || "Q3 2024")
+      // Catat respons asisten AI ke tabel ai_chat_logs sesuai akun aktif
+      aiRepository.saveChatLog(cleanTicker, result.answer, "assistant", stockContext?.period || "Q3 2024", userEmail)
         .catch((err) => console.warn("[aiController.chat] Gagal simpan chat log asisten:", err));
 
       res.json({
@@ -110,13 +136,14 @@ export const aiController = {
     }
   },
 
-  // GET /api/ai/history - Mengambil riwayat dialog chat emiten dari database MySQL
+  // GET /api/ai/history - Mengambil riwayat dialog chat emiten milik akun aktif dari database MySQL
   async getHistory(req: Request, res: Response) {
     try {
       const ticker = (req.query.ticker as string) || "MARKET";
       const limit = Number(req.query.limit) || 30;
+      const userEmail = resolveAiUserEmail(req);
 
-      const history = await aiRepository.getChatHistory(ticker, limit);
+      const history = await aiRepository.getChatHistory(ticker, limit, userEmail);
 
       res.json({
         status: "success",
@@ -131,10 +158,11 @@ export const aiController = {
     }
   },
 
-  // GET /api/ai/sessions - Mengambil daftar seluruh sesi riwayat chat per emiten dari database MySQL
-  async getSessions(_req: Request, res: Response) {
+  // GET /api/ai/sessions - Mengambil daftar seluruh sesi riwayat chat milik akun aktif per emiten
+  async getSessions(req: Request, res: Response) {
     try {
-      const sessions = await aiRepository.getChatSessions();
+      const userEmail = resolveAiUserEmail(req);
+      const sessions = await aiRepository.getChatSessions(userEmail);
 
       res.json({
         status: "success",
@@ -149,12 +177,13 @@ export const aiController = {
     }
   },
 
-  // DELETE /api/ai/history - Menghapus riwayat dialog chat emiten dari database MySQL
+  // DELETE /api/ai/history - Menghapus riwayat dialog chat emiten milik akun aktif
   async clearHistory(req: Request, res: Response) {
     try {
       const ticker = (req.query.ticker as string) || (req.body?.ticker as string) || "MARKET";
+      const userEmail = resolveAiUserEmail(req);
 
-      const result = await aiRepository.clearChatHistory(ticker);
+      const result = await aiRepository.clearChatHistory(ticker, userEmail);
 
       res.json({
         status: "success",

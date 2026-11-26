@@ -181,6 +181,7 @@ exports.Prisma.AiInsightScalarFieldEnum = {
 
 exports.Prisma.AiChatLogScalarFieldEnum = {
   id: 'id',
+  userEmail: 'userEmail',
   stockTicker: 'stockTicker',
   sender: 'sender',
   message: 'message',
@@ -293,6 +294,7 @@ exports.Prisma.AiInsightOrderByRelevanceFieldEnum = {
 
 exports.Prisma.AiChatLogOrderByRelevanceFieldEnum = {
   id: 'id',
+  userEmail: 'userEmail',
   stockTicker: 'stockTicker',
   sender: 'sender',
   message: 'message',

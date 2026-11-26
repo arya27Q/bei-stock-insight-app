@@ -6,6 +6,7 @@ import {
   saveStoredChatHistory,
   clearAiChatHistory,
 } from "../services/stock-service";
+import { AUTH_CHANGE_EVENT } from "../services/auth-service";
 
 export interface UseGeneralAiChatReturn {
   generalMessages: ChatMessage[];
@@ -32,14 +33,18 @@ export function useGeneralAiChat(): UseGeneralAiChatReturn {
   const [isGeneralSending, setIsGeneralSending] = useState(false);
   const generalMessagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Muat riwayat chat pasar umum dari localStorage pada client mount (aman SSR/hydration)
+  // Muat riwayat chat pasar umum milik akun aktif dari localStorage (+ sinkron saat ganti akun)
   useEffect(() => {
-    const saved = getStoredChatHistory("MARKET");
-    if (saved.length > 0) {
+    const syncGeneralHistory = () => {
+      const saved = getStoredChatHistory("MARKET");
       queueMicrotask(() => {
-        setGeneralMessages([GENERAL_WELCOME_MESSAGE, ...saved]);
+        setGeneralMessages(saved.length > 0 ? [GENERAL_WELCOME_MESSAGE, ...saved] : [GENERAL_WELCOME_MESSAGE]);
       });
-    }
+    };
+
+    syncGeneralHistory();
+    window.addEventListener(AUTH_CHANGE_EVENT, syncGeneralHistory);
+    return () => window.removeEventListener(AUTH_CHANGE_EVENT, syncGeneralHistory);
   }, []);
 
   useEffect(() => {

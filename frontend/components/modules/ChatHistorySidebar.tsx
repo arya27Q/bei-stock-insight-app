@@ -15,6 +15,7 @@ import {
   fetchAiChatSessions,
   clearAiChatHistory,
 } from "@/services/stock-service";
+import { AUTH_CHANGE_EVENT } from "@/services/auth-service";
 import { Avatar } from "@/components/ui/Avatar";
 
 export interface ChatHistorySidebarProps {
@@ -78,7 +79,11 @@ export const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
       loadSessions();
     };
     window.addEventListener("bei-ai-history-updated", onUpdated);
-    return () => window.removeEventListener("bei-ai-history-updated", onUpdated);
+    window.addEventListener(AUTH_CHANGE_EVENT, onUpdated);
+    return () => {
+      window.removeEventListener("bei-ai-history-updated", onUpdated);
+      window.removeEventListener(AUTH_CHANGE_EVENT, onUpdated);
+    };
   }, [loadSessions]);
 
   const handleDelete = async (e: React.MouseEvent, ticker: string) => {

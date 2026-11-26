@@ -1,5 +1,6 @@
 import { StockFundamental, AIInsightData, MetricDefinition, MetricType, LotSimulationResult, ChatMessage } from "../types/stock";
 import { INITIAL_STOCKS, SECTORS_METADATA } from "@/data/sectors";
+import { getStoredToken, getStoredUser } from "./auth-service";
 
 export { INITIAL_STOCKS, SECTORS_METADATA };
 
@@ -347,11 +348,14 @@ export async function fetchAiInsight(ticker: string): Promise<AIInsightData> {
 }
 
 export async function askAiStockChat(ticker: string, question: string): Promise<string> {
-  // 1. Coba panggil endpoint AI cerdas backend Express (didukung Google Gemini AI & MySQL logging)
+  // 1. Coba panggil endpoint AI cerdas backend Express (didukung Google Gemini AI & MySQL logging per akun)
   try {
     const res = await fetch("/api/ai/chat", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...getAiAuthHeaders(),
+      },
       body: JSON.stringify({ ticker, question }),
     });
 
@@ -422,6 +426,34 @@ export async function simulateLotPurchase(
 
 const CHAT_STORAGE_PREFIX = "bei_ai_chat_history_";
 
+function getChatAccountScope(): string {
+  if (typeof window === "undefined") return "guest";
+  const email = getStoredUser()?.email?.toLowerCase().trim();
+  return email || "guest";
+}
+
+function getChatStoragePrefixForCurrentUser(): string {
+  return `${CHAT_STORAGE_PREFIX}${getChatAccountScope()}_`;
+}
+
+function getChatStorageKey(ticker: string): string {
+  return `${getChatStoragePrefixForCurrentUser()}${ticker.toUpperCase()}`;
+}
+
+function getAiAuthHeaders(): Record<string, string> {
+  if (typeof window === "undefined") return {};
+  const headers: Record<string, string> = {};
+  const token = getStoredToken();
+  const user = getStoredUser();
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  if (user?.email) {
+    headers["x-user-email"] = user.email.toLowerCase().trim();
+  }
+  return headers;
+}
+
 function formatChatTime(isoString?: string): string {
   if (!isoString) return "Riwayat";
   try {
@@ -439,7 +471,7 @@ function formatChatTime(isoString?: string): string {
 export function getStoredChatHistory(ticker: string): ChatMessage[] {
   if (typeof window === "undefined") return [];
   try {
-    const raw = window.localStorage.getItem(`${CHAT_STORAGE_PREFIX}${ticker.toUpperCase()}`);
+    const raw = window.localStorage.getItem(getChatStorageKey(ticker));
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
@@ -468,15 +500,13 @@ export function saveStoredChatHistory(ticker: string, messages: ChatMessage[]): 
     const toStore = messages.filter(
       (m) => !m.id.startsWith("stock-welcome-") && m.id !== "gen-welcome"
     );
+    const key = getChatStorageKey(ticker);
     if (toStore.length === 0) {
-      window.localStorage.removeItem(`${CHAT_STORAGE_PREFIX}${ticker.toUpperCase()}`);
+      window.localStorage.removeItem(key);
       notifyChatHistoryUpdated();
       return;
     }
-    window.localStorage.setItem(
-      `${CHAT_STORAGE_PREFIX}${ticker.toUpperCase()}`,
-      JSON.stringify(toStore.slice(-40))
-    );
+    window.localStorage.setItem(key, JSON.stringify(toStore.slice(-40)));
     notifyChatHistoryUpdated();
   } catch {
     // Abaikan jika storage penuh atau private browsing
@@ -493,15 +523,16 @@ interface BackendChatLogItem {
 export async function fetchAiChatHistory(ticker: string): Promise<ChatMessage[]> {
   const cleanTicker = ticker.toUpperCase();
 
-  // 1. Untuk emiten spesifik, ambil histori persisten dari database MySQL backend
+  // 1. Untuk emiten spesifik, ambil histori persisten milik akun aktif dari database MySQL backend
   if (cleanTicker !== "MARKET" && cleanTicker !== "ALL") {
     try {
       const res = await fetch(`/api/ai/history?ticker=${encodeURIComponent(cleanTicker)}&limit=30`, {
         cache: "no-store",
+        headers: getAiAuthHeaders(),
       });
       if (res.ok) {
         const json = await res.json();
-        if (json.status === "success" && Array.isArray(json.data) && json.data.length > 0) {
+        if (json.status === "success" && Array.isArray(json.data)) {
           const mapped: ChatMessage[] = json.data.map((item: BackendChatLogItem) => ({
             id: `db-${item.id}`,
             sender: item.sender === "user" ? "user" : "assistant",
@@ -517,7 +548,7 @@ export async function fetchAiChatHistory(ticker: string): Promise<ChatMessage[]>
     }
   }
 
-  // 2. Fallback ke localStorage (juga digunakan untuk chat pasar umum "MARKET")
+  // 2. Fallback ke localStorage khusus akun aktif (juga digunakan untuk chat pasar umum "MARKET")
   return getStoredChatHistory(cleanTicker);
 }
 
@@ -526,7 +557,7 @@ export async function clearAiChatHistory(ticker: string): Promise<void> {
 
   if (typeof window !== "undefined") {
     try {
-      window.localStorage.removeItem(`${CHAT_STORAGE_PREFIX}${cleanTicker}`);
+      window.localStorage.removeItem(getChatStorageKey(cleanTicker));
     } catch {
       // Abaikan error storage
     }
@@ -536,6 +567,7 @@ export async function clearAiChatHistory(ticker: string): Promise<void> {
     try {
       await fetch(`/api/ai/history?ticker=${encodeURIComponent(cleanTicker)}`, {
         method: "DELETE",
+        headers: getAiAuthHeaders(),
       });
     } catch (err) {
       console.warn("[clearAiChatHistory] Gagal menghapus histori di backend:", err);
@@ -548,9 +580,12 @@ export async function clearAiChatHistory(ticker: string): Promise<void> {
 export async function fetchAiChatSessions(): Promise<ChatSessionSummary[]> {
   const sessionMap = new Map<string, ChatSessionSummary>();
 
-  // 1. Ambil seluruh sesi emiten dari database MySQL backend
+  // 1. Ambil seluruh sesi emiten milik akun aktif dari database MySQL backend
   try {
-    const res = await fetch("/api/ai/sessions", { cache: "no-store" });
+    const res = await fetch("/api/ai/sessions", {
+      cache: "no-store",
+      headers: getAiAuthHeaders(),
+    });
     if (res.ok) {
       const json = await res.json();
       if (json.status === "success" && Array.isArray(json.data)) {
@@ -569,14 +604,15 @@ export async function fetchAiChatSessions(): Promise<ChatSessionSummary[]> {
     console.warn("[fetchAiChatSessions] Gagal memuat sesi dari backend, menggunakan cache lokal:", err);
   }
 
-  // 2. Gabungkan dengan sesi tersimpan di localStorage (termasuk MARKET dan cache offline)
+  // 2. Gabungkan dengan sesi tersimpan di localStorage KHUSUS akun aktif (termasuk MARKET dan cache offline)
   if (typeof window !== "undefined") {
     try {
+      const userPrefix = getChatStoragePrefixForCurrentUser();
       for (let i = 0; i < window.localStorage.length; i++) {
         const storageKey = window.localStorage.key(i);
-        if (!storageKey || !storageKey.startsWith(CHAT_STORAGE_PREFIX)) continue;
+        if (!storageKey || !storageKey.startsWith(userPrefix)) continue;
 
-        const ticker = storageKey.replace(CHAT_STORAGE_PREFIX, "").toUpperCase();
+        const ticker = storageKey.replace(userPrefix, "").toUpperCase();
         const msgs = getStoredChatHistory(ticker);
         if (msgs.length === 0) continue;
 
