@@ -34,9 +34,13 @@ const SECTOR_OPTIONS = [
   { value: "Semua Sektor", label: "Semua Sektor Industri" },
   { value: "Keuangan", label: "Keuangan & Perbankan", dotColor: "bg-blue-500" },
   { value: "Barang Konsumsi Primer", label: "Barang Konsumsi Primer", dotColor: "bg-emerald-500" },
+  { value: "Bahan Baku", label: "Bahan Baku & Pertambangan", dotColor: "bg-orange-500" },
   { value: "Infrastruktur", label: "Infrastruktur & Telekomunikasi", dotColor: "bg-purple-500" },
+  { value: "Perindustrian", label: "Perindustrian & Alat Berat", dotColor: "bg-slate-500" },
   { value: "Energi", label: "Energi & Sumber Daya", dotColor: "bg-amber-500" },
+  { value: "Teknologi", label: "Teknologi & Ekosistem Digital", dotColor: "bg-cyan-500" },
   { value: "Kesehatan", label: "Kesehatan & Farmasi", dotColor: "bg-rose-500" },
+  { value: "Utilitas", label: "Utilitas & Energi Bersih", dotColor: "bg-teal-500" },
 ];
 
 export default function ProfilePage() {
@@ -74,7 +78,6 @@ export default function ProfilePage() {
     e.preventDefault();
     await updateProfile({
       name,
-      email,
       experienceLevel,
       preferredSectors: [preferredSector],
       bio,
@@ -270,11 +273,15 @@ export default function ProfilePage() {
                       id="profile-email"
                       type="email"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full rounded-xl border border-zinc-200 bg-zinc-50 pl-10 pr-4 py-2.5 text-xs text-zinc-900 focus:border-zinc-950 focus:bg-white focus:outline-none dark:border-zinc-800 dark:bg-[#0d0e13] dark:text-zinc-100 dark:focus:border-emerald-500 dark:focus:bg-[#0d0e13]"
+                      readOnly
+                      aria-readonly="true"
+                      className="w-full rounded-xl border border-zinc-200 bg-zinc-100/80 pl-10 pr-4 py-2.5 text-xs text-zinc-600 cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-emerald-500 dark:border-zinc-800 dark:bg-zinc-900/70 dark:text-zinc-400"
                     />
                     <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" aria-hidden="true" />
                   </div>
+                  <p className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">
+                    Email akun bersifat tetap sebagai identitas masuk.
+                  </p>
                 </div>
               </div>
 

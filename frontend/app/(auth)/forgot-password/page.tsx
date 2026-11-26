@@ -105,7 +105,7 @@ export default function ForgotPasswordPage() {
               Atur Ulang Kata Sandi
             </h1>
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
-              Masukkan alamat email akun investor kamu untuk menerima tautan pemulihan kata sandi.
+              Masukkan alamat email akun investor kamu untuk membuat kode verifikasi pemulihan kata sandi.
             </p>
           </div>
 
@@ -146,7 +146,7 @@ export default function ForgotPasswordPage() {
                 disabled={isLoading}
                 className="w-full flex items-center justify-center gap-2 rounded-xl bg-zinc-900 py-3 text-xs sm:text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-emerald-600 dark:text-white dark:hover:bg-emerald-500 transition-colors shadow-sm disabled:opacity-60 cursor-pointer"
               >
-                <span>{isLoading ? "Mengirim Tautan..." : "Kirim Tautan Pemulihan"}</span>
+                <span>{isLoading ? "Membuat Kode..." : "Buat Kode Verifikasi"}</span>
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </button>
             </form>
@@ -155,14 +155,14 @@ export default function ForgotPasswordPage() {
               <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/20 p-4 text-center space-y-2">
                 <CheckCircle2 className="mx-auto h-8 w-8 text-emerald-500" aria-hidden="true" />
                 <h2 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
-                  {isResetDone ? "Kata Sandi Berhasil Diperbarui" : "Kode Pemulihan Terkirim"}
+                  {isResetDone ? "Kata Sandi Berhasil Diperbarui" : "Kode Verifikasi Siap Digunakan"}
                 </h2>
                 <p className="text-xs text-zinc-600 dark:text-zinc-300 leading-relaxed">
                   {isResetDone ? (
                     "Mengalihkan Anda ke halaman masuk..."
                   ) : (
                     <>
-                      Masukkan kode verifikasi 6 digit dan kata sandi baru untuk akun:
+                      Kode verifikasi 6 digit (Mode Simulasi tanpa SMTP) telah otomatis diisi untuk akun:
                       <strong className="block text-zinc-900 dark:text-white mt-1">{email}</strong>
                     </>
                   )}
@@ -224,14 +224,14 @@ export default function ForgotPasswordPage() {
                 </form>
               )}
 
-              <p className="text-center text-[11px] text-zinc-400">
-                Tidak menerima email? Cek folder spam atau{" "}
+              <p className="text-center text-[11px] text-zinc-500 dark:text-zinc-400">
+                Ingin mengganti email atau membuat kode baru?{" "}
                 <button
                   type="button"
                   onClick={() => setIsSubmitted(false)}
                   className="font-bold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
                 >
-                  kirim ulang email
+                  Buat kode ulang
                 </button>
                 .
               </p>
