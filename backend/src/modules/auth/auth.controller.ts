@@ -209,8 +209,8 @@ export const authController = {
 
       res.json({
         status: "success",
-        message: "Instruksi dan kode pemulihan kata sandi telah dikirim ke email terdaftar.",
-        ...(process.env.NODE_ENV !== "production" ? { demoResetCode: resetCode } : {}),
+        message: "Kode pemulihan 6 digit berhasil dibuat (Mode Simulasi Tanpa SMTP).",
+        demoResetCode: resetCode,
       });
     } catch (err: unknown) {
       console.error("[authController.forgotPassword] Error:", err);
