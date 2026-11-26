@@ -9,6 +9,9 @@
         "start": "node dist/index.js",
         "db:seed": "tsx prisma/seed.ts",
         "db:sync-prices": "tsx prisma/sync-yahoo.ts",
+        "db:sync-railway": "tsx prisma/manage-railway.ts sync-yahoo",
+        "db:railway-info": "tsx prisma/manage-railway.ts info",
+        "db:reset-users": "tsx prisma/manage-railway.ts reset-users",
         "prisma:generate": "prisma generate"
     },
     "prisma": {
