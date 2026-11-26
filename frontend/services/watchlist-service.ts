@@ -3,6 +3,11 @@ import { getStoredToken } from "./auth-service";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
 const WATCHLIST_STORAGE_KEY = "bei_stock_insight_watchlist";
 
+function getWatchlistStorageKey(email?: string): string {
+  const scope = (email || "guest").toLowerCase().trim();
+  return `${WATCHLIST_STORAGE_KEY}_${scope}`;
+}
+
 function buildAuthHeaders(): Record<string, string> {
   const token = getStoredToken();
   return {
@@ -11,42 +16,40 @@ function buildAuthHeaders(): Record<string, string> {
   };
 }
 
-export const DEFAULT_WATCHLIST_TICKERS = ["BBCA", "BBRI", "ICBP", "TLKM"];
+export const DEFAULT_WATCHLIST_TICKERS: string[] = [];
 
 /**
- * Membaca watchlist dari localStorage sebagai cadangan offline
+ * Membaca watchlist akun dari localStorage sebagai cadangan offline
  */
-export function getStoredWatchlist(): string[] {
-  if (typeof window === "undefined") return DEFAULT_WATCHLIST_TICKERS;
+export function getStoredWatchlist(email?: string): string[] {
+  if (typeof window === "undefined") return [];
   try {
-    const raw = localStorage.getItem(WATCHLIST_STORAGE_KEY);
-    if (!raw) {
-      localStorage.setItem(WATCHLIST_STORAGE_KEY, JSON.stringify(DEFAULT_WATCHLIST_TICKERS));
-      return DEFAULT_WATCHLIST_TICKERS;
-    }
+    const raw = localStorage.getItem(getWatchlistStorageKey(email));
+    if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : DEFAULT_WATCHLIST_TICKERS;
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
-    return DEFAULT_WATCHLIST_TICKERS;
+    return [];
   }
 }
 
 /**
- * Menyimpan watchlist ke localStorage
+ * Menyimpan watchlist akun ke localStorage
  */
-export function saveStoredWatchlist(tickers: string[]): void {
+export function saveStoredWatchlist(tickers: string[], email?: string): void {
   if (typeof window === "undefined") return;
   try {
-    localStorage.setItem(WATCHLIST_STORAGE_KEY, JSON.stringify(tickers));
+    localStorage.setItem(getWatchlistStorageKey(email), JSON.stringify(tickers));
   } catch (err) {
     console.error("[WatchlistService] Gagal simpan ke localStorage:", err);
   }
 }
 
 /**
- * Mengambil daftar watchlist dari Backend API (dengan fallback localStorage)
+ * Mengambil daftar watchlist dari Backend API (dengan fallback localStorage khusus akun aktif)
  */
-export async function fetchWatchlist(email: string = "investor@beistockinsight.id"): Promise<string[]> {
+export async function fetchWatchlist(email?: string): Promise<string[]> {
+  if (!email) return [];
   try {
     const res = await fetch(`${API_BASE_URL}/watchlist?email=${encodeURIComponent(email)}`, {
       method: "GET",
@@ -60,13 +63,13 @@ export async function fetchWatchlist(email: string = "investor@beistockinsight.i
 
     const json = await res.json();
     if (json.status === "success" && Array.isArray(json.tickers)) {
-      saveStoredWatchlist(json.tickers);
+      saveStoredWatchlist(json.tickers, email);
       return json.tickers;
     }
-    return getStoredWatchlist();
+    return getStoredWatchlist(email);
   } catch (err) {
     console.warn("[WatchlistService] Backend offline, menggunakan localStorage:", err);
-    return getStoredWatchlist();
+    return getStoredWatchlist(email);
   }
 }
 
@@ -78,7 +81,7 @@ export async function toggleWatchlistApi(
   email: string = "investor@beistockinsight.id"
 ): Promise<{ action: "added" | "removed"; tickers: string[] }> {
   const cleanTicker = ticker.toUpperCase().trim();
-  const currentStored = getStoredWatchlist();
+  const currentStored = getStoredWatchlist(email);
   let nextTickers: string[];
   let action: "added" | "removed";
 
@@ -91,7 +94,7 @@ export async function toggleWatchlistApi(
   }
 
   // Update localStorage seketika untuk responsivitas instan
-  saveStoredWatchlist(nextTickers);
+  saveStoredWatchlist(nextTickers, email);
 
   // Sinkronisasi ke Backend di background
   try {
@@ -104,7 +107,7 @@ export async function toggleWatchlistApi(
     if (res.ok) {
       const json = await res.json();
       if (json.status === "success" && Array.isArray(json.tickers)) {
-        saveStoredWatchlist(json.tickers);
+        saveStoredWatchlist(json.tickers, email);
         return { action: json.action, tickers: json.tickers };
       }
     }

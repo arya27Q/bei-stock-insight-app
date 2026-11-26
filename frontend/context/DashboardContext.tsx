@@ -146,24 +146,33 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   // Watchlist State: Inisialisasi awal seragam (DEFAULT_WATCHLIST_TICKERS) agar SSR dan Client Hydration sinkron
   const [watchlist, setWatchlist] = useState<string[]>(DEFAULT_WATCHLIST_TICKERS);
 
-  // Sinkronisasi data watchlist dari localStorage & backend setelah hydration selesai di client
+  // Sinkronisasi data watchlist dari localStorage & backend sesuai akun aktif (kosong untuk akun baru)
   useEffect(() => {
     let isMounted = true;
 
-    // 1. Baca cache lokal di microtask agar tidak memicu cascading synchronous render
+    if (!user?.email) {
+      queueMicrotask(() => {
+        if (isMounted) setWatchlist([]);
+      });
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    const activeEmail = user.email;
+
+    // 1. Baca cache lokal khusus akun aktif
     queueMicrotask(() => {
       if (!isMounted) return;
-      const stored = getStoredWatchlist();
-      if (stored && stored.length > 0) {
-        setWatchlist(stored);
-      }
+      const stored = getStoredWatchlist(activeEmail);
+      setWatchlist(stored);
     });
 
-    // 2. Ambil data terbaru dari backend MySQL sesuai email user aktif
-    fetchWatchlist(user?.email).then((list) => {
-      if (isMounted && list && list.length > 0) {
+    // 2. Ambil data terbaru dari backend MySQL sesuai email user aktif (termasuk saat kosong [])
+    fetchWatchlist(activeEmail).then((list) => {
+      if (isMounted && Array.isArray(list)) {
         setWatchlist(list);
-        saveStoredWatchlist(list);
+        saveStoredWatchlist(list, activeEmail);
       }
     });
 
