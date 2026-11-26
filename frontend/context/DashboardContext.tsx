@@ -79,17 +79,14 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   } = useStockSearch(stocks);
 
   const [selectedMetric, setSelectedMetric] = useState<MetricType>("revenueGrowth");
-  const [selectedStock, setSelectedStock] = useState<StockFundamental | null>(INITIAL_STOCKS[0]);
+  const [rawSelectedStock, setSelectedStock] = useState<StockFundamental | null>(INITIAL_STOCKS[0]);
 
-  // Sinkronkan selectedStock otomatis saat data harga live terbaru dari API selesai dimuat
-  useEffect(() => {
-    if (selectedStock && stocks && stocks.length > 0) {
-      const fresh = stocks.find((s) => s.ticker === selectedStock.ticker);
-      if (fresh && (fresh.pricePerShare !== selectedStock.pricePerShare || fresh.pricePerLot !== selectedStock.pricePerLot)) {
-        setSelectedStock(fresh);
-      }
-    }
-  }, [stocks, selectedStock]);
+  // Sinkronkan selectedStock secara derived agar selalu memakai harga live terbaru dari API tanpa cascading render
+  const selectedStock = useMemo(() => {
+    if (!rawSelectedStock) return null;
+    const fresh = stocks.find((s) => s.ticker === rawSelectedStock.ticker);
+    return fresh || rawSelectedStock;
+  }, [stocks, rawSelectedStock]);
   const [benchmarkSector, setBenchmarkSector] = useState<string>("Keuangan");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
